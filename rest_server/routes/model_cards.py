@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 import asyncpg
 
-from api_server.database import get_pool
-from api_server.deps import get_include_private
-from api_server.models import AIModel, ModelCardDetail, ModelCardSummary
+from rest_server.database import get_pool
+from rest_server.deps import get_include_private
+from rest_server.models import AIModel, ModelCardDetail, ModelCardSummary
 
 router = APIRouter(tags=["model_cards"])
 

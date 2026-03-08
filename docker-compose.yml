@@ -25,7 +25,7 @@ services:
   patra-server:
     build:
       context: .
-      dockerfile: rest_server/Dockerfile
+      dockerfile: legacy_server/Dockerfile
     container_name: patra_server
     ports:
       - "5002:5002"

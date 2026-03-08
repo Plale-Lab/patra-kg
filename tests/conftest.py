@@ -288,8 +288,8 @@ def _make_mock_pool():
 @pytest.fixture()
 def client():
     """TestClient with a mocked DB pool (no real database needed)."""
-    from api_server.database import get_pool
-    from api_server.main import app
+    from rest_server.database import get_pool
+    from rest_server.main import app
 
     mock_pool = _make_mock_pool()
 

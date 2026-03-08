@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api_server.database import close_pool, init_pool
-from api_server.routes import datasheets, model_cards
+from rest_server.database import close_pool, init_pool
+from rest_server.routes import datasheets, model_cards
 
 
 @asynccontextmanager

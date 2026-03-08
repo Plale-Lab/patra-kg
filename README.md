@@ -37,10 +37,31 @@ For more information, please refer to the [Patra ModelCards paper](https://ieeex
 
 ### Patra Servers
 
-Patra provides multiple server implementations for different use cases:
+Patra provides multiple server implementations for different use cases.
 
-#### 1. REST Server
-The REST server is built using Flask and exposes a RESTful API for interaction with the Patra Knowledge Graph (KG).
+#### 1. Primary REST API (FastAPI + PostgreSQL)
+
+The primary REST API is implemented with FastAPI and backed by PostgreSQL. It is intended for new integrations and powers the privacy-aware model card and datasheet APIs.
+
+- **Code location**: `rest_server/`
+- **Default port**: `8000`
+- **Example endpoints** (non-exhaustive):
+  - `GET /` – Simple health/info endpoint.
+  - `GET /modelcards` – List model cards (public-only by default; private when authorized).
+  - `GET /modelcard/{id}` – Retrieve a single model card.
+  - `GET /datasheets` – List datasheets (public-only by default; private when authorized).
+  - `GET /datasheet/{identifier}` – Retrieve a single datasheet with normalized DataCite-style metadata.
+
+The FastAPI app is exposed via the `rest_server` package (see `rest_server/main.py`) and is built into the Docker image `plalelab/patra-backend:latest` using `rest_server/Dockerfile` (see `scripts/build-push-backend.sh`).
+
+#### 2. Legacy REST Server (Flask + Neo4j)
+
+The legacy REST server is built using Flask and exposes a RESTful API for interaction with the Patra Knowledge Graph (KG) stored in Neo4j. It is still available for backwards compatibility and for graph-based operations, but new clients should prefer the FastAPI + PostgreSQL API where possible.
+
+- **Code location**: `legacy_server/`
+- **Default port**: `5002`
+
+Key endpoints include:
 
 | Endpoint                                               | Method | Description                                                                                                  |
 |--------------------------------------------------------|--------|--------------------------------------------------------------------------------------------------------------|
@@ -59,11 +80,11 @@ The REST server is built using Flask and exposes a RESTful API for interaction w
 | `/modelcard/{id}/github_credentials`                   | GET    | Get GitHub credentials (if configured).                                                                      |
 | `/modelcard/{id}/linkset`                              | GET    | Retrieve linkset relations (same output as HEAD but with empty body & Link headers).                         |
 | `/device`                                              | POST   | Register an edge device.                                                                                     |
-| `/user`                                                | POST   | Register a user.                                                                                              |
+| `/user`                                                | POST   | Register a user.                                                                                             |
 
-For more information on the REST endpoints, please refer to the [API documentation.](docs/patra_openapi.json)
+For more information on the legacy REST endpoints, please refer to the [API documentation.](docs/patra_openapi.json)
 
-#### 2. MCP (Model Context Protocol) Server
+#### 3. MCP (Model Context Protocol) Server
 The MCP server provides a complete interface for AI-native interactions with the Patra Knowledge Graph.
 
 | Endpoint                                    | Type     | Description                                                                                                  |
@@ -97,7 +118,8 @@ The MCP server runs on port `8050` and uses Server-Sent Events (SSE) transport f
 - Open network access to the following ports:
   - `7474` (Neo4j Web UI)
   - `7687` (Neo4j Bolt)
-  - `5002` (REST Server)
+  - `8000` (Primary REST API)
+  - `5002` (Legacy REST Server)
   - `8050` (MCP Server)
 
 #### Dependencies

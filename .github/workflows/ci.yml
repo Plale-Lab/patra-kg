@@ -26,15 +26,15 @@ jobs:
       - name: Install dependencies (server)
         run: |
           python -m pip install --upgrade pip
-          pip install -r rest_server/requirements.txt
+          pip install -r legacy_server/requirements.txt
 
       - name: Install dependencies (mcp_server)
         run: |
           pip install -r mcp_server/requirements.txt
 
-      - name: Install dependencies (api_server)
+      - name: Install dependencies (rest_server)
         run: |
-          pip install -r api_server/requirements.txt
+          pip install -r rest_server/requirements.txt
 
       - name: Install dependencies (tests)
         run: |
