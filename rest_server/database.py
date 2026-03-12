@@ -21,9 +21,7 @@ _TAPIS_PG_PORT = 443
 def _build_connection_options(raw_url: str) -> tuple[str, ssl.SSLContext | bool, bool]:
     """Normalise asyncpg connection options for the active PostgreSQL backend.
 
-    Tapis Pods exposes PostgreSQL behind a 443 endpoint. In practice this
-    endpoint expects direct TLS rather than PostgreSQL's SSLRequest upgrade
-    path, so asyncpg must use ``direct_tls=True`` there. If the host looks
+    Tapis Pods exposes PostgreSQL behind a 443 endpoint. If the host looks
     like a Tapis pod and the port is 5432, rewrite it to 443.
 
     asyncpg doesn't reliably consume the ``sslmode`` query-string parameter
@@ -44,16 +42,14 @@ def _build_connection_options(raw_url: str) -> tuple[str, ssl.SSLContext | bool,
     sslmode = qs.pop("sslmode", [None])[0]
 
     clean_url = urlunparse(parsed._replace(query=urlencode(qs, doseq=True)))
-    effective_port = parsed.port
-    direct_tls = bool(is_tapis_pod and effective_port == _TAPIS_PG_PORT)
 
     if sslmode in ("require", "prefer"):
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        return clean_url, ctx, direct_tls
+        return clean_url, ctx, False
     if sslmode in ("verify-ca", "verify-full"):
-        return clean_url, ssl.create_default_context(), direct_tls
+        return clean_url, ssl.create_default_context(), False
     return clean_url, False, False
 
 

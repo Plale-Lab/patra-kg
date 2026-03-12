@@ -5,14 +5,14 @@ import pytest
 from rest_server import database
 
 
-def test_build_connection_options_enables_direct_tls_for_tapis_pods():
+def test_build_connection_options_rewrites_tapis_pods_to_443_without_direct_tls():
     dsn, ssl_arg, direct_tls = database._build_connection_options(
         "postgresql://user:pass@patradb.pods.icicleai.tapis.io:5432/patradb?sslmode=require"
     )
 
     assert dsn == "postgresql://user:pass@patradb.pods.icicleai.tapis.io:443/patradb"
     assert isinstance(ssl_arg, ssl.SSLContext)
-    assert direct_tls is True
+    assert direct_tls is False
 
 
 def test_build_connection_options_uses_regular_tls_for_non_pod_hosts():
@@ -26,7 +26,7 @@ def test_build_connection_options_uses_regular_tls_for_non_pod_hosts():
 
 
 @pytest.mark.asyncio
-async def test_init_pool_passes_direct_tls_for_tapis_pods(monkeypatch):
+async def test_init_pool_disables_direct_tls_for_tapis_pods(monkeypatch):
     captured = {}
 
     async def fake_create_pool(*args, **kwargs):
@@ -45,7 +45,7 @@ async def test_init_pool_passes_direct_tls_for_tapis_pods(monkeypatch):
 
     assert pool is not None
     assert captured["args"] == ("postgresql://user:pass@patradb.pods.icicleai.tapis.io:443/patradb",)
-    assert captured["kwargs"]["direct_tls"] is True
+    assert captured["kwargs"]["direct_tls"] is False
     assert isinstance(captured["kwargs"]["ssl"], ssl.SSLContext)
 
     database._pool = None

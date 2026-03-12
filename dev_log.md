@@ -1,5 +1,47 @@
 # Dev Log
 
+## Version 0.1.3 - 2026-03-12
+
+### Context
+
+After the initial Pods TLS workaround shipped, a new runtime failure appeared during PostgreSQL pool initialization. The error changed from handshake reset behavior to `ConnectionDoesNotExistError: connection was closed in the middle of operation`, which warranted a direct reproduction against the live database endpoint.
+
+### Problem
+
+- The `0.1.2` workaround forced `direct_tls=True` for `.pods.icicleai.tapis.io:443`.
+- Direct reproduction showed that this assumption was incorrect for the Patra database endpoint.
+- The real working combination for `patradb.pods.icicleai.tapis.io:443` is regular TLS with `sslmode=require`, not `direct_tls=True`.
+
+### Engineering Approach
+
+- Reproduce the exact `asyncpg` connection mode against the live endpoint instead of reasoning from the stack trace alone.
+- Treat the runtime behavior as the source of truth and roll back the incorrect transport assumption.
+- Keep the safe parts of the earlier fix: rewriting Pods-host DSNs from `5432` to `443`, and extracting `sslmode` into an explicit SSL context.
+
+### Implementation
+
+- Removed the forced `direct_tls=True` behavior from `rest_server/database.py`.
+- Kept the Pods-specific port rewrite from `5432` to `443`.
+- Kept explicit `sslmode=require` handling with a non-verifying SSL context for the existing deployment model.
+- Updated `tests/test_database_config.py` so Pods-host connections are expected to use `direct_tls=False`.
+
+### Diagnosis Summary
+
+The failing backend image was using the wrong transport setting. For the current Patra database endpoint, `asyncpg` succeeds with:
+
+- host `patradb.pods.icicleai.tapis.io`
+- port `443`
+- `sslmode=require`
+- `direct_tls=False`
+
+The previous image forced `direct_tls=True`, which caused the database connection to be closed mid-operation during startup.
+
+### Validation
+
+- `pytest tests/test_database_config.py -q` -> `3 passed`
+- `pytest tests/test_privacy.py -q` -> `23 passed`
+- `pytest tests/test_asset_ingest_api.py -q` -> `6 passed`
+
 ## Version 0.1.2 - 2026-03-12
 
 ### Context
