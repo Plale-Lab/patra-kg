@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import ssl
+from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import asyncpg
@@ -12,6 +13,7 @@ _pool: asyncpg.Pool | None = None
 
 _MAX_RETRIES = 5
 _RETRY_DELAY_S = 3
+_SCHEMA_FILE = Path(__file__).resolve().parents[1] / "db" / "bootstrap_schema.sql"
 
 
 _TAPIS_PODS_SUFFIX = ".pods.icicleai.tapis.io"
@@ -73,6 +75,7 @@ async def init_pool() -> asyncpg.Pool:
                 command_timeout=60,
                 timeout=30,
             )
+            await ensure_schema(_pool)
             log.info("Database pool ready (attempt %d)", attempt)
             return _pool
         except (OSError, asyncpg.PostgresError, TimeoutError) as exc:
@@ -84,6 +87,16 @@ async def init_pool() -> asyncpg.Pool:
             )
             await asyncio.sleep(_RETRY_DELAY_S)
     raise RuntimeError("Unreachable")
+
+
+async def ensure_schema(pool: asyncpg.Pool) -> None:
+    if not _SCHEMA_FILE.exists():
+        raise RuntimeError(f"Bootstrap schema file not found: {_SCHEMA_FILE}")
+
+    sql = _SCHEMA_FILE.read_text(encoding="utf-8")
+    async with pool.acquire() as conn:
+        await conn.execute(sql)
+    log.info("Database schema bootstrap ensured")
 
 
 async def close_pool() -> None:

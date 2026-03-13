@@ -28,24 +28,30 @@ def test_build_connection_options_uses_regular_tls_for_non_pod_hosts():
 @pytest.mark.asyncio
 async def test_init_pool_disables_direct_tls_for_tapis_pods(monkeypatch):
     captured = {}
+    fake_pool = object()
 
     async def fake_create_pool(*args, **kwargs):
         captured["args"] = args
         captured["kwargs"] = kwargs
-        return object()
+        return fake_pool
+
+    async def fake_ensure_schema(pool):
+        captured["schema_pool"] = pool
 
     monkeypatch.setenv(
         "DATABASE_URL",
         "postgresql://user:pass@patradb.pods.icicleai.tapis.io:5432/patradb?sslmode=require",
     )
     monkeypatch.setattr(database.asyncpg, "create_pool", fake_create_pool)
+    monkeypatch.setattr(database, "ensure_schema", fake_ensure_schema)
     database._pool = None
 
     pool = await database.init_pool()
 
-    assert pool is not None
+    assert pool is fake_pool
     assert captured["args"] == ("postgresql://user:pass@patradb.pods.icicleai.tapis.io:443/patradb",)
     assert captured["kwargs"]["direct_tls"] is False
     assert isinstance(captured["kwargs"]["ssl"], ssl.SSLContext)
+    assert captured["schema_pool"] is fake_pool
 
     database._pool = None

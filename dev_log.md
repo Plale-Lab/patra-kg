@@ -1,5 +1,42 @@
 # Dev Log
 
+## Version 0.1.4 - 2026-03-13
+
+### Context
+
+After the frontend was switched to the PostgreSQL-backed asset ingestion API, the live backend still failed at runtime in Pods. Public read endpoints crashed with `UndefinedTableError` because the connected PostgreSQL database had not been initialized with the expected Patra schema, and frontend-driven asset submissions could not authenticate because the asset ingest API only accepted organization API keys.
+
+### Problem
+
+- `GET /modelcards` failed because relation `model_cards` did not exist.
+- `GET /datasheets` failed because relation `datasheets` did not exist.
+- The active backend image assumed database migrations had already been run externally.
+- The frontend submits assets using a Tapis user session, but `/v1/assets/*` only accepted `X-Asset-Org` plus `X-Asset-Api-Key`.
+
+### Engineering Approach
+
+- Treat schema availability as an application startup responsibility for the active Pods deployment, not as an undocumented manual prerequisite.
+- Avoid using the destructive migration file at runtime; bootstrap only the missing schema objects with idempotent `CREATE ... IF NOT EXISTS`.
+- Preserve existing organization API-key ingestion for partner integrations while also allowing the first-party frontend to write assets via the same Tapis-token model already used for private asset reads.
+
+### Implementation
+
+- Added `db/bootstrap_schema.sql` with idempotent creation of:
+  - `approval_status`
+  - `model_cards`, `models`
+  - `datasheets`, `publishers`, and all DataCite child tables
+  - `users`, `edge_devices`, `experiments`, `raw_images`, `experiment_images`
+  - supporting indexes
+- Updated `rest_server/database.py` so `init_pool()` now calls `ensure_schema()` immediately after the asyncpg pool is created.
+- Updated `rest_server/Dockerfile` to copy the `db/` directory into the container image so the bootstrap SQL is available at runtime.
+- Updated `rest_server/deps.py` so `/v1/assets/*` accepts a non-empty `X-Tapis-Token` as a first-party ingest principal (`organization="tapis"`), while keeping the existing API-key path intact for external organizations.
+
+### Validation
+
+- `pytest tests/test_database_config.py -q` -> `3 passed`
+- `pytest tests/test_asset_ingest_api.py -q` -> `7 passed`
+- `pytest tests/test_privacy.py -q` -> `23 passed`
+
 ## Version 0.1.3 - 2026-03-12
 
 ### Context

@@ -76,8 +76,12 @@ def _matches_configured_secret(presented: str, configured: str) -> bool:
 def require_asset_ingest_principal(
     x_asset_org: str | None = Header(default=None, alias=ASSET_INGEST_ORG_HEADER),
     x_asset_api_key: str | None = Header(default=None, alias=ASSET_INGEST_KEY_HEADER),
+    x_tapis_token: str | None = Header(default=None, alias=TAPIS_TOKEN_HEADER),
     authorization: str | None = Header(default=None),
 ) -> AssetIngestPrincipal:
+    if (x_tapis_token or "").strip():
+        return AssetIngestPrincipal(organization="tapis")
+
     try:
         configured_keys = get_asset_ingest_keys()
     except RuntimeError as exc:
