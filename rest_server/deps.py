@@ -14,11 +14,30 @@ TAPIS_TOKEN_HEADER = "X-Tapis-Token"
 ASSET_INGEST_ORG_HEADER = "X-Asset-Org"
 ASSET_INGEST_KEY_HEADER = "X-Asset-Api-Key"
 ASSET_INGEST_KEYS_ENV = "PATRA_ASSET_INGEST_KEYS_JSON"
+PATRA_USERNAME_HEADER = "X-Patra-Username"
+PATRA_ROLE_HEADER = "X-Patra-Role"
+PATRA_ADMIN_USERS_ENV = "PATRA_ADMIN_USERS"
+DEFAULT_ADMIN_USERS = frozenset({"williamq96"})
 
 
 @dataclass(frozen=True)
 class AssetIngestPrincipal:
     organization: str
+
+
+@dataclass(frozen=True)
+class PatraActor:
+    username: str | None
+    role: str = "guest"
+    auth_type: str = "guest"
+
+    @property
+    def is_authenticated(self) -> bool:
+        return self.auth_type != "guest"
+
+    @property
+    def is_admin(self) -> bool:
+        return self.role == "admin"
 
 
 def get_include_private(request: Request) -> bool:
@@ -34,6 +53,37 @@ def get_include_private(request: Request) -> bool:
         return False
     log.debug("X-Tapis-Token present – including private records")
     return True
+
+
+@lru_cache(maxsize=1)
+def get_admin_users() -> set[str]:
+    configured = os.getenv(PATRA_ADMIN_USERS_ENV, "").strip()
+    values = {item.strip().lower() for item in configured.split(",") if item.strip()}
+    return set(DEFAULT_ADMIN_USERS) | values
+
+
+def get_request_actor(request: Request) -> PatraActor:
+    username = (request.headers.get(PATRA_USERNAME_HEADER) or "").strip()
+    token = (request.headers.get(TAPIS_TOKEN_HEADER) or "").strip()
+    requested_role = (request.headers.get(PATRA_ROLE_HEADER) or "").strip().lower()
+
+    if not token:
+        return PatraActor(username=username or None)
+
+    normalized_username = username.lower() if username else None
+    is_admin = requested_role == "admin" or (normalized_username in get_admin_users() if normalized_username else False)
+    return PatraActor(
+        username=username or None,
+        role="admin" if is_admin else "user",
+        auth_type="tapis",
+    )
+
+
+def require_admin_actor(request: Request) -> PatraActor:
+    actor = get_request_actor(request)
+    if not actor.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return actor
 
 
 @lru_cache(maxsize=1)

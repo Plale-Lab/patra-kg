@@ -1,5 +1,48 @@
 # Dev Log
 
+## Version 0.1.5 - 2026-03-13
+
+### Context
+
+The frontend was successfully connected to live PostgreSQL-backed reads, but the collaboration workflows were still incomplete. `/tickets` and `/submissions` remained unimplemented, so the personalized dashboard, ticket pages, and admin review queue could not operate against the live backend.
+
+### Problem
+
+- End users could submit assets directly to `/v1/assets/*`, but there was no real pending review queue.
+- The frontend expected `/tickets` and `/submissions`, but the backend did not expose those routes.
+- Admin-only review actions had no server-side surface at all.
+- The Tapis account `williamq96` needed to be treated as an admin session in the live workflow.
+
+### Engineering Approach
+
+- Keep the existing asset ingest endpoints as the final publication path.
+- Introduce a separate queue layer for moderation: pending submissions live in `submission_queue` until explicitly approved.
+- Keep ticketing simple and operational: one table, one list/create/update surface, and admin-only resolution updates.
+- Reuse the existing asset-ingest transaction helpers on approval so accepted submissions land in the production catalog through the same code path as direct ingest.
+
+### Implementation
+
+- Added `support_tickets` and `submission_queue` to `db/bootstrap_schema.sql`.
+- Added backend actor/admin helpers in `rest_server/deps.py`, with `williamq96` included in the default admin allowlist.
+- Added `rest_server/workflow_models.py` for ticket and submission API contracts.
+- Added `rest_server/routes/tickets.py` with:
+  - `GET /tickets`
+  - `POST /tickets`
+  - `PUT /tickets/{id}` for admin review/response
+- Added `rest_server/routes/submissions.py` with:
+  - `GET /submissions`
+  - `POST /submissions`
+  - `POST /submissions/bulk`
+  - `PUT /submissions/{id}` for admin review
+- Submission queue rows now store both:
+  - display-oriented submission data for the frontend review UI
+  - `asset_payload` for final approval-time publication
+- Approval of a queued submission now reuses the existing asset-ingest helpers to create the real `model_cards` / `datasheets` records.
+
+### Validation
+
+- `pytest tests/test_workflow_api.py tests/test_asset_ingest_api.py tests/test_database_config.py tests/test_privacy.py -q` -> `36 passed`
+
 ## Version 0.1.4 - 2026-03-13
 
 ### Context
