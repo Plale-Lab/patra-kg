@@ -52,7 +52,7 @@ def _mc_detail_row(mc_id: int, private: bool) -> dict:
         "model_version": "1.0",
         "model_description": "A test model",
         "owner": "tester",
-        "location": "",
+        "location": f"https://example.com/models/{mc_id}",
         "license": "MIT",
         "framework": "PyTorch",
         "model_type": "cnn",
@@ -69,6 +69,22 @@ def _mc_download_row(mc_id: int, private: bool) -> dict:
         "model_name": detail["model_name"],
         "model_version": detail["model_version"],
         "download_url": f"https://example.com/models/{mc_id}",
+    }
+
+
+def _model_row(mc_id: int, private: bool) -> dict:
+    detail = _mc_detail_row(mc_id, private)
+    return {
+        "id": detail["model_id"],
+        "name": detail["model_name"],
+        "version": detail["model_version"],
+        "description": detail["model_description"],
+        "owner": detail["owner"],
+        "location": detail["location"],
+        "license": detail["license"],
+        "framework": detail["framework"],
+        "model_type": detail["model_type"],
+        "test_accuracy": detail["test_accuracy"],
     }
 
 
@@ -295,6 +311,12 @@ def _make_mock_pool():
         return []
 
     async def _fetchrow(query: str, *args):
+        if "FROM models" in query and "WHERE model_card_id = $1" in query and args:
+            raw = args[0]
+            mc_id = int(raw) if isinstance(raw, str) and raw.isdigit() else raw
+            if isinstance(mc_id, int) and mc_id in ALL_MC_IDS:
+                return _model_row(mc_id, mc_id in PRIVATE_MC_IDS)
+            return None
         if "m.location AS download_url" in query and args:
             mc_id = args[0]
             if mc_id in ALL_MC_IDS:
@@ -308,7 +330,7 @@ def _make_mock_pool():
                     "model_id": mc_id,
                 }
             return None
-        if "model_cards" in query and args:
+        if "FROM model_cards" in query and "WHERE id = $1" in query and args:
             raw = args[0]
             mc_id = int(raw) if isinstance(raw, str) and raw.isdigit() else raw
             if isinstance(mc_id, int) and mc_id in ALL_MC_IDS:
