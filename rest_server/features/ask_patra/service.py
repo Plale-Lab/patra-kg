@@ -21,6 +21,16 @@ STOPWORDS = {
     "is", "are", "be", "it", "i", "we", "do", "does", "help", "please",
 }
 
+GREETING_PATTERNS = {
+    "hi", "hello", "hey", "yo", "hiya", "good morning", "good afternoon", "good evening",
+}
+
+LOOKUP_HINTS = {
+    "find", "search", "look", "lookup", "look up", "show", "browse", "list", "recommend", "related",
+    "model", "models", "model card", "model cards", "datasheet", "datasheets", "record", "records",
+    "author", "metadata", "keyword", "keywords", "compare",
+}
+
 
 def _default_storage_root() -> Path:
     data_root = Path("/data")
@@ -87,6 +97,39 @@ def _tokenize_query(query: str) -> list[str]:
     return [token for token in tokens if token not in STOPWORDS]
 
 
+def _normalized_query(query: str) -> str:
+    return re.sub(r"\s+", " ", query.strip().lower())
+
+
+def _is_greeting(query: str) -> bool:
+    normalized = _normalized_query(query)
+    if normalized in GREETING_PATTERNS:
+        return True
+    if normalized in {"hi patra", "hello patra", "hey patra"}:
+        return True
+    tokens = _tokenize_query(normalized)
+    return len(tokens) == 0 and normalized in {"hi!", "hello!", "hey!"}
+
+
+def _is_capability_question(query: str) -> bool:
+    normalized = _normalized_query(query)
+    patterns = (
+        "what can you help me do",
+        "what can you do",
+        "how can you help",
+        "what can patra do",
+        "help me with patra",
+    )
+    return any(pattern in normalized for pattern in patterns)
+
+
+def _wants_record_lookup(query: str) -> bool:
+    normalized = _normalized_query(query)
+    if _is_greeting(normalized) or _is_capability_question(normalized):
+        return False
+    return any(hint in normalized for hint in LOOKUP_HINTS) or len(_tokenize_query(normalized)) >= 3
+
+
 def _score_text(query_tokens: list[str], *values: str | None) -> tuple[int, list[str]]:
     haystack = " ".join(value for value in values if value).lower()
     matched = [token for token in query_tokens if token in haystack]
@@ -101,6 +144,8 @@ async def search_pattra_records(
     limit_per_type: int = 8,
 ) -> list[AskPatraCitation]:
     query_tokens = _tokenize_query(query)
+    if not query_tokens:
+        return []
     model_filter = "" if include_private else "AND mc.is_private = false"
     datasheet_filter = "" if include_private else "AND d.is_private = false"
     model_rows = await conn.fetch(
@@ -191,7 +236,7 @@ async def search_pattra_records(
             ),
         ))
     citations.sort(key=lambda item: (-item[0], item[1].title.lower()))
-    return [citation for _, citation in citations[: limit_per_type * 2]]
+    return _dedupe_citations([citation for _, citation in citations], limit=limit_per_type * 2)
 
 
 def _system_prompt_text() -> str:
@@ -216,20 +261,45 @@ def _build_context_block(citations: list[AskPatraCitation]) -> str:
     return "\n".join(lines)
 
 
+def _dedupe_citations(citations: list[AskPatraCitation], *, limit: int) -> list[AskPatraCitation]:
+    deduped: list[AskPatraCitation] = []
+    seen: set[tuple[str, str, str]] = set()
+    for citation in citations:
+        key = (
+            citation.resource_type,
+            re.sub(r"\s+", " ", citation.title.strip().lower()),
+            re.sub(r"\s+", " ", (citation.subtitle or "").strip().lower()),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(citation)
+        if len(deduped) >= limit:
+            break
+    return deduped
+
+
 def _fallback_answer(message: str, citations: list[AskPatraCitation]) -> str:
     lowered = message.lower()
+    if _is_greeting(lowered):
+        return (
+            "Hello. I can help with **record lookup**, **metadata questions**, and **PATRA workflows**.\n\n"
+            "- Ask for model cards or datasheets\n"
+            "- Ask how PATRA features work\n"
+            "- Ask me to compare a few relevant records"
+        )
     if "what can you help" in lowered or "what can patra do" in lowered:
-        base = [
-            "I can look up model cards and datasheets, summarize PATRA features, and point you to relevant records.",
-            "Examples: search for crop-yield model cards, find geospatial datasheets, compare related resources, or explain Agent Toolkit, Edit Records, and Automated Ingestion.",
-        ]
-        if citations:
-            base.append("Relevant records I found:")
-            base.extend([f"- {item.title} ({item.resource_type}, {item.route})" for item in citations[:5]])
-        return "\n".join(base)
+        return (
+            "**I can help with:**\n"
+            "- finding model cards\n"
+            "- finding datasheets\n"
+            "- comparing related records\n"
+            "- explaining Ask Patra, Agent Toolkit, Edit Records, and Automated Ingestion\n\n"
+            "If you want, ask for a specific topic or domain and I will narrow it down."
+        )
     if citations:
-        lines = [f"I found {len(citations)} relevant records:"]
-        lines.extend([f"- {item.title} ({item.resource_type}, {item.route})" for item in citations[:6]])
+        lines = [f"**I found {len(citations)} relevant records.**"]
+        lines.extend([f"- **{item.title}** ({item.resource_type}, `{item.route}`)" for item in citations[:3]])
         return "\n".join(lines)
     return "I could not find a strong match for that query. Try naming a task, domain, author, or metadata keyword."
 
@@ -267,7 +337,8 @@ async def answer_question(
         conversation["messages"] = []
 
     include_private = actor.is_authenticated
-    citations = await search_pattra_records(conn, query=message, include_private=include_private)
+    wants_lookup = _wants_record_lookup(message)
+    citations = await search_pattra_records(conn, query=message, include_private=include_private, limit_per_type=3) if wants_lookup else []
     context_block = _build_context_block(citations)
 
     system_prompt = _system_prompt_text()
@@ -278,7 +349,9 @@ async def answer_question(
             "content": (
                 f"User question:\n{message}\n\n"
                 f"Relevant PATRA records:\n{context_block}\n\n"
-                "Answer concisely. If you mention records, use their titles and routes."
+                "Answer concisely in Markdown. Use bold labels and short bullet lists when useful. "
+                "Do not list more than 3 records unless the user explicitly asks for more. "
+                "If this is only a greeting or a broad capability question, do not enumerate records."
             ),
         },
     ]
@@ -292,7 +365,7 @@ async def answer_question(
     answer = _fallback_answer(message, citations)
     model_used: str | None = None
 
-    if enabled:
+    if enabled and not _is_greeting(message):
         try:
             answer, model_used = chat_text_with_model_fallback(
                 api_base=api_base,

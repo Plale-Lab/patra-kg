@@ -1,5 +1,52 @@
 # Dev Log
 
+## Version 0.6.1 - 2026-04-06
+
+### Context
+
+This patch hardens the backend behavior behind `Ask Patra` so the assistant stays concise for greetings and broad questions, while still supporting grounded record lookup when the user clearly asks for it.
+
+### Problem
+
+- Generic messages such as `hi` could still trigger record search and large citation payloads.
+- Default Ask Patra prompt templates did not sufficiently constrain output length or lookup behavior.
+- Existing default prompt files persisted on disk, which meant upgraded prompt logic could be ignored by already-initialized environments.
+- Record citation sets could include near-duplicate items and create noisy assistant output.
+
+### Philosophy
+
+- Do not treat every user message as a search request.
+- Keep answers short unless the user explicitly asks for depth.
+- Use retrieval only when the user intent actually indicates a record lookup.
+- Preserve prompt-template editability while still allowing safe automatic upgrades from earlier defaults.
+
+### Implementation
+
+- Added greeting / capability-question / lookup-intent classification for Ask Patra prompts.
+- Prevented greeting-style messages from triggering record retrieval or LLM lookup expansion.
+- Tightened the default Ask Patra system and behavior prompts to enforce:
+  - concise answers
+  - selective citations
+  - no long record dumps for vague prompts
+  - Markdown-friendly formatting
+- Added prompt-template upgrade logic so older default on-disk prompt files are refreshed automatically, while custom-edited prompt files remain untouched.
+- Added citation deduplication so repeated near-identical records do not dominate the answer context.
+- Updated fallback answers so greetings and PATRA-capability questions now return short, structured responses instead of broad record lists.
+
+### Validation
+
+- `python -m compileall rest_server` -> passed
+- Verified local Ask Patra behavior:
+  - `hi` is classified as greeting
+  - greeting does not trigger lookup
+  - explicit lookup still triggers retrieval
+- Verified fallback greeting output is concise and Markdown-structured.
+
+### Action Points
+
+- Deploy the `0.6.1` backend patch alongside the matching Ask Patra frontend update.
+- Continue keeping retrieval gating and response-length controls close to the Ask Patra service layer so future provider changes do not alter user-visible behavior unexpectedly.
+
 ## Version 0.6.0 - 2026-04-06
 
 ### Context
