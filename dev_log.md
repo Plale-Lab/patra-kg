@@ -1,5 +1,68 @@
 # Dev Log
 
+## Version 0.6.0 - 2026-04-06
+
+### Context
+
+This milestone extends the PATRA backend from a catalog and moderation API into a broader agent-driven workflow backend. The system now includes the `Ask Patra` assistant surface, automated external CSV ingestion into an isolated ingestion pool, stronger OpenAI-compatible provider plumbing, and a cleaner alignment with frontend feature modularization and group-based access expectations.
+
+### Problem
+
+- PATRA’s new frontend capabilities required corresponding backend services rather than ad hoc mock behavior:
+  - conversational assistant support
+  - scrape-and-validate CSV ingestion
+  - isolated artifact review without contaminating the main pool
+- LLM-backed flows needed more operational tolerance:
+  - local LM Studio during development
+  - future LiteLLM / SambaNova integration in Pods
+  - fallback behavior when structured outputs are unavailable
+- CSV ingestion could not directly enter the public resource pool without a staging boundary and explicit admin review.
+- Assistant and ingestion work needed clearer module boundaries in the backend codebase.
+
+### Philosophy
+
+- Keep LLM usage bounded and replaceable:
+  - OpenAI-compatible provider interface
+  - deterministic fallback where necessary
+  - strict schema expectations for machine-readable outputs
+- Stage externally discovered data in a dedicated internal pool before any promotion decision.
+- Organize backend feature work around product capabilities, not just route files.
+- Preserve auditability and moderation boundaries even when the frontend moves toward more direct or conversational workflows.
+
+### Implementation
+
+- Added backend support for `Ask Patra`:
+  - dedicated route surface
+  - prompt / memory storage paths
+  - OpenAI-compatible provider helper suitable for LM Studio now and LiteLLM / SambaNova later
+- Added automated ingestion backend flow with:
+  - `scraper_jobs`
+  - isolated ingestion-artifact persistence
+  - code-level CSV discovery and validation
+  - LLM semantic validation and datasheet draft generation
+  - admin review state transitions without promotion into the main pool
+- Expanded Hugging Face tolerance so dataset-page URLs can resolve CSV candidates rather than requiring only direct CSV links.
+- Added ingestion fallback logic so LLM validation and draft generation can fall back to deterministic code paths instead of failing the entire job.
+- Improved model/provider selection logic for local OpenAI-compatible endpoints so generation models are preferred over embedding-style endpoints.
+- Added artifact download endpoints and richer artifact-detail payloads for frontend review workflows.
+- Continued backend feature modularization under `rest_server/features` with per-feature documentation.
+
+### Validation
+
+- Backend compile validation completed after the new assistant and ingestion routes landed.
+- End-to-end local ingestion validation completed for:
+  - direct CSV URLs
+  - Hugging Face dataset-page discovery
+  - isolated ingestion-pool artifact creation
+  - fallback and non-fallback LLM paths
+- Local Ask Patra bootstrap and chat endpoints were verified against LM Studio.
+
+### Action Points
+
+- Keep the OpenAI-compatible provider boundary stable so Tapis deployment can switch from LM Studio to LiteLLM / SambaNova by configuration only.
+- Continue separating ingestion-pool review from main-pool publication until a dedicated promote-to-main workflow is designed.
+- Mirror any backend feature-folder conventions into frontend docs so cross-repo navigation stays predictable.
+
 ## Version 0.1.6 - 2026-03-15
 
 ### Context

@@ -2,3 +2,5 @@ fastapi
 uvicorn[standard]
 asyncpg
 python-multipart
+httpx
+pandas
