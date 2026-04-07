@@ -36,6 +36,18 @@ class AIModel(BaseModel):
     test_accuracy: Optional[float] = None
 
 
+class AIModelUpdate(BaseModel):
+    name: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
+    owner: Optional[str] = None
+    location: Optional[str] = None
+    license: Optional[str] = None
+    framework: Optional[str] = None
+    model_type: Optional[str] = None
+    test_accuracy: Optional[float] = None
+
+
 class ModelDownloadURL(BaseModel):
     model_id: int
     name: str
@@ -77,6 +89,24 @@ class ModelCardDetail(BaseModel):
     previous_version_id: Optional[int] = None
     root_version_id: Optional[int] = None
     ai_model: Optional[AIModel] = None
+
+
+class ModelCardUpdate(BaseModel):
+    name: Optional[str] = None
+    version: Optional[str] = None
+    short_description: Optional[str] = None
+    full_description: Optional[str] = None
+    keywords: Optional[str] = None
+    author: Optional[str] = None
+    category: Optional[str] = None
+    input_type: Optional[str] = None
+    input_data: Optional[str] = None
+    output_data: Optional[str] = None
+    citation: Optional[str] = None
+    documentation: Optional[str] = None
+    foundational_model: Optional[str] = None
+    is_private: Optional[bool] = None
+    ai_model: Optional[AIModelUpdate] = None
 
 
 # --- Datasheets (DataCite 4.5-style) ---
@@ -234,6 +264,14 @@ class DatasheetDetail(BaseModel):
     descriptions: list[DatasheetDescription] = []
     geo_locations: list[DatasheetGeoLocation] = []
     funding_references: list[DatasheetFundingReference] = []
+
+
+class DatasheetUpdate(BaseModel):
+    version: Optional[str] = None
+    publication_year: Optional[int] = None
+    is_private: Optional[bool] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 
 class EditableRecordSummary(BaseModel):

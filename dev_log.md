@@ -1,5 +1,41 @@
 # Dev Log
 
+## Version 0.6.3 - 2026-04-07
+
+### Context
+
+This patch fixes backend startup regressions introduced by the SQL/workflow merge so the API process can import cleanly in pod deployments again.
+
+### Problem
+
+- `rest_server.routes.submissions` imported submission workflow models that were missing from `rest_server.workflow_models`.
+- Datasheet and model-card update routes imported `DatasheetUpdate` and `ModelCardUpdate`, but those update models were missing from `rest_server.models`.
+- As a result, the backend pod failed during app import before Uvicorn could finish startup.
+
+### Implementation
+
+- Restored submission workflow request/response models in `rest_server.workflow_models`:
+  - `SubmissionCreate`
+  - `SubmissionBulkCreate`
+  - `SubmissionReviewUpdate`
+  - `SubmissionRecord`
+  - bulk result models
+- Restored asset update models in `rest_server.models`:
+  - `AIModelUpdate`
+  - `ModelCardUpdate`
+  - `DatasheetUpdate`
+- Revalidated the full import path by importing `rest_server.main` directly.
+
+### Validation
+
+- `python -m compileall rest_server` -> passed
+- `import rest_server.main` -> passed
+
+### Action Points
+
+- Redeploy backend with the patched image instead of `2026-04-07-v0-6-2`.
+- Update the stable frontend env typo (`Key2SUPPORTS_EDIT_RECORDS`) before testing edit flows.
+
 ## Version 0.6.2 - 2026-04-07
 
 ### Context
