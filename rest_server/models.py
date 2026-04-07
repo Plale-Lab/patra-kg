@@ -279,3 +279,70 @@ class AssetChangeLogEntry(BaseModel):
     changed_at: str
     summary: Optional[str] = None
     changes: list[AssetFieldChange] = Field(default_factory=list)
+
+
+class ExperimentUser(BaseModel):
+    user_id: str
+    username: Optional[str] = None
+
+
+class ExperimentSummary(BaseModel):
+    experiment_id: str
+    user_id: str
+    model_id: str
+    device_id: Optional[str] = None
+    start_at: Optional[str] = None
+    total_images: Optional[int] = None
+    saved_images: Optional[int] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1_score: Optional[float] = None
+
+
+class ExperimentListItem(BaseModel):
+    experiment_id: str
+    start_at: Optional[str] = None
+    device_id: Optional[str] = None
+    model_id: str
+
+
+class ExperimentDetail(BaseModel):
+    experiment_id: str
+    model_id: str
+    device_id: Optional[str] = None
+    start_at: Optional[str] = None
+    total_images: Optional[int] = None
+    total_predictions: Optional[int] = None
+    total_ground_truth_objects: Optional[int] = None
+    true_positives: Optional[int] = None
+    false_positives: Optional[int] = None
+    false_negatives: Optional[int] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1_score: Optional[float] = None
+    map_50: Optional[float] = None
+    map_50_95: Optional[float] = None
+    mean_iou: Optional[float] = None
+
+
+class ExperimentImage(BaseModel):
+    image_name: str
+    ground_truth: Optional[str] = None
+    label: Optional[str] = None
+    probability: Optional[float] = None
+    image_decision: Optional[str] = None
+    flattened_scores: Optional[str] = None
+    image_receiving_timestamp: Optional[str] = None
+    image_scoring_timestamp: Optional[str] = None
+
+
+class DeploymentDetail(BaseModel):
+    experiment_id: str
+    image_generating_plugin_cpu_power_consumption: Optional[float] = None
+    image_generating_plugin_gpu_power_consumption: Optional[float] = None
+    power_monitor_plugin_cpu_power_consumption: Optional[float] = None
+    power_monitor_plugin_gpu_power_consumption: Optional[float] = None
+    image_scoring_plugin_cpu_power_consumption: Optional[float] = None
+    image_scoring_plugin_gpu_power_consumption: Optional[float] = None
+    total_cpu_power_consumption: Optional[float] = None
+    total_gpu_power_consumption: Optional[float] = None

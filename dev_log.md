@@ -1,5 +1,56 @@
 # Dev Log
 
+## Version 0.6.2 - 2026-04-07
+
+### Context
+
+This patch records the backend alignment work needed to support the shared frontend experiment surfaces and to keep the API process usable even when the database is slow or unavailable during pod startup.
+
+### Problem
+
+- The frontend now expects first-class support for two experiment domains:
+  - `animal-ecology`
+  - `digital-ag`
+- Experiment pages need dedicated API routes for users, summaries, lists, images, and deployment power data.
+- In environments where the database is unavailable at startup, the backend previously failed hard instead of exposing a degraded-but-running API process.
+
+### Implementation
+
+- Added experiment API models for:
+  - users
+  - summaries
+  - experiment lists
+  - experiment detail
+  - image rows
+  - deployment power detail
+- Added `/experiments/...` routes for:
+  - user listing
+  - per-user summaries
+  - experiment lists
+  - experiment detail
+  - image rows
+  - power data
+- Extended bootstrap schema support for:
+  - `camera_trap_events`
+  - `camera_trap_power`
+  - `digital_ag_events`
+  - `digital_ag_power`
+  - supporting user / device columns needed by the experiment views
+- Registered the experiment router in the main FastAPI app.
+- Switched database-pool dependency failure from raw runtime exception to explicit `503 database unavailable`.
+- Added startup-time tolerance so the API can enter a degraded mode when the database does not initialize within the configured timeout.
+
+### Validation
+
+- `python -m compileall rest_server` -> passed
+- Confirmed route registration and model/schema wiring for the experiment endpoints
+- Confirmed degraded-startup path returns controlled API errors instead of crashing the process
+
+### Action Points
+
+- Apply the schema changes to the live database before relying on experiment pages in production.
+- Configure database startup timing and readiness expectations explicitly in pod deployments if degraded startup is intended.
+
 ## Version 0.6.1 - 2026-04-06
 
 ### Context

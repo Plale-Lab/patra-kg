@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import asyncpg
+from fastapi import HTTPException
 
 log = logging.getLogger(__name__)
 
@@ -110,5 +111,5 @@ async def close_pool() -> None:
 def get_pool() -> asyncpg.Pool:
     """FastAPI dependency: returns the connection pool."""
     if _pool is None:
-        raise RuntimeError("Database pool not initialized")
+        raise HTTPException(status_code=503, detail="database unavailable")
     return _pool

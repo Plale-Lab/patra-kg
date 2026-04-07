@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import asyncpg
 
 from rest_server.database import close_pool, get_pool, init_pool
-from rest_server.routes import agent_tools, ask_patra, assets, automated_ingestion, datasheets, model_cards, submissions, tickets
+from rest_server.routes import agent_tools, ask_patra, assets, automated_ingestion, datasheets, experiments, model_cards, submissions, tickets
 
 log = logging.getLogger(__name__)
 
@@ -16,10 +16,15 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("Starting Patra FastAPI backend")
-    pool = await init_pool()
+    pool = None
+    db_startup_timeout = int(os.getenv("DB_STARTUP_TIMEOUT_SECONDS", "12") or "12")
+    try:
+        pool = await asyncio.wait_for(init_pool(), timeout=db_startup_timeout)
+    except Exception:
+        log.exception("Database initialization failed within startup timeout; starting in degraded mode")
     backup_task = None
     interval_seconds = int(os.getenv("ASSET_PERIODIC_BACKUP_INTERVAL_SECONDS", "0") or "0")
-    if interval_seconds > 0:
+    if interval_seconds > 0 and pool is not None:
         async def _backup_loop():
             while True:
                 try:
@@ -65,6 +70,7 @@ app.include_router(tickets.router)
 app.include_router(agent_tools.router)
 app.include_router(automated_ingestion.router)
 app.include_router(ask_patra.router)
+app.include_router(experiments.router)
 
 
 @app.get("/")
