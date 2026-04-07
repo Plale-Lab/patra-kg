@@ -11,12 +11,13 @@ from fastapi import APIRouter, Depends, Path, Query
 import asyncpg
 
 from rest_server.database import get_pool
-from rest_server.deps import get_include_private
+from rest_server.deps import get_include_private, require_authenticated_actor, PatraActor
 from rest_server.errors import asset_not_available_or_visible
 from rest_server.models import (
     AIModel,
     ModelCardDetail,
     ModelCardSummary,
+    ModelCardUpdate,
     ModelDeployment,
     ModelDownloadURL,
 )
@@ -28,6 +29,18 @@ _MODEL_COLUMNS = """
     id, name, version, description, owner, location, license,
     framework, model_type, test_accuracy
 """
+
+_AI_MODEL_UPDATE_COLUMNS = {
+    "name": "name",
+    "version": "version",
+    "description": "description",
+    "owner": "owner",
+    "location": "location",
+    "license": "license",
+    "framework": "framework",
+    "model_type": "model_type",
+    "test_accuracy": "test_accuracy",
+}
 
 
 def _clean_text(value):
@@ -367,6 +380,107 @@ async def get_model_card(
         is_gated=is_gated,
         ai_model=ai_model,
     )
+
+
+
+# Column name mapping for model card updates (field name -> DB column)
+_MC_UPDATE_COLUMNS = {
+    "name": "name",
+    "version": "version",
+    "short_description": "short_description",
+    "full_description": "full_description",
+    "keywords": "keywords",
+    "author": "author",
+    "category": "category",
+    "input_type": "input_type",
+    "input_data": "input_data",
+    "output_data": "output_data",
+    "citation": "citation",
+    "documentation": "documentation",
+    "foundational_model": "foundational_model",
+    "is_private": "is_private",
+}
+
+
+@router.put("/modelcard/{id}", response_model=ModelCardDetail)
+async def update_model_card(
+    body: ModelCardUpdate,
+    id: int = Path(..., description="Model card ID (integer)"),
+    pool: asyncpg.Pool = Depends(get_pool),
+    include_private: bool = Depends(get_include_private),
+    actor: PatraActor = Depends(require_authenticated_actor),
+):
+    """Update a model card and its linked AI model (authenticated users only)."""
+    updates = body.model_dump(exclude_none=True)
+    ai_model_updates = updates.pop("ai_model", None) or {}
+    if not updates and not ai_model_updates:
+        return await get_model_card(id=id, pool=pool, include_private=include_private)
+
+    async with pool.acquire() as conn:
+        # Update model_cards table
+        if updates:
+            set_parts = []
+            values = []
+            idx = 2  # $1 is the id
+            for field, value in updates.items():
+                col = _MC_UPDATE_COLUMNS.get(field)
+                if col is None:
+                    continue
+                set_parts.append(f"{col} = ${idx}")
+                values.append(value)
+                idx += 1
+
+            if set_parts:
+                set_parts.append("updated_at = NOW()")
+                query = f"UPDATE model_cards SET {', '.join(set_parts)} WHERE id = $1"
+                result = await conn.execute(query, id, *values)
+                if result == "UPDATE 0":
+                    raise asset_not_available_or_visible()
+
+        # Update or create linked models row
+        if ai_model_updates:
+            existing_model = await conn.fetchval(
+                "SELECT id FROM models WHERE model_card_id = $1", id,
+            )
+            set_parts = []
+            values = []
+            idx = 2
+            for field, value in ai_model_updates.items():
+                col = _AI_MODEL_UPDATE_COLUMNS.get(field)
+                if col is None:
+                    continue
+                set_parts.append(f"{col} = ${idx}")
+                values.append(value)
+                idx += 1
+
+            if set_parts and existing_model is not None:
+                set_parts.append("updated_at = NOW()")
+                query = f"UPDATE models SET {', '.join(set_parts)} WHERE model_card_id = $1"
+                await conn.execute(query, id, *values)
+            elif set_parts and existing_model is None:
+                # Insert new models row
+                col_names = ["model_card_id", "created_at", "updated_at"]
+                col_vals = [id]
+                placeholders = ["$1", "NOW()", "NOW()"]
+                p_idx = 2
+                for field, value in ai_model_updates.items():
+                    col = _AI_MODEL_UPDATE_COLUMNS.get(field)
+                    if col is None:
+                        continue
+                    col_names.append(col)
+                    col_vals.append(value)
+                    placeholders.append(f"${p_idx}")
+                    p_idx += 1
+                # name is NOT NULL in schema — default to model card name
+                if "name" not in ai_model_updates:
+                    mc_name = await conn.fetchval("SELECT name FROM model_cards WHERE id = $1", id)
+                    col_names.append("name")
+                    col_vals.append(mc_name or "Unnamed")
+                    placeholders.append(f"${p_idx}")
+                query = f"INSERT INTO models ({', '.join(col_names)}) VALUES ({', '.join(placeholders)})"
+                await conn.execute(query, *col_vals)
+
+    return await get_model_card(id=id, pool=pool, include_private=include_private)
 
 
 @router.get("/modelcard/{id}/download_url", response_model=ModelDownloadURL)

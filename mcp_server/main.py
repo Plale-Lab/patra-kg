@@ -1,448 +1,515 @@
-"""Suspended legacy MCP + Neo4j server.
+"""Patra MCP Server — PostgreSQL-backed, read-only tools and resources."""
 
-This module is retained for archive/reference compatibility only.
-New development and deployments must use the PostgreSQL-backed FastAPI service
-under rest_server/.
-"""
-
-from mcp.server.fastmcp import FastMCP
-import os
+import asyncio
 import json
 import logging
-import hashlib
-from typing import Any, Dict, Optional
-from urllib.parse import urlparse
+import os
 
-from ingester.neo4j_ingester import MCIngester
-from reconstructor.mc_reconstructor import MCReconstructor
+import uvicorn
+from mcp.server.fastmcp import FastMCP
+from starlette.middleware.cors import CORSMiddleware
 
-# Environment variables
-NEO4J_URI = os.getenv("NEO4J_URI")
-NEO4J_USERNAME = os.getenv("NEO4J_USER")
-NEO4J_PWD = os.getenv("NEO4J_PWD")
-ENABLE_MC_SIMILARITY = os.getenv("ENABLE_MC_SIMILARITY", "False").lower() == "true"
-
-# Initialize ingester and reconstructor
-mc_ingester = MCIngester(NEO4J_URI, NEO4J_USERNAME, NEO4J_PWD, ENABLE_MC_SIMILARITY)
-mc_reconstructor = MCReconstructor(NEO4J_URI, NEO4J_USERNAME, NEO4J_PWD)
-
-logging.basicConfig(level=logging.INFO)
-logging.warning(
-    "Suspended legacy MCP server initialized. Use rest_server/ with PostgreSQL for all new backend work."
+from mcp_server.db import (
+    DOMAIN_TABLES,
+    _serialize_row,
+    close_pool,
+    get_pool,
+    init_pool,
 )
 
-# Create MCP server
-mcp = FastMCP(
-    name="Patra MCP Server",
-    host="0.0.0.0",
-    port=8050,
-)
+log = logging.getLogger(__name__)
 
+mcp = FastMCP("patra-mcp")
 
-def get_pid(author: str, name: str, version: str) -> str:
-    """
-    Generate a persistent ID (PID) for a model card based on author, name, and version.
-    Uses SHA256 hash to create a deterministic ID.
-    """
-    combined = f"{author}:{name}:{version}"
-    hash_obj = hashlib.sha256(combined.encode())
-    hash_hex = hash_obj.hexdigest()[:8]
-    return f"{name}-{version}-{hash_hex}"
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
 
-
-# ============================================================================
-# MCP Resources (read-only by identifier)
-# ============================================================================
 
 @mcp.resource("modelcard://{mc_id}")
-async def get_modelcard_resource(mc_id: str) -> str:
-    """
-    Get a model card by its ID as an MCP resource.
-    
-    Resources are for reading existing entities by identifier.
-    This follows proper MCP semantics for data retrieval.
-    
-    Args:
-        mc_id: The model card ID to retrieve
-        
-    Returns:
-        The model card data as JSON string
-    """
-    model_card = mc_reconstructor.reconstruct(str(mc_id))
-    if model_card is None:
-        return json.dumps({"error": "Model card not found"})
-    return json.dumps(model_card)
+async def modelcard_resource(mc_id: int) -> str:
+    """Model card with AI model detail."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        mc = await conn.fetchrow(
+            """
+            SELECT id, name, version, short_description, full_description,
+                   keywords, author, input_data, output_data, input_type,
+                   category, citation, foundational_model, is_gated
+            FROM model_cards
+            WHERE id = $1 AND is_private = false
+            """,
+            mc_id,
+        )
+        model = await conn.fetchrow(
+            """
+            SELECT id, name, version, description, owner, location,
+                   license, framework, model_type, test_accuracy
+            FROM models WHERE model_card_id = $1 LIMIT 1
+            """,
+            mc_id,
+        ) if mc else None
+    if not mc:
+        return json.dumps({"error": "Not found"})
+    result = _serialize_row(mc)
+    result["ai_model"] = _serialize_row(model)
+    return json.dumps(result)
 
 
 @mcp.resource("modelcard://{mc_id}/download_url")
-async def get_model_download_url_resource(mc_id: str) -> str:
-    """
-    Get the download URL for a model as an MCP resource.
-    
-    Args:
-        mc_id: The model card ID
-        
-    Returns:
-        The download URL information as JSON string
-    """
-    model_location = mc_reconstructor.get_model_location(str(mc_id))
-    if model_location is None:
-        return json.dumps({"error": "Model could not be found!"})
-    return json.dumps(model_location)
+async def modelcard_download_url_resource(mc_id: int) -> str:
+    """Model download URL."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT m.id AS model_id, m.name, m.version, m.location
+            FROM models m
+            JOIN model_cards mc ON mc.id = m.model_card_id
+            WHERE mc.id = $1 AND mc.is_private = false
+            LIMIT 1
+            """,
+            mc_id,
+        )
+    if not row or not row["location"]:
+        return json.dumps({"error": "Not found"})
+    return json.dumps(_serialize_row(row))
 
 
 @mcp.resource("modelcard://{mc_id}/deployments")
-async def get_model_deployments_resource(mc_id: str) -> str:
-    """
-    Get deployments for a model as an MCP resource.
-    
-    Args:
-        mc_id: The model card ID
-        
-    Returns:
-        The deployments information as JSON string
-    """
-    deployments = mc_reconstructor.get_deployments(str(mc_id))
-    if deployments is None:
-        return json.dumps({"error": "Deployments not found!"})
-    return json.dumps(deployments)
-
-
-@mcp.resource("modelcard://{mc_id}/linkset")
-async def get_modelcard_linkset_resource(mc_id: str) -> str:
-    """
-    Get linkset relations for a model card as an MCP resource.
-    
-    Args:
-        mc_id: The model card ID
-        
-    Returns:
-        The linkset information as JSON string
-    """
-    model_card = mc_reconstructor.reconstruct(str(mc_id))
-    if not model_card:
-        return json.dumps({"error": f"Model card with ID '{mc_id}' could not be found!"})
-    link_headers = mc_reconstructor.get_link_headers(model_card)
-    return json.dumps(link_headers)
-
-
-# ============================================================================
-# MCP Tools (operations and state modifications)
-# ============================================================================
-
-@mcp.tool()
-async def upload_modelcard(model_card: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Upload model card to the Patra Knowledge Graph.
-    
-    Args:
-        model_card: Model card data as dictionary
-        
-    Returns:
-        Dictionary with message and model_card_id
-    """
-    exists, base_mc_id = mc_ingester.add_mc(model_card)
-    if exists:
-        return {"message": "Model card already exists", "model_card_id": base_mc_id}
-    return {"message": "Successfully uploaded the model card", "model_card_id": base_mc_id}
-
-
-@mcp.tool()
-async def update_modelcard(mc_id: str, model_card: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Update an existing model card in the Patra Knowledge Graph.
-    
-    Args:
-        mc_id: The model card ID to update
-        model_card: Updated model card data as dictionary
-        
-    Returns:
-        Dictionary with message and model_card_id
-    """
-    # Ensure the model_card has the correct ID
-    model_card['id'] = mc_id
-    base_mc_id = mc_ingester.update_mc(model_card)
-    if base_mc_id:
-        return {"message": "Successfully updated the model card", "model_card_id": base_mc_id}
-    return {"message": "Model card not found", "model_card_id": base_mc_id}
-
-
-@mcp.tool()
-async def upload_datasheet(datasheet: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Upload datasheet to the Patra Knowledge Graph.
-    
-    Args:
-        datasheet: Datasheet data as dictionary
-        
-    Returns:
-        Dictionary with success message
-    """
-    mc_ingester.add_datasheet(datasheet)
-    return {"message": "Successfully uploaded the datasheet"}
-
-
-@mcp.tool()
-async def update_model_location(mc_id: str, location: str) -> Dict[str, Any]:
-    """
-    Update the model location URL.
-    
-    Args:
-        mc_id: The model card ID
-        location: The new location URL
-        
-    Returns:
-        Dictionary with success message or error
-    """
-    # Validate URL
-    parsed_url = urlparse(location)
-    if not all([parsed_url.scheme, parsed_url.netloc]):
-        return {"error": "Location must be a valid URL"}
-    
-    mc_reconstructor.set_model_location(mc_id, location)
-    return {"message": "Model location updated successfully"}
-
-
-@mcp.tool()
-async def generate_pid(author: str, name: str, version: str) -> Dict[str, Any]:
-    """
-    Generate a persistent model ID (PID) for author, name, and version.
-    
-    Args:
-        author: The author of the model
-        name: The name of the model
-        version: The version of the model
-        
-    Returns:
-        Dictionary with pid, or error if missing parameters or PID already exists
-    """
-    if not all([author, name, version]):
-        logging.error("Missing one or more required parameters: author, name, version")
-        return {"error": "Author, name, and version are required"}
-    
-    pid = get_pid(author, name, version)
-    if pid is None:
-        logging.error("PID generation failed. Could not generate a unique identifier.")
-        return {"error": "PID could not be generated. Please try again."}
-    
-    if mc_ingester.check_id_exists(pid):
-        logging.warning(f"Model ID '{pid}' already exists.")
-        return {"pid": pid}  # Return 409 equivalent - PID exists
-    
-    logging.info(f"Model ID successfully generated: {pid}")
-    return {"pid": pid}
-
-
-@mcp.tool()
-async def register_device(device: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Register a new edge device for deployment tracking.
-    
-    Args:
-        device: Device information dictionary (must include device_id)
-        
-    Returns:
-        Dictionary with success message or error
-    """
-    if not device or 'device_id' not in device:
-        logging.error("Missing device_id in request")
-        return {"error": "device_id is required"}
-    
-    if mc_ingester.check_device_exists(device['device_id']):
-        logging.warning(f"Device with ID '{device['device_id']}' already exists")
-        return {"error": "Device with this ID already exists"}
-    
-    try:
-        mc_ingester.add_device(device)
-        logging.info(f"Device '{device['device_id']}' registered successfully")
-        return {"message": "Device registered successfully"}
-    except Exception as e:
-        logging.error(f"Failed to register device: {str(e)}")
-        return {"error": f"Failed to register device: {str(e)}"}
-
-
-@mcp.tool()
-async def register_user(user: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Register a new user for experiment tracking and model submissions.
-    
-    Args:
-        user: User information dictionary (must include user_id)
-        
-    Returns:
-        Dictionary with success message or error
-    """
-    if not user or 'user_id' not in user:
-        logging.error("Missing user_id in request")
-        return {"error": "user_id is required"}
-    
-    if mc_ingester.check_user_exists(user['user_id']):
-        logging.warning(f"User with ID '{user['user_id']}' already exists")
-        return {"error": "User with this ID already exists"}
-    
-    try:
-        mc_ingester.add_user(user)
-        logging.info(f"User '{user['user_id']}' registered successfully")
-        return {"message": "User registered successfully"}
-    except Exception as e:
-        logging.error(f"Failed to register user: {str(e)}")
-        return {"error": f"Failed to register user: {str(e)}"}
-
-
-@mcp.tool()
-async def create_edge(source_node_id: str, target_node_id: str) -> Dict[str, Any]:
-    """
-    Create an edge/relationship between two nodes in the Neo4j graph.
-    The relationship type is automatically determined based on the node labels and VALID_LINK_CONSTRAINTS.
-    
-    Args:
-        source_node_id: Neo4j elementId of the source node
-        target_node_id: Neo4j elementId of the target node
-        
-    Returns:
-        Dictionary with success status, relationship type, and node information
-    """
-    # VALID_LINK_CONSTRAINTS mapping
-    VALID_LINK_CONSTRAINTS = {
-        'ModelCard': ['Datasheet', 'ModelRequirements', 'BiasAnalysis', 'ExplainabilityAnalysis', 'Model'],
-        'Model': ['Deployment', 'Experiment'],
-        'Server': ['Deployment'],
-        'Deployment': ['Experiment', 'Device'],
-        'Experiment': ['RawImage', 'User', 'Device', 'Model'],
-        'Datasheet': ['ModelCard'],
-        'ModelRequirements': ['ModelCard'],
-        'BiasAnalysis': ['ModelCard'],
-        'ExplainabilityAnalysis': ['ModelCard'],
-        'User': ['Experiment'],
-        'RawImage': ['Experiment'],
-        'Device': ['Deployment', 'Experiment']
-    }
-    
-    # Mapping from (source_label, target_label) to relationship type
-    RELATIONSHIP_TYPE_MAP = {
-        ('ModelCard', 'Model'): 'USED',
-        ('ModelCard', 'Datasheet'): 'TRAINED_ON',
-        ('ModelCard', 'ModelRequirements'): 'REQUIREMENTS',
-        ('ModelCard', 'BiasAnalysis'): 'BIAS_ANALYSIS',
-        ('ModelCard', 'ExplainabilityAnalysis'): 'XAI_ANALYSIS',
-        ('Model', 'Deployment'): 'hasDeployment',
-        ('Model', 'Experiment'): 'used',
-        ('Server', 'Deployment'): 'hosts',
-        ('Deployment', 'Experiment'): 'deploymentInfo',
-        ('Deployment', 'Device'): 'deployedIn',
-        ('Experiment', 'RawImage'): 'uses',
-        ('Experiment', 'User'): 'submittedBy',
-        ('Experiment', 'Device'): 'runsOn',
-        ('Experiment', 'Model'): 'uses',
-        ('User', 'Experiment'): 'submittedBy',
-        ('RawImage', 'Experiment'): 'usedIn',
-        ('Device', 'Deployment'): 'hosts',
-        ('Device', 'Experiment'): 'runsOn'
-    }
-    
-    try:
-        from neo4j import AsyncGraphDatabase
-        
-        driver = AsyncGraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PWD))
-        async with driver.session() as session:
-            # Get node labels
-            query = """
-            MATCH (a), (b)
-            WHERE elementId(a) = $source_id AND elementId(b) = $target_id
-            RETURN labels(a) as source_labels, labels(b) as target_labels
+async def modelcard_deployments_resource(mc_id: int) -> str:
+    """Deployment history for a model card."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        model = await conn.fetchrow(
             """
-            result = await session.run(query, source_id=source_node_id, target_id=target_node_id)
-            record = await result.single()
-            
-            if not record:
-                await driver.close()
-                return {"success": False, "error": "One or both nodes not found"}
-            
-            source_labels = record["source_labels"]
-            target_labels = record["target_labels"]
-            
-            if not source_labels or not target_labels:
-                await driver.close()
-                return {"success": False, "error": "Nodes have no labels"}
-            
-            source_label = source_labels[0]
-            target_label = target_labels[0]
-            
-            # Determine relationship type
-            relationship_type = RELATIONSHIP_TYPE_MAP.get((source_label, target_label))
-            
-            if not relationship_type:
-                # Check if relationship is valid according to constraints
-                if target_label not in VALID_LINK_CONSTRAINTS.get(source_label, []):
-                    await driver.close()
-                    return {
-                        "success": False,
-                        "error": f"No valid relationship type between {source_label} and {target_label}",
-                        "source_label": source_label,
-                        "target_label": target_label
-                    }
-                # Default relationship type if not in map
-                relationship_type = "RELATED_TO"
-            
-            # Create the edge
-            create_query = f"""
-            MATCH (a), (b)
-            WHERE elementId(a) = $source_id AND elementId(b) = $target_id
-            CREATE (a)-[r:{relationship_type}]->(b)
-            RETURN r, type(r) as rel_type
+            SELECT m.id
+            FROM models m
+            JOIN model_cards mc ON mc.id = m.model_card_id
+            WHERE mc.id = $1 AND mc.is_private = false
+            LIMIT 1
+            """,
+            mc_id,
+        )
+        if not model:
+            return json.dumps([])
+        rows = await conn.fetch(
             """
-            create_result = await session.run(create_query, source_id=source_node_id, target_id=target_node_id)
-            created = await create_result.single()
-            
-            await driver.close()
-            
-            if created:
-                return {
-                    "success": True,
-                    "message": "Edge created successfully",
-                    "relationship_type": relationship_type,
-                    "source_node_id": source_node_id,
-                    "target_node_id": target_node_id,
-                    "source_label": source_label,
-                    "target_label": target_label
-                }
-            else:
-                return {"success": False, "error": "Failed to create edge"}
-    except Exception as e:
-        logging.error(f"Error creating edge: {str(e)}")
-        return {"success": False, "error": str(e)}
+            SELECT
+                e.id AS experiment_id,
+                e.edge_device_id AS device_id,
+                COALESCE(e.executed_at, e.model_used_at, e.start_at) AS timestamp,
+                CASE WHEN e.executed_at IS NULL THEN 'active' ELSE 'completed' END AS status,
+                e.precision, e.recall, e.f1_score, e.map_50, e.map_50_95
+            FROM experiments e
+            WHERE e.model_id = $1
+            ORDER BY COALESCE(e.executed_at, e.model_used_at, e.start_at) DESC NULLS LAST, e.id DESC
+            LIMIT 50
+            """,
+            model["id"],
+        )
+    return json.dumps([_serialize_row(r) for r in rows])
+
+
+@mcp.resource("datasheet://{ds_id}")
+async def datasheet_resource(ds_id: int) -> str:
+    """Full datasheet with nested DataCite fields."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        core = await conn.fetchrow(
+            """
+            SELECT d.identifier, d.publication_year, d.resource_type,
+                   d.resource_type_general, d.size, d.format, d.version,
+                   d.updated_at, d.dataset_schema_id,
+                   p.name AS publisher_name, p.publisher_identifier,
+                   p.publisher_identifier_scheme, p.scheme_uri AS publisher_scheme_uri,
+                   p.lang AS publisher_lang
+            FROM datasheets d
+            LEFT JOIN publishers p ON p.id = d.publisher_id
+            WHERE d.identifier = $1 AND d.is_private = false
+            """,
+            ds_id,
+        )
+    if not core:
+        return json.dumps({"error": "Not found"})
+
+    async with pool.acquire() as conn:
+        creators = await conn.fetch(
+            """SELECT creator_name, name_type, lang, given_name, family_name,
+                      name_identifier, name_identifier_scheme, name_id_scheme_uri,
+                      affiliation, affiliation_identifier,
+                      affiliation_identifier_scheme, affiliation_scheme_uri
+               FROM datasheet_creators WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        titles = await conn.fetch(
+            "SELECT title, title_type, lang FROM datasheet_titles WHERE datasheet_id = $1 ORDER BY id",
+            ds_id,
+        )
+        subjects = await conn.fetch(
+            """SELECT subject, subject_scheme, scheme_uri, value_uri,
+                      classification_code, lang
+               FROM datasheet_subjects WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        contributors = await conn.fetch(
+            """SELECT contributor_type, contributor_name, name_type,
+                      given_name, family_name,
+                      name_identifier, name_identifier_scheme, name_id_scheme_uri,
+                      affiliation, affiliation_identifier,
+                      affiliation_identifier_scheme, affiliation_scheme_uri
+               FROM datasheet_contributors WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        descriptions = await conn.fetch(
+            "SELECT description, description_type, lang FROM datasheet_descriptions WHERE datasheet_id = $1 ORDER BY id",
+            ds_id,
+        )
+
+    result = _serialize_row(core)
+    result["creators"] = [_serialize_row(r) for r in creators]
+    result["titles"] = [_serialize_row(r) for r in titles]
+    result["subjects"] = [_serialize_row(r) for r in subjects]
+    result["contributors"] = [_serialize_row(r) for r in contributors]
+    result["descriptions"] = [_serialize_row(r) for r in descriptions]
+    return json.dumps(result)
+
+
+# ---------------------------------------------------------------------------
+# Tools
+# ---------------------------------------------------------------------------
 
 
 @mcp.tool()
-async def search_modelcards(query: str) -> Dict[str, Any]:
-    """
-    Full text search for model cards.
-    
-    Args:
-        query: Search query string
-        
-    Returns:
-        Dictionary with search results or error
-    """
-    if not query:
-        return {"error": "Query (q) is required"}
-    
-    results = mc_reconstructor.search_kg(query)
-    return {"results": results}
+async def list_modelcards(skip: int = 0, limit: int = 50) -> str:
+    """List public model cards (paginated)."""
+    limit = min(limit, 100)
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT id, name, category, author, version, short_description, is_gated
+            FROM model_cards
+            WHERE is_private = false
+            ORDER BY id
+            LIMIT $1 OFFSET $2
+            """,
+            limit, skip,
+        )
+    return json.dumps([_serialize_row(r) for r in rows])
 
 
 @mcp.tool()
-async def list_modelcards() -> Dict[str, Any]:
-    """
-    Lists all the models in Patra KG.
-    
-    Returns:
-        Dictionary with all model cards
-    """
-    model_card_dict = mc_reconstructor.get_all_mcs()
-    return model_card_dict
+async def search_modelcards(query: str, skip: int = 0, limit: int = 50) -> str:
+    """Search public model cards by name, description, keywords, or author."""
+    limit = min(limit, 100)
+    pattern = f"%{query}%"
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT id, name, category, author, version, short_description, is_gated
+            FROM model_cards
+            WHERE is_private = false
+              AND (name ILIKE $1 OR short_description ILIKE $1
+                   OR keywords ILIKE $1 OR author ILIKE $1)
+            ORDER BY id
+            LIMIT $2 OFFSET $3
+            """,
+            pattern, limit, skip,
+        )
+    return json.dumps([_serialize_row(r) for r in rows])
 
+
+@mcp.tool()
+async def get_modelcard(mc_id: int) -> str:
+    """Get a single public model card by ID, including AI model detail."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        mc = await conn.fetchrow(
+            """
+            SELECT id, name, version, short_description, full_description,
+                   keywords, author, input_data, output_data, input_type,
+                   category, citation, foundational_model, is_gated
+            FROM model_cards
+            WHERE id = $1 AND is_private = false
+            """,
+            mc_id,
+        )
+        model = await conn.fetchrow(
+            """
+            SELECT id, name, version, description, owner, location,
+                   license, framework, model_type, test_accuracy
+            FROM models WHERE model_card_id = $1 LIMIT 1
+            """,
+            mc_id,
+        ) if mc else None
+    if not mc:
+        return json.dumps({"error": "Not found"})
+    result = _serialize_row(mc)
+    result["ai_model"] = _serialize_row(model)
+    return json.dumps(result)
+
+
+@mcp.tool()
+async def list_datasheets(skip: int = 0, limit: int = 50) -> str:
+    """List public datasheets (paginated)."""
+    limit = min(limit, 100)
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT
+                d.identifier,
+                t.title,
+                c.creator,
+                s.subject AS category
+            FROM datasheets d
+            LEFT JOIN LATERAL (
+                SELECT title FROM datasheet_titles
+                WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1
+            ) AS t ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT creator_name AS creator FROM datasheet_creators
+                WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1
+            ) AS c ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT subject FROM datasheet_subjects
+                WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1
+            ) AS s ON TRUE
+            WHERE d.is_private = false
+            ORDER BY d.identifier
+            LIMIT $1 OFFSET $2
+            """,
+            limit, skip,
+        )
+    return json.dumps([_serialize_row(r) for r in rows])
+
+
+@mcp.tool()
+async def get_datasheet(ds_id: int) -> str:
+    """Get a single public datasheet by identifier, including nested DataCite fields."""
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        core = await conn.fetchrow(
+            """
+            SELECT d.identifier, d.publication_year, d.resource_type,
+                   d.resource_type_general, d.size, d.format, d.version,
+                   d.updated_at, d.dataset_schema_id,
+                   p.name AS publisher_name, p.publisher_identifier,
+                   p.publisher_identifier_scheme, p.scheme_uri AS publisher_scheme_uri,
+                   p.lang AS publisher_lang
+            FROM datasheets d
+            LEFT JOIN publishers p ON p.id = d.publisher_id
+            WHERE d.identifier = $1 AND d.is_private = false
+            """,
+            ds_id,
+        )
+    if not core:
+        return json.dumps({"error": "Not found"})
+
+    async with pool.acquire() as conn:
+        creators = await conn.fetch(
+            """SELECT creator_name, name_type, lang, given_name, family_name,
+                      name_identifier, name_identifier_scheme, name_id_scheme_uri,
+                      affiliation, affiliation_identifier,
+                      affiliation_identifier_scheme, affiliation_scheme_uri
+               FROM datasheet_creators WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        titles = await conn.fetch(
+            "SELECT title, title_type, lang FROM datasheet_titles WHERE datasheet_id = $1 ORDER BY id",
+            ds_id,
+        )
+        subjects = await conn.fetch(
+            """SELECT subject, subject_scheme, scheme_uri, value_uri,
+                      classification_code, lang
+               FROM datasheet_subjects WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        contributors = await conn.fetch(
+            """SELECT contributor_type, contributor_name, name_type,
+                      given_name, family_name,
+                      name_identifier, name_identifier_scheme, name_id_scheme_uri,
+                      affiliation, affiliation_identifier,
+                      affiliation_identifier_scheme, affiliation_scheme_uri
+               FROM datasheet_contributors WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        dates = await conn.fetch(
+            "SELECT date, date_type, date_information FROM datasheet_dates WHERE datasheet_id = $1 ORDER BY id",
+            ds_id,
+        )
+        alt_ids = await conn.fetch(
+            """SELECT alternate_identifier, alternate_identifier_type
+               FROM datasheet_alternate_identifiers WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        rel_ids = await conn.fetch(
+            """SELECT related_identifier, related_identifier_type, relation_type,
+                      related_metadata_scheme, scheme_uri, scheme_type, resource_type_general
+               FROM datasheet_related_identifiers WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        rights = await conn.fetch(
+            """SELECT rights, rights_uri, rights_identifier,
+                      rights_identifier_scheme, scheme_uri, lang
+               FROM datasheet_rights WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        descriptions = await conn.fetch(
+            "SELECT description, description_type, lang FROM datasheet_descriptions WHERE datasheet_id = $1 ORDER BY id",
+            ds_id,
+        )
+        geo = await conn.fetch(
+            """SELECT geo_location_place, point_longitude, point_latitude,
+                      box_west, box_east, box_south, box_north, polygon
+               FROM datasheet_geo_locations WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+        funding = await conn.fetch(
+            """SELECT funder_name, funder_identifier, funder_identifier_type,
+                      scheme_uri, award_number, award_uri, award_title
+               FROM datasheet_funding_references WHERE datasheet_id = $1 ORDER BY id""",
+            ds_id,
+        )
+
+    result = _serialize_row(core)
+    result["creators"] = [_serialize_row(r) for r in creators]
+    result["titles"] = [_serialize_row(r) for r in titles]
+    result["subjects"] = [_serialize_row(r) for r in subjects]
+    result["contributors"] = [_serialize_row(r) for r in contributors]
+    result["dates"] = [_serialize_row(r) for r in dates]
+    result["alternate_identifiers"] = [_serialize_row(r) for r in alt_ids]
+    result["related_identifiers"] = [_serialize_row(r) for r in rel_ids]
+    result["rights_list"] = [_serialize_row(r) for r in rights]
+    result["descriptions"] = [_serialize_row(r) for r in descriptions]
+    result["geo_locations"] = [_serialize_row(r) for r in geo]
+    result["funding_references"] = [_serialize_row(r) for r in funding]
+    return json.dumps(result)
+
+
+@mcp.tool()
+async def list_experiment_users(domain: str) -> str:
+    """List distinct users with experiment events in a domain."""
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(f"""
+            SELECT DISTINCT user_id, user_id AS username
+            FROM {tables['events']}
+            ORDER BY user_id
+        """)
+    return json.dumps([_serialize_row(r) for r in rows])
+
+
+@mcp.tool()
+async def get_experiment_summary(domain: str, user_id: str) -> str:
+    """Experiment summary table for a given user in a domain."""
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(f"""
+            SELECT
+                experiment_id, user_id, model_id, device_id,
+                MIN(image_receiving_timestamp) AS start_at,
+                MAX(total_images) AS total_images,
+                SUM(CASE WHEN image_decision = 'Save' THEN 1 ELSE 0 END) AS saved_images,
+                MAX(precision) AS precision,
+                MAX(recall) AS recall,
+                MAX(f1_score) AS f1_score
+            FROM {tables['events']}
+            WHERE user_id = $1
+            GROUP BY experiment_id, user_id, model_id, device_id
+            ORDER BY MIN(image_receiving_timestamp) DESC
+        """, user_id)
+    return json.dumps([_serialize_row(r) for r in rows])
+
+
+@mcp.tool()
+async def get_experiment_detail(domain: str, experiment_id: str) -> str:
+    """Full experiment detail — latest metrics snapshot."""
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        r = await conn.fetchrow(f"""
+            SELECT * FROM {tables['events']}
+            WHERE experiment_id = $1
+            ORDER BY image_count DESC
+            LIMIT 1
+        """, experiment_id)
+    if not r:
+        return json.dumps({"error": "Experiment not found"})
+    return json.dumps(_serialize_row(r))
+
+
+@mcp.tool()
+async def get_experiment_images(domain: str, experiment_id: str, skip: int = 0, limit: int = 100) -> str:
+    """Raw image data table for an experiment (paginated)."""
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    limit = min(limit, 500)
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(f"""
+            SELECT
+                image_name, ground_truth, label, probability,
+                image_decision, flattened_scores,
+                image_receiving_timestamp, image_scoring_timestamp
+            FROM {tables['events']}
+            WHERE experiment_id = $1
+            ORDER BY image_receiving_timestamp ASC
+            LIMIT $2 OFFSET $3
+        """, experiment_id, limit, skip)
+    return json.dumps([_serialize_row(r) for r in rows])
+
+
+@mcp.tool()
+async def get_experiment_power(domain: str, experiment_id: str) -> str:
+    """Power consumption breakdown for an experiment."""
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        r = await conn.fetchrow(
+            f"SELECT * FROM {tables['power']} WHERE experiment_id = $1",
+            experiment_id,
+        )
+    if not r:
+        return json.dumps(None)
+    return json.dumps(_serialize_row(r))
+
+
+# ---------------------------------------------------------------------------
+# Entrypoint
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    logging.basicConfig(level=logging.INFO)
+    port = int(os.getenv("MCP_PORT", "8050"))
 
+    async def run():
+        await init_pool()
+        app = mcp.sse_app()
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+        config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info")
+        server = uvicorn.Server(config)
+        try:
+            await server.serve()
+        finally:
+            await close_pool()
+
+    asyncio.run(run())

@@ -79,6 +79,14 @@ def get_request_actor(request: Request) -> PatraActor:
     )
 
 
+def require_authenticated_actor(request: Request) -> PatraActor:
+    """Return the actor if authenticated, otherwise raise 401."""
+    actor = get_request_actor(request)
+    if not actor.is_authenticated:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return actor
+
+
 def require_admin_actor(request: Request) -> PatraActor:
     actor = get_request_actor(request)
     if not actor.is_admin:

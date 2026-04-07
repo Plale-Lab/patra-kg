@@ -221,3 +221,120 @@ class DatasheetDetail(BaseModel):
     descriptions: list[DatasheetDescription] = []
     geo_locations: list[DatasheetGeoLocation] = []
     funding_references: list[DatasheetFundingReference] = []
+
+
+# --- Update Models (partial updates) ---
+
+
+class AIModelUpdate(BaseModel):
+    """All-optional model for partial updates to the linked AI model."""
+
+    name: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
+    owner: Optional[str] = None
+    location: Optional[str] = None
+    license: Optional[str] = None
+    framework: Optional[str] = None
+    model_type: Optional[str] = None
+    test_accuracy: Optional[float] = None
+
+
+class ModelCardUpdate(BaseModel):
+    """All-optional model for PATCH/PUT partial updates to a model card."""
+
+    name: Optional[str] = None
+    version: Optional[str] = None
+    short_description: Optional[str] = None
+    full_description: Optional[str] = None
+    keywords: Optional[str] = None
+    author: Optional[str] = None
+    category: Optional[str] = None
+    input_type: Optional[str] = None
+    input_data: Optional[str] = None
+    output_data: Optional[str] = None
+    citation: Optional[str] = None
+    documentation: Optional[str] = None
+    foundational_model: Optional[str] = None
+    is_private: Optional[bool] = None
+    ai_model: Optional[AIModelUpdate] = None
+
+
+class DatasheetUpdate(BaseModel):
+    """All-optional model for PATCH/PUT partial updates to a datasheet."""
+
+    version: Optional[str] = None
+    publication_year: Optional[int] = None
+    is_private: Optional[bool] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
+# --- Camera Traps / Experiments ---
+
+
+class ExperimentUser(BaseModel):
+    user_id: str
+    username: Optional[str] = None
+
+
+class ExperimentSummary(BaseModel):
+    experiment_id: str
+    user_id: str
+    model_id: str
+    device_id: Optional[str] = None
+    start_at: Optional[str] = None
+    total_images: Optional[int] = None
+    saved_images: Optional[int] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1_score: Optional[float] = None
+
+
+class ExperimentListItem(BaseModel):
+    experiment_id: str
+    start_at: Optional[str] = None
+    device_id: Optional[str] = None
+    model_id: str
+
+
+class ExperimentDetail(BaseModel):
+    experiment_id: str
+    model_id: str
+    device_id: Optional[str] = None
+    start_at: Optional[str] = None
+    total_images: Optional[int] = None
+    total_predictions: Optional[int] = None
+    total_ground_truth_objects: Optional[int] = None
+    true_positives: Optional[int] = None
+    false_positives: Optional[int] = None
+    false_negatives: Optional[int] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1_score: Optional[float] = None
+    map_50: Optional[float] = None
+    map_50_95: Optional[float] = None
+    mean_iou: Optional[float] = None
+
+
+class ExperimentImage(BaseModel):
+    image_name: str
+    ground_truth: Optional[str] = None
+    label: Optional[str] = None
+    probability: Optional[float] = None
+    image_decision: Optional[str] = None
+    flattened_scores: Optional[str] = None
+    image_receiving_timestamp: Optional[str] = None
+    image_scoring_timestamp: Optional[str] = None
+
+
+class DeploymentDetail(BaseModel):
+    experiment_id: str
+    image_generating_plugin_cpu_power_consumption: Optional[float] = None
+    image_generating_plugin_gpu_power_consumption: Optional[float] = None
+    power_monitor_plugin_cpu_power_consumption: Optional[float] = None
+    power_monitor_plugin_gpu_power_consumption: Optional[float] = None
+    image_scoring_plugin_cpu_power_consumption: Optional[float] = None
+    image_scoring_plugin_gpu_power_consumption: Optional[float] = None
+    total_cpu_power_consumption: Optional[float] = None
+    total_gpu_power_consumption: Optional[float] = None

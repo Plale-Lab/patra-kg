@@ -62,8 +62,10 @@ The primary REST API is implemented with FastAPI and backed by PostgreSQL. It is
   - `GET /` – Simple health/info endpoint.
   - `GET /modelcards` – List model cards (public-only by default; private when authorized).
   - `GET /modelcard/{id}` – Retrieve a single model card.
+  - `PUT /modelcard/{id}` – Update a model card and its linked AI model (authenticated).
   - `GET /datasheets` – List datasheets (public-only by default; private when authorized).
   - `GET /datasheet/{identifier}` – Retrieve a single datasheet with normalized DataCite-style metadata.
+  - `PUT /datasheet/{identifier}` – Update a datasheet, including title and description (authenticated).
 
 The FastAPI app is exposed via the `rest_server` package (see `rest_server/main.py`) and is built into the Docker image `plalelab/patra-backend:latest` using `rest_server/Dockerfile` (see `scripts/build-push-backend.sh`).
 
