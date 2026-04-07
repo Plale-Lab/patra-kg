@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 import asyncpg
 
 from rest_server.database import get_pool
-from rest_server.deps import get_include_private
+from rest_server.deps import get_include_private, require_authenticated_actor, PatraActor
 from rest_server.errors import asset_not_available_or_visible
 from rest_server.models import (
     DatasheetAlternateIdentifier,
@@ -22,6 +22,7 @@ from rest_server.models import (
     DatasheetSubject,
     DatasheetSummary,
     DatasheetTitle,
+    DatasheetUpdate,
 )
 
 router = APIRouter(tags=["datasheets"])
@@ -452,3 +453,84 @@ async def get_datasheet(
             for r in funding_rows
         ],
     )
+
+
+_DS_UPDATE_COLUMNS = {
+    "version": "version",
+    "publication_year": "publication_year",
+    "is_private": "is_private",
+}
+
+
+@router.put("/datasheet/{identifier}", response_model=DatasheetDetail)
+async def update_datasheet(
+    body: DatasheetUpdate,
+    identifier: int,
+    pool: asyncpg.Pool = Depends(get_pool),
+    include_private: bool = Depends(get_include_private),
+    actor: PatraActor = Depends(require_authenticated_actor),
+):
+    """Update a datasheet (authenticated users only)."""
+    updates = body.model_dump(exclude_none=True)
+    title_val = updates.pop("title", None)
+    description_val = updates.pop("description", None)
+
+    if not updates and title_val is None and description_val is None:
+        return await get_datasheet(identifier=identifier, pool=pool, include_private=include_private)
+
+    async with pool.acquire() as conn:
+        # Update core datasheet columns
+        if updates:
+            set_parts = []
+            values = []
+            idx = 2  # $1 is the identifier
+            for field, value in updates.items():
+                col = _DS_UPDATE_COLUMNS.get(field)
+                if col is None:
+                    continue
+                set_parts.append(f"{col} = ${idx}")
+                values.append(value)
+                idx += 1
+
+            if set_parts:
+                set_parts.append("updated_at = NOW()")
+                query = f"UPDATE datasheets SET {', '.join(set_parts)} WHERE identifier = $1"
+                result = await conn.execute(query, identifier, *values)
+                if result == "UPDATE 0":
+                    raise asset_not_available_or_visible()
+
+        # Update first title row (or insert if none exists)
+        if title_val is not None:
+            existing_title = await conn.fetchval(
+                "SELECT id FROM datasheet_titles WHERE datasheet_id = $1 ORDER BY id LIMIT 1",
+                identifier,
+            )
+            if existing_title is not None:
+                await conn.execute(
+                    "UPDATE datasheet_titles SET title = $1 WHERE id = $2",
+                    title_val, existing_title,
+                )
+            else:
+                await conn.execute(
+                    "INSERT INTO datasheet_titles (datasheet_id, title) VALUES ($1, $2)",
+                    identifier, title_val,
+                )
+
+        # Update first description row (or insert if none exists)
+        if description_val is not None:
+            existing_desc = await conn.fetchval(
+                "SELECT id FROM datasheet_descriptions WHERE datasheet_id = $1 ORDER BY id LIMIT 1",
+                identifier,
+            )
+            if existing_desc is not None:
+                await conn.execute(
+                    "UPDATE datasheet_descriptions SET description = $1 WHERE id = $2",
+                    description_val, existing_desc,
+                )
+            else:
+                await conn.execute(
+                    "INSERT INTO datasheet_descriptions (datasheet_id, description, description_type) VALUES ($1, $2, 'Abstract')",
+                    identifier, description_val,
+                )
+
+    return await get_datasheet(identifier=identifier, pool=pool, include_private=include_private)

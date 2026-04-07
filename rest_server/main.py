@@ -64,8 +64,8 @@ app.add_middleware(
 
 app.include_router(model_cards.router)
 app.include_router(datasheets.router)
+app.include_router(experiments.router)
 app.include_router(assets.router)
-app.include_router(submissions.router)
 app.include_router(tickets.router)
 app.include_router(agent_tools.router)
 app.include_router(automated_ingestion.router)
