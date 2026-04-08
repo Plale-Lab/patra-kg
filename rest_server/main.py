@@ -13,6 +13,13 @@ from rest_server.routes import agent_tools, ask_patra, assets, automated_ingesti
 log = logging.getLogger(__name__)
 
 
+def _env_flag(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None or value == "":
+        return default
+    return value.strip().lower() == "true"
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("Starting Patra FastAPI backend")
@@ -64,13 +71,28 @@ app.add_middleware(
 
 app.include_router(model_cards.router)
 app.include_router(datasheets.router)
-app.include_router(experiments.router)
 app.include_router(assets.router)
 app.include_router(tickets.router)
 app.include_router(agent_tools.router)
-app.include_router(automated_ingestion.router)
-app.include_router(ask_patra.router)
-app.include_router(experiments.router)
+app.include_router(submissions.router)
+
+if _env_flag("ENABLE_ASK_PATRA", default=False):
+    app.include_router(ask_patra.router)
+    log.info("Ask Patra routes enabled")
+else:
+    log.info("Ask Patra routes disabled")
+
+if _env_flag("ENABLE_AUTOMATED_INGESTION", default=False):
+    app.include_router(automated_ingestion.router)
+    log.info("Automated ingestion routes enabled")
+else:
+    log.info("Automated ingestion routes disabled")
+
+if _env_flag("ENABLE_DOMAIN_EXPERIMENTS", default=False):
+    app.include_router(experiments.router)
+    log.info("Experiment routes enabled")
+else:
+    log.info("Experiment routes disabled")
 
 
 @app.get("/")
