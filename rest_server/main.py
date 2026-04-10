@@ -8,7 +8,23 @@ from fastapi.middleware.cors import CORSMiddleware
 import asyncpg
 
 from rest_server.database import close_pool, get_pool, init_pool
-from rest_server.routes import agent_tools, ask_patra, assets, automated_ingestion, datasheets, experiments, model_cards, submissions, tickets
+from rest_server.routes import (
+    agent_tools,
+    ask_patra,
+    assets,
+    automated_ingestion,
+    baseline_training,
+    dataset_assembly,
+    datasheets,
+    experiments,
+    intent_schema,
+    metadata_discovery,
+    mvp_demo_report,
+    model_cards,
+    submissions,
+    tickets,
+    training_readiness,
+)
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +97,42 @@ if _env_flag("ENABLE_ASK_PATRA", default=False):
     log.info("Ask Patra routes enabled")
 else:
     log.info("Ask Patra routes disabled")
+
+if _env_flag("ENABLE_INTENT_SCHEMA", default=False):
+    app.include_router(intent_schema.router)
+    log.info("Intent schema routes enabled")
+else:
+    log.info("Intent schema routes disabled")
+
+if _env_flag("ENABLE_METADATA_DISCOVERY", default=False):
+    app.include_router(metadata_discovery.router)
+    log.info("Metadata discovery routes enabled")
+else:
+    log.info("Metadata discovery routes disabled")
+
+if _env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)):
+    app.include_router(dataset_assembly.router)
+    log.info("Dataset assembly routes enabled")
+else:
+    log.info("Dataset assembly routes disabled")
+
+if _env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))):
+    app.include_router(training_readiness.router)
+    log.info("Training readiness routes enabled")
+else:
+    log.info("Training readiness routes disabled")
+
+if _env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)))):
+    app.include_router(baseline_training.router)
+    log.info("Baseline training stub routes enabled")
+else:
+    log.info("Baseline training stub routes disabled")
+
+if _env_flag("ENABLE_MVP_DEMO_REPORT", default=_env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))))):
+    app.include_router(mvp_demo_report.router)
+    log.info("MVP demo report routes enabled")
+else:
+    log.info("MVP demo report routes disabled")
 
 if _env_flag("ENABLE_AUTOMATED_INGESTION", default=False):
     app.include_router(automated_ingestion.router)

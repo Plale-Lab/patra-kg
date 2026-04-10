@@ -1,5 +1,42 @@
 # Dev Log
 
+## Version 0.7.0 - 2026-04-10
+
+### Context
+
+The current backend work now splits into two tracks:
+
+- the intent-driven MVP demo pipeline framework is largely assembled at the API level
+- the next active milestone is Ask Patra tool unification, where Ask Patra becomes the routing layer for user-facing PATRA tools
+
+### Current MVP Demo Status
+
+- The backend already exposes the high-level demo pipeline surfaces for:
+  - intent schema
+  - metadata discovery
+  - dataset assembly
+  - composition preview
+  - training readiness
+  - baseline training stub
+  - MVP demo report
+- The framework is now sufficiently complete for architectural demonstration.
+- The remaining instability is believed to be concentrated in LLM invocation / integration behavior rather than missing deterministic pipeline modules.
+- That issue is temporarily paused so it can be repaired as a separate stabilization task.
+
+### New Active Milestone
+
+- Ask Patra now becomes the active integration priority.
+- First-stage Ask Patra scope is:
+  - deterministic-first intent routing
+  - user-tool registry
+  - hybrid navigation / handoff behavior
+  - no admin-only surfaces in the first pass
+
+### Action Points
+
+- Keep the MVP demo branch documented but paused until LLM invocation stability is revisited.
+- Proceed with Ask Patra tool orchestration as the next backend-facing integration milestone.
+
 ## Version 0.6.3 - 2026-04-07
 
 ### Context

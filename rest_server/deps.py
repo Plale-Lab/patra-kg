@@ -18,6 +18,8 @@ PATRA_USERNAME_HEADER = "X-Patra-Username"
 PATRA_ROLE_HEADER = "X-Patra-Role"
 PATRA_ADMIN_USERS_ENV = "PATRA_ADMIN_USERS"
 DEFAULT_ADMIN_USERS = frozenset({"williamq96"})
+DEV_OPEN_ACCESS_ENV = "PATRA_DEV_OPEN_ACCESS"
+DEV_OPEN_ACCESS_TOKEN = "__patra_dev_open_access__"
 
 
 @dataclass(frozen=True)
@@ -66,6 +68,13 @@ def get_request_actor(request: Request) -> PatraActor:
     username = (request.headers.get(PATRA_USERNAME_HEADER) or "").strip()
     token = (request.headers.get(TAPIS_TOKEN_HEADER) or "").strip()
     requested_role = (request.headers.get(PATRA_ROLE_HEADER) or "").strip().lower()
+
+    if os.getenv(DEV_OPEN_ACCESS_ENV, "").strip().lower() == "true" and token == DEV_OPEN_ACCESS_TOKEN:
+        return PatraActor(
+            username=username or "dev-open-access",
+            role="admin",
+            auth_type="tapis",
+        )
 
     if not token:
         return PatraActor(username=username or None)

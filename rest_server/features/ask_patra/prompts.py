@@ -33,10 +33,12 @@ DEFAULT_BEHAVIOR_PROMPT = """Behavior guidelines:
 
 
 DEFAULT_STARTER_PROMPTS = [
-    AskPatraStarter(title="Find model cards", prompt="Find up to 3 model cards related to crop yield forecasting."),
-    AskPatraStarter(title="Find datasheets", prompt="Find up to 3 datasheets related to geospatial or agricultural datasets."),
-    AskPatraStarter(title="What PATRA can do", prompt="What can you help me do inside PATRA?"),
-    AskPatraStarter(title="Compare records", prompt="Show me a few relevant model cards and datasheets for weather-driven prediction."),
+    AskPatraStarter(title="Find records", prompt="Find up to 3 model cards or datasheets related to crop yield forecasting."),
+    AskPatraStarter(title="Plan a model", prompt="Help me generate a training intent schema for predicting customer churn."),
+    AskPatraStarter(title="Run the demo", prompt="Run the crop-yield MVP demo report and summarize the pipeline."),
+    AskPatraStarter(title="Open MCP", prompt="Open MCP Explorer and tell me what tools are available."),
+    AskPatraStarter(title="Browse experiments", prompt="Show me crop-yield experiments and route me to the right PATRA surface."),
+    AskPatraStarter(title="Start a workflow", prompt="Help me decide whether I should use Submit Records, Edit Records, or Automated Ingestion."),
 ]
 
 
@@ -64,6 +66,13 @@ _LEGACY_STARTER_PROMPTS = [
     {"title": "Compare resources", "prompt": "Show me relevant model cards and datasheets for weather-driven prediction."},
 ]
 
+_PREVIOUS_DEFAULT_STARTER_PROMPTS = [
+    {"title": "Find model cards", "prompt": "Find up to 3 model cards related to crop yield forecasting."},
+    {"title": "Find datasheets", "prompt": "Find up to 3 datasheets related to geospatial or agricultural datasets."},
+    {"title": "What PATRA can do", "prompt": "What can you help me do inside PATRA?"},
+    {"title": "Compare records", "prompt": "Show me a few relevant model cards and datasheets for weather-driven prediction."},
+]
+
 
 def ensure_prompt_templates(prompts_dir: Path) -> list[AskPatraStarter]:
     prompts_dir.mkdir(parents=True, exist_ok=True)
@@ -87,7 +96,8 @@ def ensure_prompt_templates(prompts_dir: Path) -> list[AskPatraStarter]:
     else:
         try:
             loaded_starters = json.loads(starter_path.read_text(encoding="utf-8"))
-            if loaded_starters == _LEGACY_STARTER_PROMPTS:
+            loaded_key = _json_key(loaded_starters)
+            if loaded_key in {_json_key(_LEGACY_STARTER_PROMPTS), _json_key(_PREVIOUS_DEFAULT_STARTER_PROMPTS)}:
                 starter_path.write_text(
                     json.dumps([item.model_dump() for item in DEFAULT_STARTER_PROMPTS], indent=2),
                     encoding="utf-8",
@@ -99,3 +109,7 @@ def ensure_prompt_templates(prompts_dir: Path) -> list[AskPatraStarter]:
         return [AskPatraStarter.model_validate(item) for item in loaded]
     except Exception:
         return DEFAULT_STARTER_PROMPTS
+
+
+def _json_key(payload) -> str:
+    return json.dumps(payload, sort_keys=True)

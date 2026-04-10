@@ -348,6 +348,25 @@ def extract_schema_from_uploaded_file(
 
 
 def _build_matcher(cache_dir: str, disable_llm: bool, api_base: str | None, model: str | None, api_key: str | None, timeout_seconds: int):
+    return _build_matcher_from_pairs(
+        _get_pool(cache_dir),
+        disable_llm=disable_llm,
+        api_base=api_base,
+        model=model,
+        api_key=api_key,
+        timeout_seconds=timeout_seconds,
+    )
+
+
+def _build_matcher_from_pairs(
+    pairs: list[Any],
+    *,
+    disable_llm: bool,
+    api_base: str | None,
+    model: str | None,
+    api_key: str | None,
+    timeout_seconds: int,
+):
     modules = _modules()
     llm_client = None
     resolved_api_base = api_base or DEFAULT_LLM_API_BASE
@@ -361,14 +380,18 @@ def _build_matcher(cache_dir: str, disable_llm: bool, api_base: str | None, mode
             timeout_seconds=timeout_seconds,
         )
     return modules["HybridSchemaMatcher"](
-        schema_records=[pair.to_matcher_record() for pair in _get_pool(cache_dir)],
+        schema_records=[pair.to_matcher_record() for pair in pairs],
         llm_client=llm_client,
     )
 
 
 def _candidate_rows(match_result: Any, cache_dir: str, query_schema: dict[str, Any]) -> list[dict[str, Any]]:
+    return _candidate_rows_from_pairs(match_result, list(_pair_map(cache_dir).values()), query_schema)
+
+
+def _candidate_rows_from_pairs(match_result: Any, pairs: list[Any], query_schema: dict[str, Any]) -> list[dict[str, Any]]:
     modules = _modules()
-    pair_lookup = _pair_map(cache_dir)
+    pair_lookup = {pair.dataset_id: pair for pair in pairs}
     rows: list[dict[str, Any]] = []
     for item in match_result["ranking"]:
         pair = pair_lookup[item["schema_id"]]
@@ -408,6 +431,66 @@ def _candidate_rows(match_result: Any, cache_dir: str, query_schema: dict[str, A
     return rows
 
 
+def rank_query_schema_candidates(
+    query_schema: dict[str, Any],
+    *,
+    top_k: int,
+    disable_llm: bool,
+    api_base: str | None,
+    model: str | None,
+    api_key: str | None,
+    timeout_seconds: int,
+    cache_dir: str | None,
+    success_message: str,
+) -> dict[str, Any]:
+    normalized_cache = _normalize_cache_dir(cache_dir)
+    matcher = _build_matcher(normalized_cache, disable_llm, api_base, model, api_key, timeout_seconds)
+    match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
+    ranking = _candidate_rows(match_result["report"], normalized_cache, query_schema)
+    winner = ranking[0]["dataset_id"] if ranking else None
+    return {
+        "status": "ok",
+        "message": success_message,
+        "query_schema": query_schema,
+        "candidate_count": len(ranking),
+        "winner_dataset_id": winner,
+        "ranking": ranking,
+    }
+
+
+def rank_query_schema_candidates_from_pairs(
+    query_schema: dict[str, Any],
+    *,
+    pairs: list[Any],
+    top_k: int,
+    disable_llm: bool,
+    api_base: str | None,
+    model: str | None,
+    api_key: str | None,
+    timeout_seconds: int,
+    success_message: str,
+) -> dict[str, Any]:
+    matcher = _build_matcher_from_pairs(
+        pairs,
+        disable_llm=disable_llm,
+        api_base=api_base,
+        model=model,
+        api_key=api_key,
+        timeout_seconds=timeout_seconds,
+    )
+    match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
+    ranking = _candidate_rows_from_pairs(match_result["report"], pairs, query_schema)
+    winner = ranking[0]["dataset_id"] if ranking else None
+    return {
+        "status": "ok",
+        "message": success_message,
+        "query_schema": query_schema,
+        "candidate_count": len(ranking),
+        "winner_dataset_id": winner,
+        "ranking": ranking,
+    }
+
+
 def run_paper_schema_search(
     document_path: str | None,
     document_url: str | None,
@@ -434,19 +517,19 @@ def run_paper_schema_search(
             "ranking": [],
         }
 
-    matcher = _build_matcher(normalized_cache, disable_llm, api_base, model, api_key, timeout_seconds)
-    match_result = asdict(matcher.match_schema(extraction["machine_schema"], top_k=top_k))
-    ranking = _candidate_rows(match_result["report"], normalized_cache, extraction["machine_schema"])
-    winner = ranking[0]["dataset_id"] if ranking else None
-    return {
-        "status": "ok",
-        "message": "Schema extracted and ranked against the PATRA public dataset-schema pool.",
-        "query_schema": extraction["machine_schema"],
-        "extraction": extraction,
-        "candidate_count": len(ranking),
-        "winner_dataset_id": winner,
-        "ranking": ranking,
-    }
+    response = rank_query_schema_candidates(
+        extraction["machine_schema"],
+        top_k=top_k,
+        disable_llm=disable_llm,
+        api_base=api_base,
+        model=model,
+        api_key=api_key,
+        timeout_seconds=timeout_seconds,
+        cache_dir=normalized_cache,
+        success_message="Schema extracted and ranked against the PATRA public dataset-schema pool.",
+    )
+    response["extraction"] = extraction
+    return response
 
 
 def run_uploaded_paper_schema_search(
@@ -474,19 +557,21 @@ def run_uploaded_paper_schema_search(
             "ranking": [],
         }
 
-    matcher = _build_matcher(normalized_cache, disable_llm, api_base, model, api_key, timeout_seconds)
-    match_result = asdict(matcher.match_schema(extraction["machine_schema"], top_k=top_k))
-    ranking = _candidate_rows(match_result["report"], normalized_cache, extraction["machine_schema"])
-    winner = ranking[0]["dataset_id"] if ranking else None
-    return {
-        "status": "ok",
-        "message": "Uploaded document parsed in-memory and ranked against the PATRA public dataset-schema pool.",
-        "query_schema": extraction["machine_schema"],
-        "extraction": extraction,
-        "candidate_count": len(ranking),
-        "winner_dataset_id": winner,
-        "ranking": ranking,
-    }
+    response = rank_query_schema_candidates(
+        extraction["machine_schema"],
+        top_k=top_k,
+        disable_llm=disable_llm,
+        api_base=api_base,
+        model=model,
+        api_key=api_key,
+        timeout_seconds=timeout_seconds,
+        cache_dir=normalized_cache,
+        success_message="Uploaded document parsed in-memory and ranked against the PATRA public dataset-schema pool.",
+    )
+    response["extraction"] = extraction
+    return response
+
+
 def analyze_missing_columns_for_candidate(query_schema: dict[str, Any], candidate_dataset_id: str, cache_dir: str | None) -> dict[str, Any]:
     normalized_cache = _normalize_cache_dir(cache_dir)
     lookup = _pair_map(normalized_cache)

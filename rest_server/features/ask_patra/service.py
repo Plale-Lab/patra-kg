@@ -4,14 +4,31 @@ import json
 import os
 import re
 import uuid
+from contextlib import suppress
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urljoin, urlparse
+from urllib.request import Request, urlopen
 
 import asyncpg
 
 from rest_server.deps import PatraActor
-from rest_server.features.ask_patra.models import AskPatraCitation, AskPatraMessage
+from rest_server.features.ask_patra.inline_executor import (
+    InlineExecutionContext,
+    get_inline_executor_registry,
+    run_inline_executor,
+)
+from rest_server.features.ask_patra.models import (
+    AskPatraCitation,
+    AskPatraExecution,
+    AskPatraHandoff,
+    AskPatraIntent,
+    AskPatraMessage,
+    AskPatraSuggestedAction,
+    AskPatraToolCard,
+)
 from rest_server.features.ask_patra.prompts import DEFAULT_BEHAVIOR_PROMPT, DEFAULT_SYSTEM_PROMPT, ensure_prompt_templates
+from rest_server.features.ask_patra.tool_registry import build_tool_navigation, classify_tool_intent, get_tool_capability_map
 from rest_server.features.shared.openai_compat import chat_text_with_model_fallback
 
 
@@ -30,6 +47,12 @@ LOOKUP_HINTS = {
     "model", "models", "model card", "model cards", "datasheet", "datasheets", "record", "records",
     "author", "metadata", "keyword", "keywords", "compare",
 }
+
+LOOKUP_ROUTE_TOOL_MAP = {
+    "datasheet": "browse_datasheets",
+    "datasheets": "browse_datasheets",
+}
+INLINE_EXECUTOR_TOOL_IDS = set(get_inline_executor_registry())
 
 
 def _default_storage_root() -> Path:
@@ -279,7 +302,181 @@ def _dedupe_citations(citations: list[AskPatraCitation], *, limit: int) -> list[
     return deduped
 
 
-def _fallback_answer(message: str, citations: list[AskPatraCitation]) -> str:
+def _extract_first_url(message: str) -> str | None:
+    match = re.search(r"https?://[^\s)]+", message)
+    return match.group(0) if match else None
+
+
+def _prefill_query(message: str, *, fallback: str = "") -> str:
+    compact = re.sub(r"\s+", " ", message.strip())
+    return compact[:220] if compact else fallback
+
+
+def _lookup_tool_id(message: str) -> str:
+    normalized = _normalized_query(message)
+    for token, tool_id in LOOKUP_ROUTE_TOOL_MAP.items():
+        if token in normalized:
+            return tool_id
+    return "browse_model_cards"
+
+
+def _build_capability_cards(actor: PatraActor) -> tuple[list[AskPatraToolCard], list[AskPatraSuggestedAction], AskPatraHandoff]:
+    cards: list[AskPatraToolCard] = []
+    actions: list[AskPatraSuggestedAction] = []
+    handoff = AskPatraHandoff(kind="explanatory", tool_target=None, route=None, label="Browse PATRA tools")
+    for tool_id, reason in [
+        ("browse_model_cards", "Use PATRA search when you want to inspect published records."),
+        ("intent_schema", "Use Intent Schema when you want PATRA to turn a modeling goal into a dataset plan."),
+        ("mvp_demo_report", "Use MVP Demo Report when you want to show the current demo pipeline end to end."),
+    ]:
+        card, action, _ = build_tool_navigation(tool_id=tool_id, actor=actor, reason=reason)
+        cards.append(card)
+        actions.append(action)
+    return cards, actions, handoff
+
+
+def _build_tool_routing(
+    *,
+    actor: PatraActor,
+    message: str,
+    citations: list[AskPatraCitation],
+) -> tuple[AskPatraIntent, list[AskPatraToolCard], list[AskPatraSuggestedAction], AskPatraHandoff, AskPatraExecution]:
+    if _is_greeting(message):
+        return (
+            AskPatraIntent(category="greeting", confidence=0.99, tool_target=None),
+            [],
+            [],
+            AskPatraHandoff(kind="explanatory", tool_target=None, route=None, label="Greeting"),
+            AskPatraExecution(state="idle", message="No tool execution requested."),
+        )
+
+    if _is_capability_question(message):
+        cards, actions, handoff = _build_capability_cards(actor)
+        return (
+            AskPatraIntent(category="capability", confidence=0.92, tool_target=None),
+            cards,
+            actions,
+            handoff,
+            AskPatraExecution(state="idle", message="Capability suggestions prepared."),
+        )
+
+    classified = classify_tool_intent(message)
+    cards: list[AskPatraToolCard] = []
+    actions: list[AskPatraSuggestedAction] = []
+    handoff = AskPatraHandoff(kind="explanatory", tool_target=None, route=None, label=None)
+    execution = AskPatraExecution(state="idle", message="No inline execution requested.")
+
+    if classified.category in {"animal_ecology", "digital_agriculture"} and classified.tool_target:
+        card, action, handoff = build_tool_navigation(
+            tool_id=classified.tool_target,
+            actor=actor,
+            reason="This request matches an experiment-domain workflow.",
+        )
+        return classified, [card], [action], handoff, execution
+
+    if classified.category in {
+        "browse_model_cards",
+        "browse_datasheets",
+        "intent_schema",
+        "mvp_demo_report",
+        "agent_tools",
+        "automated_ingestion",
+        "edit_records",
+        "submit_records",
+        "tickets",
+        "mcp_explorer",
+    } and classified.tool_target:
+        query: dict[str, str] = {}
+        prefilled_payload: dict = {}
+        cta_kind = "navigate"
+        if classified.tool_target in {"browse_model_cards", "browse_datasheets"}:
+            query["q"] = _prefill_query(message)
+        elif classified.tool_target in {"intent_schema", "mvp_demo_report"}:
+            query["intent"] = message.strip()
+        elif classified.tool_target == "edit_records":
+            query["q"] = _prefill_query(message)
+            cta_kind = "prefill"
+            prefilled_payload["query"] = _prefill_query(message)
+        elif classified.tool_target == "submit_records":
+            cta_kind = "prefill"
+            source_url = _extract_first_url(message)
+            if source_url:
+                query["asset_url"] = source_url
+                query["mode"] = "asset_link"
+                query["type"] = "datasheet" if any(token in _normalized_query(message) for token in ("dataset", "datasheet")) else "model_card"
+                prefilled_payload["asset_url"] = source_url
+            prefilled_payload["intent_text"] = _prefill_query(message)
+        elif classified.tool_target == "automated_ingestion":
+            source_url = _extract_first_url(message)
+            if source_url:
+                query["source_url"] = source_url
+                prefilled_payload["source_url"] = source_url
+            cta_kind = "prefill"
+        elif classified.tool_target == "tickets":
+            cta_kind = "prefill"
+            query["subject"] = _prefill_query(message, fallback="PATRA support request")
+            query["description"] = message.strip()
+            prefilled_payload["subject"] = _prefill_query(message, fallback="PATRA support request")
+            prefilled_payload["description"] = message.strip()
+        card, action, handoff = build_tool_navigation(
+            tool_id=classified.tool_target,
+            actor=actor,
+            reason="This request maps cleanly to a PATRA tool surface.",
+            query=query,
+            prefilled_payload=prefilled_payload,
+            cta_kind=cta_kind,
+        )
+        return classified, [card], [action], handoff, execution
+
+    if classified.category == "experiments":
+        for tool_id, reason in [
+            ("animal_ecology", "Animal Ecology is the right surface for wildlife and camera-trap activity."),
+            ("digital_agriculture", "Digital Agriculture is the right surface for crop-yield and field experiment activity."),
+        ]:
+            card, action, _ = build_tool_navigation(tool_id=tool_id, actor=actor, reason=reason)
+            cards.append(card)
+            actions.append(action)
+        return (
+            AskPatraIntent(category="experiments", confidence=0.8, tool_target=None),
+            cards,
+            actions,
+            AskPatraHandoff(kind="navigate", tool_target=None, route=None, label="Choose an experiments surface"),
+            execution,
+        )
+
+    if citations or _wants_record_lookup(message):
+        browse_tool = _lookup_tool_id(message)
+        card, action, handoff = build_tool_navigation(
+            tool_id=browse_tool,
+            actor=actor,
+            reason="Use the full browse page if you want to expand beyond the inline record suggestions.",
+            query={"q": _prefill_query(message)},
+        )
+        return (
+            AskPatraIntent(category="record_search", confidence=0.88, tool_target=browse_tool),
+            [card],
+            [action],
+            handoff,
+            execution,
+        )
+
+    cards, actions, handoff = _build_capability_cards(actor)
+    return (
+        AskPatraIntent(category="general_help", confidence=0.55, tool_target=None),
+        cards,
+        actions,
+        handoff,
+        execution,
+    )
+
+
+def _fallback_answer(
+    message: str,
+    citations: list[AskPatraCitation],
+    *,
+    intent: AskPatraIntent,
+    tool_cards: list[AskPatraToolCard],
+) -> str:
     lowered = message.lower()
     if _is_greeting(lowered):
         return (
@@ -288,24 +485,463 @@ def _fallback_answer(message: str, citations: list[AskPatraCitation]) -> str:
             "- Ask how PATRA features work\n"
             "- Ask me to compare a few relevant records"
         )
-    if "what can you help" in lowered or "what can patra do" in lowered:
+    if intent.category in {"capability", "general_help"}:
         return (
             "**I can help with:**\n"
             "- finding model cards\n"
             "- finding datasheets\n"
-            "- comparing related records\n"
-            "- explaining Ask Patra, Agent Toolkit, Edit Records, and Automated Ingestion\n\n"
-            "If you want, ask for a specific topic or domain and I will narrow it down."
+            "- generating an intent schema\n"
+            "- showing the MVP demo report\n"
+            "- routing you to Agent Toolkit, MCP Explorer, experiments, tickets, and edit workflows\n\n"
+            "Ask for a specific tool or task and I will route you to the right surface."
         )
     if citations:
         lines = [f"**I found {len(citations)} relevant records.**"]
         lines.extend([f"- **{item.title}** ({item.resource_type}, `{item.route}`)" for item in citations[:3]])
+        if tool_cards:
+            lines.append("")
+            lines.append(f"Use **{tool_cards[0].title}** if you want the full browse page for this topic.")
         return "\n".join(lines)
+    if tool_cards:
+        card = tool_cards[0]
+        if intent.category in {"intent_schema", "mvp_demo_report", "mcp_explorer", "agent_tools", "animal_ecology", "digital_agriculture"}:
+            return (
+                f"**This request maps to {card.title}.**\n"
+                f"- {card.summary}\n"
+                f"- I prepared a route handoff so you can continue in the right PATRA tool."
+            )
+        if intent.category in {"automated_ingestion", "edit_records", "submit_records", "tickets"}:
+            return (
+                f"**This request needs {card.title}.**\n"
+                f"- {card.summary}\n"
+                f"- I prepared a draft handoff so the workflow can continue in that tool."
+            )
     return "I could not find a strong match for that query. Try naming a task, domain, author, or metadata keyword."
 
 
 def _message_payload(messages: list[dict]) -> list[AskPatraMessage]:
     return [AskPatraMessage.model_validate(item) for item in messages]
+
+
+def _append_assistant_message(
+    conversation: dict,
+    *,
+    content: str,
+    intent: AskPatraIntent | None = None,
+    tool_cards: list[AskPatraToolCard] | None = None,
+    suggested_actions: list[AskPatraSuggestedAction] | None = None,
+    handoff: AskPatraHandoff | None = None,
+    execution: AskPatraExecution | None = None,
+) -> None:
+    payload: dict = {
+        "role": "assistant",
+        "content": content,
+        "created_at": _now_iso(),
+    }
+    if intent is not None:
+        payload["intent"] = intent.model_dump()
+    if tool_cards is not None:
+        payload["tool_cards"] = [item.model_dump() for item in tool_cards]
+    if suggested_actions is not None:
+        payload["suggested_actions"] = [item.model_dump() for item in suggested_actions]
+    if handoff is not None:
+        payload["handoff"] = handoff.model_dump()
+    if execution is not None:
+        payload["execution"] = execution.model_dump()
+    conversation["messages"].append(payload)
+
+
+def _coerce_int(value: object, default: int, *, minimum: int = 1, maximum: int = 50) -> int:
+    try:
+        coerced = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(minimum, min(maximum, coerced))
+
+
+def _resolve_execution_message(
+    *,
+    conversation: dict,
+    message: str | None,
+    query: dict[str, str],
+    prefilled_payload: dict,
+) -> str:
+    if message and message.strip():
+        return message.strip()
+    for candidate in (
+        prefilled_payload.get("intent_text"),
+        query.get("intent"),
+        prefilled_payload.get("query"),
+        query.get("q"),
+    ):
+        if isinstance(candidate, str) and candidate.strip():
+            return candidate.strip()
+    for item in reversed(conversation.get("messages", [])):
+        if item.get("role") == "user":
+            candidate = str(item.get("content", "")).strip()
+            if candidate:
+                return candidate
+    return ""
+
+
+def _build_intent_schema_execution_payload(result) -> dict:
+    return {
+        "kind": "intent_schema",
+        "intent_summary": result.intent_summary,
+        "task_type": result.task_type,
+        "target_column": result.target_column,
+        "field_count": len(result.schema_fields),
+        "ambiguity_count": len(result.ambiguity_warnings),
+        "assumption_count": len(result.assumptions),
+    }
+
+
+def _format_intent_schema_execution_message(result) -> str:
+    return (
+        "**Intent Schema generated in deterministic mode.**\n"
+        f"- Task type: **{result.task_type}**\n"
+        f"- Target column: **{result.target_column}**\n"
+        f"- Fields drafted: **{len(result.schema_fields)}**\n"
+        f"- Ambiguity warnings: **{len(result.ambiguity_warnings)}**\n\n"
+        "Open the full Intent Schema surface if you want to inspect the full field contract."
+    )
+
+
+def _build_mvp_demo_execution_payload(report) -> dict:
+    preview_rows = ((report.composition_preview or {}).get("preview_rows") or [])[:3]
+    return {
+        "kind": "mvp_demo_report",
+        "executive_summary": [item.model_dump() for item in report.executive_summary[:6]],
+        "preview_row_count": len((report.composition_preview or {}).get("preview_rows") or []),
+        "preview_rows": preview_rows,
+        "selected_dataset_count": len((report.assembly_plan or {}).get("selected_datasets") or []),
+        "gate_status": str((((report.training_stub or {}).get("summary") or {}).get("gate_status") or "unknown")),
+        "execution_status": str((((report.training_stub or {}).get("summary") or {}).get("execution_status") or "unknown")),
+    }
+
+
+def _mcp_base_url() -> str:
+    return os.getenv("MCP_BASE_URL", "http://localhost:8050").strip() or "http://localhost:8050"
+
+
+def _read_mcp_endpoint(base_url: str) -> tuple[str | None, str | None]:
+    request = Request(f"{base_url.rstrip('/')}/sse", headers={"Accept": "text/event-stream"})
+    event_name = None
+    endpoint_data = None
+    with urlopen(request, timeout=5) as response:
+        for _ in range(40):
+            raw_line = response.readline()
+            if not raw_line:
+                break
+            line = raw_line.decode("utf-8", errors="ignore").strip()
+            if not line:
+                if event_name == "endpoint" and endpoint_data:
+                    return endpoint_data, None
+                event_name = None
+                endpoint_data = None
+                continue
+            if line.startswith("event:"):
+                event_name = line.partition(":")[2].strip()
+            elif line.startswith("data:") and event_name == "endpoint":
+                endpoint_data = line.partition(":")[2].strip()
+    return None, "The MCP SSE endpoint did not yield a usable endpoint event."
+
+
+def _post_mcp_rpc(endpoint_url: str, body: dict) -> dict:
+    data = json.dumps(body).encode("utf-8")
+    request = Request(
+        endpoint_url,
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urlopen(request, timeout=8) as response:
+        payload = response.read().decode("utf-8", errors="ignore").strip()
+    return json.loads(payload) if payload else {}
+
+
+def _run_mcp_preview() -> dict:
+    base_url = _mcp_base_url()
+    endpoint_data, endpoint_error = _read_mcp_endpoint(base_url)
+    if endpoint_error:
+        return {
+            "kind": "mcp_explorer",
+            "connected": False,
+            "endpoint_url": None,
+            "tool_count": 0,
+            "tools": [],
+            "error": endpoint_error,
+            "mcp_base_url": base_url,
+        }
+    endpoint_url = urljoin(f"{base_url.rstrip('/')}/", endpoint_data or "")
+    initialize_result = _post_mcp_rpc(
+        endpoint_url,
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2025-06-18",
+                "capabilities": {},
+                "clientInfo": {"name": "ask-patra-inline", "version": "0.1.0"},
+            },
+        },
+    )
+    with suppress(Exception):
+        _post_mcp_rpc(endpoint_url, {"jsonrpc": "2.0", "method": "notifications/initialized"})
+    tools_result = _post_mcp_rpc(endpoint_url, {"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+    tool_entries = (((tools_result or {}).get("result") or {}).get("tools") or [])
+    tool_names = [str(item.get("name")) for item in tool_entries if isinstance(item, dict) and item.get("name")]
+    return {
+        "kind": "mcp_explorer",
+        "connected": True,
+        "endpoint_url": endpoint_url,
+        "tool_count": len(tool_names),
+        "tools": tool_names[:8],
+        "server_name": ((((initialize_result or {}).get("result") or {}).get("serverInfo") or {}).get("name") or "MCP server"),
+        "mcp_base_url": base_url,
+    }
+
+
+def _format_mcp_execution_message(result: dict) -> str:
+    if not result.get("connected"):
+        return (
+            "**MCP preview failed.**\n"
+            f"- Endpoint: **{result.get('mcp_base_url') or 'unknown'}**\n"
+            f"- Error: **{result.get('error') or 'unknown'}**\n\n"
+            "Open MCP Explorer for full diagnostics."
+        )
+    tool_names = result.get("tools") or []
+    tool_line = ", ".join(f"`{name}`" for name in tool_names[:4]) if tool_names else "No tools reported"
+    return (
+        "**MCP preview succeeded.**\n"
+        f"- Server: **{result.get('server_name') or 'unknown'}**\n"
+        f"- Tool count: **{result.get('tool_count') or 0}**\n"
+        f"- Sample tools: {tool_line}\n\n"
+        "Open MCP Explorer for interactive execution and resource reads."
+    )
+
+
+def _build_mcp_execution_payload(result: dict) -> dict:
+    return {
+        "kind": "mcp_explorer",
+        "connected": bool(result.get("connected")),
+        "mcp_base_url": result.get("mcp_base_url"),
+        "endpoint_url": result.get("endpoint_url"),
+        "tool_count": int(result.get("tool_count") or 0),
+        "tools": list(result.get("tools") or []),
+        "server_name": result.get("server_name"),
+        "error": result.get("error"),
+    }
+
+
+async def _build_experiment_preview(*, pool: asyncpg.Pool, tool_id: str) -> dict:
+    domain = "animal-ecology" if tool_id == "animal_ecology" else "digital-ag"
+    tables = DOMAIN_TABLES.get(domain)
+    if not tables:
+        return {"kind": tool_id, "domain": domain, "available": False, "error": "Unknown experiment domain."}
+    events_table = tables["events"]
+    async with pool.acquire() as conn:
+        user_rows = await conn.fetch(
+            f"SELECT DISTINCT user_id FROM {events_table} ORDER BY user_id LIMIT 5"
+        )
+        summary_rows = await conn.fetch(
+            f"""
+            SELECT
+                experiment_id,
+                user_id,
+                model_id,
+                MAX(total_images) AS total_images,
+                MAX(precision) AS precision,
+                MAX(recall) AS recall,
+                MAX(f1_score) AS f1_score
+            FROM {events_table}
+            GROUP BY experiment_id, user_id, model_id
+            ORDER BY MAX(total_images) DESC NULLS LAST, experiment_id
+            LIMIT 5
+            """
+        )
+        count_row = await conn.fetchrow(f"SELECT COUNT(*)::int AS total_rows FROM {events_table}")
+    summaries = [
+        {
+            "experiment_id": row["experiment_id"],
+            "user_id": row["user_id"],
+            "model_id": row["model_id"],
+            "total_images": row["total_images"],
+            "precision": float(row["precision"]) if row["precision"] is not None else None,
+            "recall": float(row["recall"]) if row["recall"] is not None else None,
+            "f1_score": float(row["f1_score"]) if row["f1_score"] is not None else None,
+        }
+        for row in summary_rows
+    ]
+    return {
+        "kind": tool_id,
+        "domain": domain,
+        "available": True,
+        "total_rows": int((count_row or {}).get("total_rows") or 0),
+        "user_count": len(user_rows),
+        "users": [str(row["user_id"]) for row in user_rows],
+        "experiments": summaries,
+    }
+
+
+def _format_experiment_execution_message(result: dict) -> str:
+    if not result.get("available"):
+        return f"**Experiment preview failed.** {result.get('error') or 'Unknown error.'}"
+    label = "Animal Ecology" if result.get("domain") == "animal-ecology" else "Digital Agriculture"
+    top = (result.get("experiments") or [])[:2]
+    top_lines = [f"- **{item['experiment_id']}** via `{item['model_id']}` ({item.get('total_images') or 0} images)" for item in top]
+    details = "\n".join(top_lines) if top_lines else "- No experiment summaries available"
+    return (
+        f"**{label} preview generated.**\n"
+        f"- Users indexed: **{result.get('user_count') or 0}**\n"
+        f"- Event rows: **{result.get('total_rows') or 0}**\n"
+        f"{details}\n\n"
+        "Open the full experiments page for user selection, detailed metrics, and image traces."
+    )
+
+
+def _format_mvp_demo_execution_message(report) -> str:
+    training_summary = (report.training_stub or {}).get("summary") or {}
+    gate_status = str(training_summary.get("gate_status") or "unknown")
+    execution_status = str(training_summary.get("execution_status") or "unknown")
+    preview_row_count = len((report.composition_preview or {}).get("preview_rows") or [])
+    return (
+        "**MVP Demo Report generated in deterministic mode.**\n"
+        f"- Training gate: **{gate_status}**\n"
+        f"- Stub execution: **{execution_status}**\n"
+        f"- Preview rows: **{preview_row_count}**\n\n"
+        "Open the full MVP Demo Report surface if you want the full executive summary and raw JSON."
+    )
+
+
+async def execute_tool_action(
+    *,
+    actor: PatraActor,
+    tool_id: str,
+    message: str | None,
+    conversation_id: str | None,
+    pool: asyncpg.Pool | None = None,
+    query: dict[str, str] | None = None,
+    prefilled_payload: dict | None = None,
+    disable_llm: bool = True,
+) -> tuple[str, list[AskPatraMessage], AskPatraExecution]:
+    conversation_id = conversation_id or uuid.uuid4().hex
+    conversation = _load_conversation(conversation_id)
+    query = query or {}
+    prefilled_payload = prefilled_payload or {}
+    capability = get_tool_capability_map(actor).get(tool_id)
+
+    if capability is None:
+        execution = AskPatraExecution(
+            state="failed",
+            message="The requested tool is not registered in Ask Patra.",
+            tool_id=tool_id,
+        )
+        _append_assistant_message(conversation, content="**Inline execution failed.** The requested tool is unknown.", execution=execution)
+        _save_conversation(conversation)
+        return conversation_id, _message_payload(conversation["messages"]), execution
+
+    if tool_id not in INLINE_EXECUTOR_TOOL_IDS or not capability.supports_inline:
+        execution = AskPatraExecution(
+            state="blocked",
+            message="This tool is routed through handoff only. Continue in the target page.",
+            next_step_route=capability.route,
+            tool_id=tool_id,
+        )
+        card, action, handoff = build_tool_navigation(
+            tool_id=tool_id,
+            actor=actor,
+            reason="This workflow is not allowed to execute inside chat.",
+        )
+        _append_assistant_message(
+            conversation,
+            content="**Inline execution is blocked for this tool.** Continue in the full tool surface to proceed.",
+            intent=AskPatraIntent(category="general_help", confidence=1.0, tool_target=tool_id),
+            tool_cards=[card],
+            suggested_actions=[action],
+            handoff=handoff,
+            execution=execution,
+        )
+        _save_conversation(conversation)
+        return conversation_id, _message_payload(conversation["messages"]), execution
+
+    if capability.availability != "available":
+        execution = AskPatraExecution(
+            state="blocked",
+            message=capability.availability_reason or "This tool is not available for the current actor.",
+            next_step_route=capability.route,
+            tool_id=tool_id,
+        )
+        _append_assistant_message(
+            conversation,
+            content=f"**Inline execution is unavailable.** {execution.message}",
+            execution=execution,
+        )
+        _save_conversation(conversation)
+        return conversation_id, _message_payload(conversation["messages"]), execution
+
+    execution_message = _resolve_execution_message(
+        conversation=conversation,
+        message=message,
+        query=query,
+        prefilled_payload=prefilled_payload,
+    )
+    context = str(prefilled_payload.get("context") or query.get("context") or "").strip() or None
+
+    try:
+        outcome = await run_inline_executor(
+            InlineExecutionContext(
+                tool_id=tool_id,
+                tool_route=capability.route,
+                message=execution_message,
+                context=context,
+                query=query,
+                prefilled_payload=prefilled_payload,
+                disable_llm=disable_llm,
+                pool=pool,
+            )
+        )
+        execution = outcome.execution
+        card, action, _ = build_tool_navigation(
+            tool_id=tool_id,
+            actor=actor,
+            reason=outcome.navigation_reason,
+            query=outcome.navigation_query,
+        )
+        _append_assistant_message(
+            conversation,
+            content=outcome.content,
+            intent=outcome.intent,
+            tool_cards=[card],
+            suggested_actions=[action],
+            handoff=AskPatraHandoff(kind="inline", tool_target=tool_id, route=capability.route, label=outcome.handoff_label),
+            execution=execution,
+        )
+    except Exception as exc:
+        execution = AskPatraExecution(
+            state="failed",
+            message=str(exc),
+            next_step_route=capability.route,
+            tool_id=tool_id,
+        )
+        card, action, handoff = build_tool_navigation(
+            tool_id=tool_id,
+            actor=actor,
+            reason="The inline run failed. Continue in the full tool surface.",
+        )
+        _append_assistant_message(
+            conversation,
+            content=f"**Inline execution failed.** {execution.message}",
+            intent=AskPatraIntent(category="general_help", confidence=1.0, tool_target=tool_id),
+            tool_cards=[card],
+            suggested_actions=[action],
+            handoff=handoff,
+            execution=execution,
+        )
+
+    _save_conversation(conversation)
+    return conversation_id, _message_payload(conversation["messages"]), execution
 
 
 def _resolve_llm_auth(api_base: str, request_tapis_token: str | None) -> tuple[str | None, dict[str, str]]:
@@ -329,7 +965,19 @@ async def answer_question(
     conversation_id: str | None = None,
     reset: bool = False,
     request_tapis_token: str | None = None,
-) -> tuple[str, str, str | None, list[AskPatraCitation], list[AskPatraMessage], list]:
+) -> tuple[
+    str,
+    str,
+    str | None,
+    list[AskPatraCitation],
+    list[AskPatraMessage],
+    list,
+    AskPatraIntent,
+    list[AskPatraToolCard],
+    list[AskPatraSuggestedAction],
+    AskPatraHandoff,
+    AskPatraExecution,
+]:
     starters = ensure_ask_patra_storage()
     conversation_id = conversation_id or uuid.uuid4().hex
     conversation = _load_conversation(conversation_id)
@@ -339,6 +987,11 @@ async def answer_question(
     include_private = actor.is_authenticated
     wants_lookup = _wants_record_lookup(message)
     citations = await search_pattra_records(conn, query=message, include_private=include_private, limit_per_type=3) if wants_lookup else []
+    intent, tool_cards, suggested_actions, handoff, execution = _build_tool_routing(
+        actor=actor,
+        message=message,
+        citations=citations,
+    )
     context_block = _build_context_block(citations)
 
     system_prompt = _system_prompt_text()
@@ -362,10 +1015,12 @@ async def answer_question(
     enabled = os.getenv("ASK_PATRA_LLM_ENABLED", "true").strip().lower() == "true" and bool(api_base)
 
     mode = "code_fallback"
-    answer = _fallback_answer(message, citations)
+    answer = _fallback_answer(message, citations, intent=intent, tool_cards=tool_cards)
     model_used: str | None = None
 
-    if enabled and not _is_greeting(message):
+    allow_llm_answer = intent.category in {"record_search", "general_help"} and not _is_greeting(message)
+
+    if enabled and allow_llm_answer:
         try:
             answer, model_used = chat_text_with_model_fallback(
                 api_base=api_base,
@@ -382,7 +1037,30 @@ async def answer_question(
             mode = "code_fallback"
 
     conversation["messages"].append({"role": "user", "content": message, "created_at": _now_iso()})
-    conversation["messages"].append({"role": "assistant", "content": answer, "created_at": _now_iso()})
+    conversation["messages"].append(
+        {
+            "role": "assistant",
+            "content": answer,
+            "created_at": _now_iso(),
+            "intent": intent.model_dump(),
+            "tool_cards": [item.model_dump() for item in tool_cards],
+            "suggested_actions": [item.model_dump() for item in suggested_actions],
+            "handoff": handoff.model_dump(),
+            "execution": execution.model_dump(),
+        }
+    )
     _save_conversation(conversation)
 
-    return conversation_id, answer, model_used, citations, _message_payload(conversation["messages"]), starters
+    return (
+        conversation_id,
+        answer,
+        model_used,
+        citations,
+        _message_payload(conversation["messages"]),
+        starters,
+        intent,
+        tool_cards,
+        suggested_actions,
+        handoff,
+        execution,
+    )
