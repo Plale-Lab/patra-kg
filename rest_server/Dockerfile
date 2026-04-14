@@ -9,6 +9,7 @@ COPY rest_server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY rest_server/ ./rest_server/
+COPY src/ ./src/
 COPY db/ ./db/
 
 EXPOSE 8000

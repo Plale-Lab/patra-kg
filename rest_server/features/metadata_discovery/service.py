@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 
 from rest_server.features.metadata_discovery.internal_asset_pool import (
@@ -15,6 +16,7 @@ from rest_server.patra_agent_service import rank_query_schema_candidates, rank_q
 _ENUM_PREFIX_RE = re.compile(r"^enum:\s*", re.IGNORECASE)
 _NUMERIC_RANGE_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*-\s*(-?\d+(?:\.\d+)?)\s*$")
 _GE_RANGE_RE = re.compile(r"^\s*>=\s*(-?\d+(?:\.\d+)?)\s*$")
+log = logging.getLogger(__name__)
 
 
 def _schema_type_and_format(field: IntentSchemaField) -> tuple[str, str | None]:
@@ -127,30 +129,41 @@ def discover_metadata(
 ) -> dict:
     query_schema = intent_schema_to_query_schema(intent_schema)
     internal_pairs = load_materialized_internal_asset_schema_pool(cache_dir=cache_dir, rebuild_if_missing=True)
-    if internal_pairs:
-        response = rank_query_schema_candidates_from_pairs(
-            query_schema,
-            pairs=internal_pairs,
-            top_k=top_k,
-            disable_llm=disable_llm,
-            api_base=api_base,
-            model=model,
-            api_key=api_key,
-            timeout_seconds=timeout_seconds,
-            success_message="Intent schema ranked against the PATRA internal asset pool using the shared agent matching stack.",
-        )
-    else:
-        response = rank_query_schema_candidates(
-            query_schema,
-            top_k=top_k,
-            disable_llm=disable_llm,
-            api_base=api_base,
-            model=model,
-            api_key=api_key,
-            timeout_seconds=timeout_seconds,
-            cache_dir=cache_dir,
-            success_message="Intent schema ranked against the PATRA public schema pool using the shared agent matching stack.",
-        )
+    try:
+        if internal_pairs:
+            response = rank_query_schema_candidates_from_pairs(
+                query_schema,
+                pairs=internal_pairs,
+                top_k=top_k,
+                disable_llm=disable_llm,
+                api_base=api_base,
+                model=model,
+                api_key=api_key,
+                timeout_seconds=timeout_seconds,
+                success_message="Intent schema ranked against the PATRA internal asset pool using the shared agent matching stack.",
+            )
+        else:
+            response = rank_query_schema_candidates(
+                query_schema,
+                top_k=top_k,
+                disable_llm=disable_llm,
+                api_base=api_base,
+                model=model,
+                api_key=api_key,
+                timeout_seconds=timeout_seconds,
+                cache_dir=cache_dir,
+                success_message="No internal asset export was available; attempted public fallback schema pool.",
+            )
+    except Exception as exc:  # noqa: BLE001
+        log.exception("metadata_discovery.discover_metadata.ranking_failed")
+        response = {
+            "status": "degraded",
+            "message": f"Metadata discovery could not rank candidate datasets: {exc}",
+            "query_schema": query_schema,
+            "candidate_count": 0,
+            "winner_dataset_id": None,
+            "ranking": [],
+        }
     coverage = _winner_coverage(response, len(intent_schema.schema_fields))
     response["winner_coverage"] = coverage.model_dump() if coverage is not None else None
     response["pool_mode"] = "internal" if internal_pairs else "public"

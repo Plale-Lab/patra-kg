@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import Awaitable, Callable
@@ -23,6 +24,7 @@ class InlineExecutionContext:
     query: dict[str, str]
     prefilled_payload: dict
     disable_llm: bool
+    request_tapis_token: str | None
     pool: asyncpg.Pool | None
 
 
@@ -47,7 +49,7 @@ def _coerce_int(value, default: int, *, minimum: int, maximum: int) -> int:
 
 
 def _mcp_base_url() -> str:
-    return "http://127.0.0.1:8050"
+    return os.getenv("MCP_BASE_URL", "http://127.0.0.1:8050").strip() or "http://127.0.0.1:8050"
 
 
 def _read_mcp_endpoint(base_url: str) -> tuple[str | None, str | None]:
@@ -157,12 +159,12 @@ def _build_intent_schema_execution_payload(result) -> dict:
         "mode": result.mode,
         "provider": result.provider,
         "model_used": result.model_used,
-        "task_type": result.schema.task_type,
-        "entity_grain": result.schema.entity_grain,
-        "target_column": result.schema.target_column,
-        "field_count": len(result.schema.fields),
-        "assumption_count": len(result.schema.assumptions),
-        "ambiguity_warning_count": len(result.schema.ambiguity_warnings),
+        "task_type": result.task_type,
+        "entity_grain": result.entity_grain,
+        "target_column": result.target_column,
+        "field_count": len(result.schema_fields),
+        "assumption_count": len(result.assumptions),
+        "ambiguity_warning_count": len(result.ambiguity_warnings),
         "fields": [
             {
                 "name": field.name,
@@ -170,18 +172,18 @@ def _build_intent_schema_execution_payload(result) -> dict:
                 "role": field.semantic_role,
                 "required": field.required,
             }
-            for field in result.schema.fields
+            for field in result.schema_fields
         ],
     }
 
 
 def _format_intent_schema_execution_message(result) -> str:
-    field_count = len(result.schema.fields)
-    warning_count = len(result.schema.ambiguity_warnings)
+    field_count = len(result.schema_fields)
+    warning_count = len(result.ambiguity_warnings)
     return (
         "**Intent Schema generated inline.**\n"
-        f"- Task type: **{result.schema.task_type}**\n"
-        f"- Target column: **{result.schema.target_column}**\n"
+        f"- Task type: **{result.task_type}**\n"
+        f"- Target column: **{result.target_column}**\n"
         f"- Fields: **{field_count}**\n"
         f"- Ambiguity warnings: **{warning_count}**\n\n"
         "Open the full Intent Schema surface if you want to inspect every field, assumption, and warning."
@@ -291,6 +293,7 @@ async def _run_intent_schema_tool(context: InlineExecutionContext) -> InlineExec
         context=context.context,
         max_fields=max_fields,
         disable_llm=context.disable_llm,
+        request_tapis_token=context.request_tapis_token,
     )
     return InlineExecutionOutcome(
         content=_format_intent_schema_execution_message(result),

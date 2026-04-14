@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 import sys
 import tempfile
@@ -10,6 +11,9 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 import os
+
+
+log = logging.getLogger(__name__)
 
 
 class AgentServiceError(RuntimeError):
@@ -173,7 +177,21 @@ def _pair_map(cache_dir: str) -> dict[str, Any]:
 def list_schema_pool(cache_dir: str | None = None) -> list[dict[str, Any]]:
     normalized_cache = _normalize_cache_dir(cache_dir)
     items = []
-    for pair in _get_pool(normalized_cache):
+    try:
+        pool = _get_pool(normalized_cache)
+    except ModuleNotFoundError as exc:
+        log.exception("patra_agent_service.list_schema_pool.degraded_missing_src")
+        return [
+            {
+                "dataset_id": "schema_pool_unavailable",
+                "title": f"Schema pool unavailable: {exc}",
+                "source_family": "degraded",
+                "source_url": "",
+                "public_access": "unavailable",
+                "task_tags": {"error": str(exc)},
+            }
+        ]
+    for pair in pool:
         items.append(
             {
                 "dataset_id": pair.dataset_id,
@@ -431,6 +449,82 @@ def _candidate_rows_from_pairs(match_result: Any, pairs: list[Any], query_schema
     return rows
 
 
+def _normalize_field_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(value or "").lower()).strip("_")
+
+
+def _property_type(prop: dict[str, Any]) -> str:
+    return str(prop.get("type") or "").lower()
+
+
+def _types_compatible(query_prop: dict[str, Any], candidate_prop: dict[str, Any]) -> bool:
+    query_type = _property_type(query_prop)
+    candidate_type = _property_type(candidate_prop)
+    if not query_type or not candidate_type:
+        return False
+    if query_type == candidate_type:
+        return True
+    numeric = {"integer", "number"}
+    return query_type in numeric and candidate_type in numeric
+
+
+def _deterministic_candidate_rows_from_pairs(query_schema: dict[str, Any], pairs: list[Any], *, top_k: int) -> list[dict[str, Any]]:
+    query_props = query_schema.get("properties") or {}
+    query_keys = {_normalize_field_key(name): (name, prop) for name, prop in query_props.items()}
+    rows: list[dict[str, Any]] = []
+    for pair in pairs:
+        candidate_props = (getattr(pair, "schema", {}) or {}).get("properties") or {}
+        candidate_keys = {_normalize_field_key(name): (name, prop) for name, prop in candidate_props.items()}
+        matched: list[str] = []
+        derivable: list[str] = []
+        missing: list[str] = []
+        for query_key, (query_name, query_prop) in query_keys.items():
+            candidate = candidate_keys.get(query_key)
+            if candidate and _types_compatible(query_prop, candidate[1]):
+                matched.append(query_name)
+                continue
+            if candidate:
+                derivable.append(query_name)
+                continue
+            query_tokens = {token for token in query_key.split("_") if len(token) > 2}
+            best_overlap = 0
+            for candidate_key in candidate_keys:
+                candidate_tokens = {token for token in candidate_key.split("_") if len(token) > 2}
+                best_overlap = max(best_overlap, len(query_tokens & candidate_tokens))
+            if best_overlap:
+                derivable.append(query_name)
+            else:
+                missing.append(query_name)
+        total = max(1, len(query_keys))
+        score = (len(matched) + 0.35 * len(derivable)) / total
+        rows.append(
+            {
+                "rank": 0,
+                "dataset_id": pair.dataset_id,
+                "title": pair.title,
+                "source_family": pair.source_family,
+                "source_url": pair.source_url,
+                "public_access": pair.public_access,
+                "score": round(score, 4),
+                "summary": (
+                    f"deterministic_fallback_score={score:.2f}, "
+                    f"direct={len(matched)}, derivable={len(derivable)}, missing={len(missing)}"
+                ),
+                "matched_field_groups": matched,
+                "derivable_field_groups": derivable,
+                "missing_field_groups": missing,
+                "aligned_pairs": [],
+                "derived_support": [],
+                "type_conflicts": [],
+                "tradeoffs": ["Optional src matcher unavailable; deterministic fallback used."],
+            }
+        )
+    rows.sort(key=lambda row: row["score"], reverse=True)
+    for index, row in enumerate(rows[:top_k], start=1):
+        row["rank"] = index
+    return rows[:top_k]
+
+
 def rank_query_schema_candidates(
     query_schema: dict[str, Any],
     *,
@@ -444,9 +538,14 @@ def rank_query_schema_candidates(
     success_message: str,
 ) -> dict[str, Any]:
     normalized_cache = _normalize_cache_dir(cache_dir)
-    matcher = _build_matcher(normalized_cache, disable_llm, api_base, model, api_key, timeout_seconds)
-    match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
-    ranking = _candidate_rows(match_result["report"], normalized_cache, query_schema)
+    try:
+        matcher = _build_matcher(normalized_cache, disable_llm, api_base, model, api_key, timeout_seconds)
+        match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
+        ranking = _candidate_rows(match_result["report"], normalized_cache, query_schema)
+    except ModuleNotFoundError as exc:
+        log.exception("patra_agent_service.rank_query_schema_candidates.degraded_missing_src")
+        ranking = []
+        success_message = f"{success_message} Public matcher unavailable: {exc}"
     winner = ranking[0]["dataset_id"] if ranking else None
     return {
         "status": "ok",
@@ -470,16 +569,21 @@ def rank_query_schema_candidates_from_pairs(
     timeout_seconds: int,
     success_message: str,
 ) -> dict[str, Any]:
-    matcher = _build_matcher_from_pairs(
-        pairs,
-        disable_llm=disable_llm,
-        api_base=api_base,
-        model=model,
-        api_key=api_key,
-        timeout_seconds=timeout_seconds,
-    )
-    match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
-    ranking = _candidate_rows_from_pairs(match_result["report"], pairs, query_schema)
+    try:
+        matcher = _build_matcher_from_pairs(
+            pairs,
+            disable_llm=disable_llm,
+            api_base=api_base,
+            model=model,
+            api_key=api_key,
+            timeout_seconds=timeout_seconds,
+        )
+        match_result = asdict(matcher.match_schema(query_schema, top_k=top_k))
+        ranking = _candidate_rows_from_pairs(match_result["report"], pairs, query_schema)
+    except ModuleNotFoundError as exc:
+        log.exception("patra_agent_service.rank_query_schema_candidates_from_pairs.degraded_missing_src")
+        ranking = _deterministic_candidate_rows_from_pairs(query_schema, pairs, top_k=top_k)
+        success_message = f"{success_message} Used deterministic fallback matcher because optional src matcher is unavailable: {exc}"
     winner = ranking[0]["dataset_id"] if ranking else None
     return {
         "status": "ok",

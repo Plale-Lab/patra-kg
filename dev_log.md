@@ -1,5 +1,96 @@
 # Dev Log
 
+## Version 0.7.2 - 2026-04-13
+
+### Context
+
+This update records the latest dev backend work for the PATRA planning pipeline, Ask Patra tool orchestration, and LiteLLM/JWT diagnostics.
+
+The main deployment target is now:
+
+- Backend image: `plalelab/patra-backend:WQ-4-12-7`
+- Frontend companion image: `plalelab/patra-frontend:WQ-4-13-2`
+
+### Backend Changes
+
+- Confirmed LiteLLM calls can use the request-scoped Tapis user token through `X-Tapis-Token` without treating placeholder service-token values as valid credentials.
+- Kept `/api/llm-test/chat` as the vanilla validation path for LLM connectivity, separate from Ask Patra tool orchestration.
+- Added route-level diagnostics for Intent Schema and Ask Patra LLM calls so logs show whether request tokens, service tokens, or API keys are selected.
+- Fixed the backend Docker image packaging for shared matcher dependencies by including the `src/` matcher package in the runtime image.
+- This resolves the deployed error:
+  - `ModuleNotFoundError: No module named 'src'`
+- Preserved metadata discovery degraded behavior for cases where matcher fallback can still produce a response, while allowing dataset assembly and training-readiness paths to import the shared matcher correctly.
+- Updated Ask Patra record handling so requested record counts are honored more tightly and model-card / datasheet requests do not silently over-return unrelated records.
+- Normalized Ask Patra assistant Markdown to avoid inline asterisk bullets leaking into the rendered UI.
+
+### Current Behavior Notes
+
+- `Baseline Training Stub` is still intentionally a stub. It does not fit a real model, produce a train/validation/test split, or generate a reusable model artifact.
+- When the readiness gate is blocked, the stub should return a blocked readiness/eval report instead of fabricating metrics.
+- A blocked report is expected when metadata discovery and dataset assembly find no safe selected dataset and no preview rows.
+- The next real training artifact milestone should be a separate executor after the dataset composition manifest and preview path can provide sufficiently covered training candidates.
+
+### Validation
+
+- `python -m compileall rest_server src` passed.
+- Container import validation passed:
+  - `from src.hybrid_schema_matcher import HybridSchemaMatcher`
+  - `from rest_server.patra_agent_service import _modules`
+- Docker image `plalelab/patra-backend:WQ-4-12-7` was built and pushed.
+
+## Version 0.7.1 - 2026-04-12
+
+### Context
+
+This update records the current suspended state for the LiteLLM/JWT investigation and the backend changes shipped in Docker tag `WQ-4-12-2`.
+
+The active blocker is not route registration. The backend confirms the relevant routes are enabled and registered. The blocker is LiteLLM authorization: calls to `https://litellm.pods.tacc.tapis.io/v1/chat/completions` still return `403 Forbidden` unless a valid service token or user Tapis JWT with LiteLLM access is supplied.
+
+Work is paused until the Tapis Pods maintainer can provide or validate a service token for the dev backend pod.
+
+### Backend Changes
+
+- Added a minimal vanilla LLM test endpoint:
+  - `POST /api/llm-test/chat`
+- Included the LLM test route when Ask Patra routes are enabled.
+- The endpoint intentionally bypasses:
+  - Ask Patra intent classification
+  - tool registry
+  - citation lookup
+  - starter prompts
+  - inline execution
+  - workflow handoff logic
+- The endpoint sends the user message directly through the shared OpenAI-compatible client so it can isolate LiteLLM/JWT behavior.
+- On failure, the endpoint returns a structured error response instead of falling back to deterministic text.
+- Added non-sensitive diagnostics for:
+  - route-level token/header presence
+  - selected auth source: service token, request token, API key, or none
+  - OpenAI-compatible request header presence
+  - HTTP status, redirect location, and short response body on upstream failure
+- Added placeholder-token detection so values like `<valid Tapis JWT/service token with LiteLLM access>` are not treated as real credentials.
+- Added service-token env aliases:
+  - `ASK_PATRA_TAPIS_TOKEN`
+  - `INTENT_SCHEMA_TAPIS_TOKEN`
+  - `LITELLM_TAPIS_TOKEN`
+  - `PATRA_LITELLM_TAPIS_TOKEN`
+- Updated MCP inline execution to read `MCP_BASE_URL` from environment instead of using a local hardcoded endpoint.
+
+### Current Suspended State
+
+- `Ask Patra` and `Intent Schema` are still expected to fall back when LiteLLM returns `403 Forbidden`.
+- `LLM Test` should now be used as the primary validation surface because it does not involve tool orchestration.
+- If `/llm-test` logs `selected=service` and sends both `Authorization` and `X-Tapis-Token` but still receives `403`, the installed token lacks LiteLLM access.
+- If `/llm-test` logs `selected=none`, the pod still does not have a usable token configured.
+
+### Docker Images
+
+- Backend image pushed: `plalelab/patra-backend:WQ-4-12-2`
+- Frontend companion image expected for the same test run: `plalelab/patra-frontend:WQ-4-12-2`
+
+### Validation
+
+- `python -m compileall rest_server` passed.
+
 ## Version 0.7.0 - 2026-04-10
 
 ### Context

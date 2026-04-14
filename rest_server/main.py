@@ -18,6 +18,7 @@ from rest_server.routes import (
     datasheets,
     experiments,
     intent_schema,
+    llm_test,
     metadata_discovery,
     mvp_demo_report,
     model_cards,
@@ -29,6 +30,11 @@ from rest_server.routes import (
 log = logging.getLogger(__name__)
 
 
+def _emit(message: str) -> None:
+    print(message, flush=True)
+    log.info(message)
+
+
 def _env_flag(name: str, default: bool = False) -> bool:
     value = os.getenv(name)
     if value is None or value == "":
@@ -36,14 +42,34 @@ def _env_flag(name: str, default: bool = False) -> bool:
     return value.strip().lower() == "true"
 
 
+def _ask_patra_enabled() -> bool:
+    explicit = os.getenv("ENABLE_ASK_PATRA")
+    if explicit is not None and explicit != "":
+        return explicit.strip().lower() == "true"
+    for candidate in (
+        "ASK_PATRA_LLM_API_BASE",
+        "ASK_PATRA_LLM_BASE_URL",
+        "ASK_PATRA_LLM_MODEL",
+        "ASK_PATRA_MODEL",
+        "LITELLM_API_BASE",
+        "LITELLM_MODEL",
+        "OPENAI_API_BASE",
+        "OPENAI_MODEL",
+    ):
+        if (os.getenv(candidate) or "").strip():
+            return True
+    return True
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    log.info("Starting Patra FastAPI backend")
+    _emit("Starting Patra FastAPI backend")
     pool = None
     db_startup_timeout = int(os.getenv("DB_STARTUP_TIMEOUT_SECONDS", "12") or "12")
     try:
         pool = await asyncio.wait_for(init_pool(), timeout=db_startup_timeout)
     except Exception:
+        print("Database initialization failed within startup timeout; starting in degraded mode", flush=True)
         log.exception("Database initialization failed within startup timeout; starting in degraded mode")
     backup_task = None
     interval_seconds = int(os.getenv("ASSET_PERIODIC_BACKUP_INTERVAL_SECONDS", "0") or "0")
@@ -66,7 +92,7 @@ async def lifespan(app: FastAPI):
             await backup_task
         except asyncio.CancelledError:
             pass
-    log.info("Stopping Patra FastAPI backend")
+    _emit("Stopping Patra FastAPI backend")
     await close_pool()
 
 
@@ -92,59 +118,85 @@ app.include_router(tickets.router)
 app.include_router(agent_tools.router)
 app.include_router(submissions.router)
 
-if _env_flag("ENABLE_ASK_PATRA", default=False):
+if _ask_patra_enabled():
     app.include_router(ask_patra.router)
-    log.info("Ask Patra routes enabled")
+    app.include_router(llm_test.router)
+    _emit("Ask Patra routes enabled")
+    _emit("LLM test routes enabled")
 else:
-    log.info("Ask Patra routes disabled")
+    _emit("Ask Patra routes disabled")
+    _emit("LLM test routes disabled")
 
 if _env_flag("ENABLE_INTENT_SCHEMA", default=False):
     app.include_router(intent_schema.router)
-    log.info("Intent schema routes enabled")
+    _emit("Intent schema routes enabled")
 else:
-    log.info("Intent schema routes disabled")
+    _emit("Intent schema routes disabled")
 
 if _env_flag("ENABLE_METADATA_DISCOVERY", default=False):
     app.include_router(metadata_discovery.router)
-    log.info("Metadata discovery routes enabled")
+    _emit("Metadata discovery routes enabled")
 else:
-    log.info("Metadata discovery routes disabled")
+    _emit("Metadata discovery routes disabled")
 
 if _env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)):
     app.include_router(dataset_assembly.router)
-    log.info("Dataset assembly routes enabled")
+    _emit("Dataset assembly routes enabled")
 else:
-    log.info("Dataset assembly routes disabled")
+    _emit("Dataset assembly routes disabled")
 
 if _env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))):
     app.include_router(training_readiness.router)
-    log.info("Training readiness routes enabled")
+    _emit("Training readiness routes enabled")
 else:
-    log.info("Training readiness routes disabled")
+    _emit("Training readiness routes disabled")
 
 if _env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)))):
     app.include_router(baseline_training.router)
-    log.info("Baseline training stub routes enabled")
+    _emit("Baseline training stub routes enabled")
 else:
-    log.info("Baseline training stub routes disabled")
+    _emit("Baseline training stub routes disabled")
 
 if _env_flag("ENABLE_MVP_DEMO_REPORT", default=_env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))))):
     app.include_router(mvp_demo_report.router)
-    log.info("MVP demo report routes enabled")
+    _emit("MVP demo report routes enabled")
 else:
-    log.info("MVP demo report routes disabled")
+    _emit("MVP demo report routes disabled")
 
 if _env_flag("ENABLE_AUTOMATED_INGESTION", default=False):
     app.include_router(automated_ingestion.router)
-    log.info("Automated ingestion routes enabled")
+    _emit("Automated ingestion routes enabled")
 else:
-    log.info("Automated ingestion routes disabled")
+    _emit("Automated ingestion routes disabled")
 
 if _env_flag("ENABLE_DOMAIN_EXPERIMENTS", default=False):
     app.include_router(experiments.router)
-    log.info("Experiment routes enabled")
+    _emit("Experiment routes enabled")
 else:
-    log.info("Experiment routes disabled")
+    _emit("Experiment routes disabled")
+
+_emit(
+    "Patra feature flags ask_patra=%s intent_schema=%s metadata_discovery=%s dataset_assembly=%s training_readiness=%s baseline_training_stub=%s mvp_demo_report=%s automated_ingestion=%s domain_experiments=%s"
+    % (
+        _ask_patra_enabled(),
+        _env_flag("ENABLE_INTENT_SCHEMA", default=False),
+        _env_flag("ENABLE_METADATA_DISCOVERY", default=False),
+        _env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)),
+        _env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))),
+        _env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False)))),
+        _env_flag("ENABLE_MVP_DEMO_REPORT", default=_env_flag("ENABLE_BASELINE_TRAINING_STUB", default=_env_flag("ENABLE_TRAINING_READINESS", default=_env_flag("ENABLE_DATASET_ASSEMBLY", default=_env_flag("ENABLE_METADATA_DISCOVERY", default=False))))),
+        _env_flag("ENABLE_AUTOMATED_INGESTION", default=False),
+        _env_flag("ENABLE_DOMAIN_EXPERIMENTS", default=False),
+    )
+)
+_emit(
+    "Patra registered routes: %s"
+    % sorted(
+        f"{','.join(sorted(route.methods or []))}:{getattr(route, 'path', '')}"
+        for route in app.router.routes
+        if getattr(route, "path", None)
+    )
+)
 
 
 @app.get("/")

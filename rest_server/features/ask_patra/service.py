@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import uuid
@@ -31,10 +32,11 @@ from rest_server.features.ask_patra.prompts import DEFAULT_BEHAVIOR_PROMPT, DEFA
 from rest_server.features.ask_patra.tool_registry import build_tool_navigation, classify_tool_intent, get_tool_capability_map
 from rest_server.features.shared.openai_compat import chat_text_with_model_fallback
 
+log = logging.getLogger(__name__)
 
 STOPWORDS = {
     "the", "a", "an", "and", "or", "for", "to", "of", "in", "on", "with", "about", "me", "you",
-    "can", "what", "where", "how", "show", "find", "look", "up", "into", "from", "that", "this",
+    "can", "what", "where", "how", "show", "find", "give", "random", "look", "up", "into", "from", "that", "this",
     "is", "are", "be", "it", "i", "we", "do", "does", "help", "please",
 }
 
@@ -43,7 +45,7 @@ GREETING_PATTERNS = {
 }
 
 LOOKUP_HINTS = {
-    "find", "search", "look", "lookup", "look up", "show", "browse", "list", "recommend", "related",
+    "find", "search", "look", "lookup", "look up", "show", "give", "browse", "list", "recommend", "related",
     "model", "models", "model card", "model cards", "datasheet", "datasheets", "record", "records",
     "author", "metadata", "keyword", "keywords", "compare",
 }
@@ -75,12 +77,39 @@ def _prompts_dir() -> Path:
 
 
 def _provider_label() -> str:
-    api_base = os.getenv("ASK_PATRA_LLM_API_BASE", "").strip()
+    api_base = _llm_api_base()
     if "litellm.pods.tacc.tapis.io" in api_base:
         return "SambaNova via LiteLLM"
     if api_base:
         return "PATRA AI"
     return "PATRA AI (code fallback)"
+
+
+def _first_env(*names: str) -> str:
+    for name in names:
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _llm_api_base() -> str:
+    return _first_env(
+        "ASK_PATRA_LLM_API_BASE",
+        "ASK_PATRA_LLM_BASE_URL",
+        "LITELLM_API_BASE",
+        "OPENAI_API_BASE",
+    )
+
+
+def _llm_model() -> str | None:
+    value = _first_env(
+        "ASK_PATRA_LLM_MODEL",
+        "ASK_PATRA_MODEL",
+        "LITELLM_MODEL",
+        "OPENAI_MODEL",
+    )
+    return value or None
 
 
 def ensure_ask_patra_storage() -> list:
@@ -153,6 +182,40 @@ def _wants_record_lookup(query: str) -> bool:
     return any(hint in normalized for hint in LOOKUP_HINTS) or len(_tokenize_query(normalized)) >= 3
 
 
+def _requested_record_limit(query: str, default: int = 3) -> int:
+    normalized = _normalized_query(query)
+    word_numbers = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
+    for word, value in word_numbers.items():
+        if re.search(rf"\b{word}\b", normalized):
+            return max(1, min(10, value))
+    match = re.search(r"\b(?:top|up to|give me|show me|find|list)?\s*(\d{1,2})\s+(?:random\s+)?(?:model cards?|datasheets?|records?|items?|results?)\b", normalized)
+    if match:
+        return max(1, min(10, int(match.group(1))))
+    return default
+
+
+def _requested_resource_types(query: str) -> set[str] | None:
+    normalized = _normalized_query(query)
+    wants_model_cards = any(token in normalized for token in ("model card", "model cards", "models"))
+    wants_datasheets = any(token in normalized for token in ("datasheet", "datasheets", "datasets"))
+    if wants_model_cards and not wants_datasheets:
+        return {"model_card"}
+    if wants_datasheets and not wants_model_cards:
+        return {"datasheet"}
+    return None
+
+
 def _score_text(query_tokens: list[str], *values: str | None) -> tuple[int, list[str]]:
     haystack = " ".join(value for value in values if value).lower()
     matched = [token for token in query_tokens if token in haystack]
@@ -164,49 +227,56 @@ async def search_pattra_records(
     *,
     query: str,
     include_private: bool,
-    limit_per_type: int = 8,
+    limit: int = 3,
+    resource_types: set[str] | None = None,
 ) -> list[AskPatraCitation]:
     query_tokens = _tokenize_query(query)
     if not query_tokens:
         return []
+    resource_types = resource_types or {"model_card", "datasheet"}
     model_filter = "" if include_private else "AND mc.is_private = false"
     datasheet_filter = "" if include_private else "AND d.is_private = false"
-    model_rows = await conn.fetch(
-        f"""
-        WITH ranked AS (
-            SELECT mc.id, mc.name, mc.author, mc.short_description, mc.full_description, mc.keywords,
-                   mc.category, mc.input_data, mc.output_data, mc.foundational_model, mc.asset_version,
-                   ROW_NUMBER() OVER (PARTITION BY COALESCE(mc.root_version_id, mc.id) ORDER BY mc.asset_version DESC, mc.id DESC) AS rn
-            FROM model_cards mc
-            WHERE mc.status = 'approved' {model_filter}
+    model_rows = []
+    datasheet_rows = []
+    fetch_limit = max(limit * 12, 40)
+    if "model_card" in resource_types:
+        model_rows = await conn.fetch(
+            f"""
+            WITH ranked AS (
+                SELECT mc.id, mc.name, mc.author, mc.short_description, mc.full_description, mc.keywords,
+                       mc.category, mc.input_data, mc.output_data, mc.foundational_model, mc.asset_version,
+                       ROW_NUMBER() OVER (PARTITION BY COALESCE(mc.root_version_id, mc.id) ORDER BY mc.asset_version DESC, mc.id DESC) AS rn
+                FROM model_cards mc
+                WHERE mc.status = 'approved' {model_filter}
+            )
+            SELECT r.id, r.name, r.author, r.short_description, r.full_description, r.keywords, r.category,
+                   r.input_data, r.output_data, r.foundational_model
+            FROM ranked r
+            WHERE r.rn = 1
+            LIMIT $1
+            """,
+            fetch_limit,
         )
-        SELECT r.id, r.name, r.author, r.short_description, r.full_description, r.keywords, r.category,
-               r.input_data, r.output_data, r.foundational_model
-        FROM ranked r
-        WHERE r.rn = 1
-        LIMIT $1
-        """,
-        max(limit_per_type * 10, 40),
-    )
-    datasheet_rows = await conn.fetch(
-        f"""
-        WITH ranked AS (
-            SELECT d.identifier, d.asset_version,
-                   ROW_NUMBER() OVER (PARTITION BY COALESCE(d.root_version_id, d.identifier) ORDER BY d.asset_version DESC, d.identifier DESC) AS rn
-            FROM datasheets d
-            WHERE d.status = 'approved' {datasheet_filter}
+    if "datasheet" in resource_types:
+        datasheet_rows = await conn.fetch(
+            f"""
+            WITH ranked AS (
+                SELECT d.identifier, d.asset_version,
+                       ROW_NUMBER() OVER (PARTITION BY COALESCE(d.root_version_id, d.identifier) ORDER BY d.asset_version DESC, d.identifier DESC) AS rn
+                FROM datasheets d
+                WHERE d.status = 'approved' {datasheet_filter}
+            )
+            SELECT r.identifier,
+                   (SELECT title FROM datasheet_titles WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS title,
+                   (SELECT creator_name FROM datasheet_creators WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS creator,
+                   (SELECT description FROM datasheet_descriptions WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS description,
+                   (SELECT subject FROM datasheet_subjects WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS subject
+            FROM ranked r
+            WHERE r.rn = 1
+            LIMIT $1
+            """,
+            fetch_limit,
         )
-        SELECT r.identifier,
-               (SELECT title FROM datasheet_titles WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS title,
-               (SELECT creator_name FROM datasheet_creators WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS creator,
-               (SELECT description FROM datasheet_descriptions WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS description,
-               (SELECT subject FROM datasheet_subjects WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS subject
-        FROM ranked r
-        WHERE r.rn = 1
-        LIMIT $1
-        """,
-        max(limit_per_type * 10, 40),
-    )
 
     citations: list[tuple[int, AskPatraCitation]] = []
     for row in model_rows:
@@ -259,7 +329,7 @@ async def search_pattra_records(
             ),
         ))
     citations.sort(key=lambda item: (-item[0], item[1].title.lower()))
-    return _dedupe_citations([citation for _, citation in citations], limit=limit_per_type * 2)
+    return _dedupe_citations([citation for _, citation in citations], limit=limit)
 
 
 def _system_prompt_text() -> str:
@@ -517,6 +587,18 @@ def _fallback_answer(
                 f"- I prepared a draft handoff so the workflow can continue in that tool."
             )
     return "I could not find a strong match for that query. Try naming a task, domain, author, or metadata keyword."
+
+
+def _normalize_answer_markdown(answer: str) -> str:
+    normalized = str(answer or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+    if not normalized:
+        return normalized
+    # Some LLMs emit inline Markdown bullets like "I can help: * A * B".
+    # Convert those to proper Markdown list items before the frontend parser sees them.
+    normalized = re.sub(r"(?<!\n)\s+\*\s+(?=\S)", "\n- ", normalized)
+    normalized = re.sub(r"(?m)^\s*\*\s+", "- ", normalized)
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized)
+    return normalized.strip()
 
 
 def _message_payload(messages: list[dict]) -> list[AskPatraMessage]:
@@ -825,7 +907,16 @@ async def execute_tool_action(
     query: dict[str, str] | None = None,
     prefilled_payload: dict | None = None,
     disable_llm: bool = True,
+    request_tapis_token: str | None = None,
 ) -> tuple[str, list[AskPatraMessage], AskPatraExecution]:
+    log.info(
+        "ask_patra.execute_tool_action.start tool_id=%s conversation_id=%s query_keys=%s payload_keys=%s disable_llm=%s",
+        tool_id,
+        conversation_id,
+        sorted((query or {}).keys()),
+        sorted((prefilled_payload or {}).keys()),
+        disable_llm,
+    )
     conversation_id = conversation_id or uuid.uuid4().hex
     conversation = _load_conversation(conversation_id)
     query = query or {}
@@ -833,6 +924,7 @@ async def execute_tool_action(
     capability = get_tool_capability_map(actor).get(tool_id)
 
     if capability is None:
+        log.error("ask_patra.execute_tool_action.unknown_tool tool_id=%s", tool_id)
         execution = AskPatraExecution(
             state="failed",
             message="The requested tool is not registered in Ask Patra.",
@@ -843,6 +935,7 @@ async def execute_tool_action(
         return conversation_id, _message_payload(conversation["messages"]), execution
 
     if tool_id not in INLINE_EXECUTOR_TOOL_IDS or not capability.supports_inline:
+        log.info("ask_patra.execute_tool_action.blocked_handoff_only tool_id=%s", tool_id)
         execution = AskPatraExecution(
             state="blocked",
             message="This tool is routed through handoff only. Continue in the target page.",
@@ -867,6 +960,7 @@ async def execute_tool_action(
         return conversation_id, _message_payload(conversation["messages"]), execution
 
     if capability.availability != "available":
+        log.info("ask_patra.execute_tool_action.unavailable tool_id=%s availability=%s", tool_id, capability.availability)
         execution = AskPatraExecution(
             state="blocked",
             message=capability.availability_reason or "This tool is not available for the current actor.",
@@ -890,6 +984,7 @@ async def execute_tool_action(
     context = str(prefilled_payload.get("context") or query.get("context") or "").strip() or None
 
     try:
+        log.info("ask_patra.execute_tool_action.dispatch tool_id=%s route=%s", tool_id, capability.route)
         outcome = await run_inline_executor(
             InlineExecutionContext(
                 tool_id=tool_id,
@@ -899,6 +994,7 @@ async def execute_tool_action(
                 query=query,
                 prefilled_payload=prefilled_payload,
                 disable_llm=disable_llm,
+                request_tapis_token=request_tapis_token,
                 pool=pool,
             )
         )
@@ -919,6 +1015,7 @@ async def execute_tool_action(
             execution=execution,
         )
     except Exception as exc:
+        log.exception("ask_patra.execute_tool_action.failed tool_id=%s", tool_id)
         execution = AskPatraExecution(
             state="failed",
             message=str(exc),
@@ -941,19 +1038,60 @@ async def execute_tool_action(
         )
 
     _save_conversation(conversation)
+    log.info("ask_patra.execute_tool_action.done tool_id=%s state=%s conversation_id=%s", tool_id, execution.state, conversation_id)
     return conversation_id, _message_payload(conversation["messages"]), execution
+
+
+def _looks_like_placeholder_token(value: str) -> bool:
+    normalized = value.strip().lower()
+    return (
+        not normalized
+        or normalized.startswith("<")
+        or "valid tapis jwt" in normalized
+        or "service token" in normalized
+        or "replace" in normalized
+        or "your-token" in normalized
+    )
+
+
+def _llm_service_tapis_token() -> str:
+    for name in ("ASK_PATRA_TAPIS_TOKEN", "LITELLM_TAPIS_TOKEN", "PATRA_LITELLM_TAPIS_TOKEN"):
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return ""
 
 
 def _resolve_llm_auth(api_base: str, request_tapis_token: str | None) -> tuple[str | None, dict[str, str]]:
     extra_headers: dict[str, str] = {}
-    service_tapis_token = os.getenv("ASK_PATRA_TAPIS_TOKEN", "").strip()
-    if "litellm.pods.tacc.tapis.io" in (api_base or "").lower() and service_tapis_token:
-        extra_headers["X-Tapis-Token"] = service_tapis_token
-        return None, extra_headers
-    if "litellm.pods.tacc.tapis.io" in (api_base or "").lower() and (request_tapis_token or "").strip():
-        extra_headers["X-Tapis-Token"] = request_tapis_token.strip()
-        return None, extra_headers
+    lowered = (api_base or "").lower()
+    service_tapis_token = _llm_service_tapis_token()
+    request_token = (request_tapis_token or "").strip()
+    service_token_usable = bool(service_tapis_token) and not _looks_like_placeholder_token(service_tapis_token)
+    request_token_usable = bool(request_token) and not _looks_like_placeholder_token(request_token)
+    if "litellm.pods.tacc.tapis.io" in lowered:
+        token = service_tapis_token if service_token_usable else request_token if request_token_usable else ""
+        selected = "service" if service_token_usable else "request" if request_token_usable else "none"
+        print(
+            "ask_patra.auth_debug "
+            f"litellm=True service_token_present={bool(service_tapis_token)} "
+            f"service_token_usable={service_token_usable} "
+            f"request_token_present={bool(request_token)} request_token_usable={request_token_usable} "
+            f"selected={selected}",
+            flush=True,
+        )
+        if token:
+            log.info("ask_patra.resolve_llm_auth using %s tapis token for LiteLLM host auth_mode=tapis_x_header", selected)
+            extra_headers["X-Tapis-Token"] = token
+            return None, extra_headers
     api_key = os.getenv("ASK_PATRA_LLM_API_KEY", "").strip() or None
+    print(
+        "ask_patra.auth_debug "
+        f"litellm={'litellm.pods.tacc.tapis.io' in lowered} api_key_present={bool(api_key)} "
+        f"extra_headers={sorted(extra_headers.keys())}",
+        flush=True,
+    )
+    log.info("ask_patra.resolve_llm_auth using api_key=%s extra_headers=%s", bool(api_key), sorted(extra_headers.keys()))
     return api_key, extra_headers
 
 
@@ -978,19 +1116,47 @@ async def answer_question(
     AskPatraHandoff,
     AskPatraExecution,
 ]:
+    log.info(
+        "ask_patra.answer_question.start conversation_id=%s reset=%s message_len=%s actor=%s",
+        conversation_id,
+        reset,
+        len(message or ""),
+        getattr(actor, "username", None),
+    )
     starters = ensure_ask_patra_storage()
     conversation_id = conversation_id or uuid.uuid4().hex
     conversation = _load_conversation(conversation_id)
     if reset:
+        log.info("ask_patra.answer_question.reset conversation_id=%s", conversation_id)
         conversation["messages"] = []
 
     include_private = actor.is_authenticated
     wants_lookup = _wants_record_lookup(message)
-    citations = await search_pattra_records(conn, query=message, include_private=include_private, limit_per_type=3) if wants_lookup else []
+    log.info("ask_patra.answer_question.lookup include_private=%s wants_lookup=%s", include_private, wants_lookup)
+    requested_limit = _requested_record_limit(message, default=3)
+    requested_resource_types = _requested_resource_types(message)
+    citations = (
+        await search_pattra_records(
+            conn,
+            query=message,
+            include_private=include_private,
+            limit=requested_limit,
+            resource_types=requested_resource_types,
+        )
+        if wants_lookup
+        else []
+    )
     intent, tool_cards, suggested_actions, handoff, execution = _build_tool_routing(
         actor=actor,
         message=message,
         citations=citations,
+    )
+    log.info(
+        "ask_patra.answer_question.intent category=%s confidence=%s tool_target=%s citations=%s",
+        intent.category,
+        intent.confidence,
+        intent.tool_target,
+        len(citations),
     )
     context_block = _build_context_block(citations)
 
@@ -1003,25 +1169,36 @@ async def answer_question(
                 f"User question:\n{message}\n\n"
                 f"Relevant PATRA records:\n{context_block}\n\n"
                 "Answer concisely in Markdown. Use bold labels and short bullet lists when useful. "
-                "Do not list more than 3 records unless the user explicitly asks for more. "
+                f"Do not list more than {requested_limit} records. "
+                "Each Markdown bullet must be on its own line. Do not use inline asterisk bullets. "
+                "If record citations are provided, state exactly how many records you are listing and keep that count consistent with the listed records. "
                 "If this is only a greeting or a broad capability question, do not enumerate records."
             ),
         },
     ]
 
-    api_base = os.getenv("ASK_PATRA_LLM_API_BASE", "").strip()
+    api_base = _llm_api_base()
     api_key, extra_headers = _resolve_llm_auth(api_base, request_tapis_token)
-    model = os.getenv("ASK_PATRA_LLM_MODEL", "").strip() or None
+    model = _llm_model()
     enabled = os.getenv("ASK_PATRA_LLM_ENABLED", "true").strip().lower() == "true" and bool(api_base)
+    log.info(
+        "ask_patra.answer_question.llm_config enabled=%s api_base=%s model=%s extra_headers=%s",
+        enabled,
+        api_base,
+        model,
+        sorted(extra_headers.keys()),
+    )
 
     mode = "code_fallback"
     answer = _fallback_answer(message, citations, intent=intent, tool_cards=tool_cards)
     model_used: str | None = None
 
     allow_llm_answer = intent.category in {"record_search", "general_help"} and not _is_greeting(message)
+    log.info("ask_patra.answer_question.llm_decision allow_llm_answer=%s", allow_llm_answer)
 
     if enabled and allow_llm_answer:
         try:
+            log.info("ask_patra.answer_question.llm_attempt conversation_id=%s", conversation_id)
             answer, model_used = chat_text_with_model_fallback(
                 api_base=api_base,
                 model=model,
@@ -1033,14 +1210,19 @@ async def answer_question(
                 max_tokens=900,
             )
             mode = "llm"
+            answer = _normalize_answer_markdown(answer)
+            log.info("ask_patra.answer_question.llm_success model_used=%s", model_used)
         except Exception:
+            log.exception("ask_patra.answer_question.llm_failed conversation_id=%s", conversation_id)
             mode = "code_fallback"
+    else:
+        log.info("ask_patra.answer_question.llm_skipped enabled=%s allow_llm_answer=%s", enabled, allow_llm_answer)
 
     conversation["messages"].append({"role": "user", "content": message, "created_at": _now_iso()})
     conversation["messages"].append(
         {
             "role": "assistant",
-            "content": answer,
+            "content": _normalize_answer_markdown(answer),
             "created_at": _now_iso(),
             "intent": intent.model_dump(),
             "tool_cards": [item.model_dump() for item in tool_cards],
@@ -1050,6 +1232,14 @@ async def answer_question(
         }
     )
     _save_conversation(conversation)
+    log.info(
+        "ask_patra.answer_question.done conversation_id=%s mode=%s model_used=%s citations=%s tool_cards=%s",
+        conversation_id,
+        mode,
+        model_used,
+        len(citations),
+        len(tool_cards),
+    )
 
     return (
         conversation_id,

@@ -392,7 +392,21 @@ def build_internal_asset_schema_pool(export_path: str | None = None) -> list[Int
 def materialize_internal_asset_schema_pool(cache_dir: str | None = None, export_path: str | None = None) -> dict[str, Any]:
     resolved_export = Path(export_path) if export_path else _default_export_path()
     if resolved_export is None or not resolved_export.is_file():
-        raise FileNotFoundError("No PATRA database export CSV is available for internal asset indexing.")
+        cache_path = internal_pool_cache_path(cache_dir)
+        manifest = {
+            "version": MANIFEST_VERSION,
+            "generated_at": _utc_now_iso(),
+            "export_file": str(resolved_export) if resolved_export else None,
+            "export_last_modified": None,
+            "pair_count": 0,
+            "counts_by_asset_type": {},
+            "counts_by_source_family": {},
+            "counts_by_quality": {},
+            "records": [],
+            "warning": "No PATRA database export CSV is available for internal asset indexing.",
+        }
+        cache_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        return manifest
 
     pairs = build_internal_asset_schema_pool(str(resolved_export))
     manifest = _manifest_from_pairs(resolved_export, pairs)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncpg
+import logging
 from fastapi import APIRouter, Depends, Request
 
 from rest_server.deps import get_request_actor
@@ -17,10 +18,12 @@ from rest_server.features.ask_patra.tool_registry import get_tool_capabilities
 
 
 router = APIRouter(prefix="/api/ask-patra", tags=["ask-patra"])
+log = logging.getLogger(__name__)
 
 
 @router.get("/bootstrap", response_model=AskPatraBootstrapResponse)
 async def ask_patra_bootstrap(actor=Depends(get_request_actor)):
+    log.info("ask_patra.bootstrap actor=%s role=%s", getattr(actor, "username", None), getattr(actor, "role", None))
     starters = ensure_ask_patra_storage()
     return AskPatraBootstrapResponse(
         enabled=True,
@@ -30,13 +33,28 @@ async def ask_patra_bootstrap(actor=Depends(get_request_actor)):
     )
 
 
-@router.post("/chat", response_model=AskPatraChatResponse)
-async def ask_patra_chat(
+async def _ask_patra_chat_impl(
     payload: AskPatraChatRequest,
     request: Request,
     actor=Depends(get_request_actor),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
+    log.info(
+        "ask_patra.chat.start actor=%s role=%s conversation_id=%s message_len=%s path=%s",
+        getattr(actor, "username", None),
+        getattr(actor, "role", None),
+        payload.conversation_id,
+        len(payload.message or ""),
+        request.url.path,
+    )
+    print(
+        "ask_patra.route_debug "
+        f"path={request.url.path} "
+        f"x_tapis_token_present={bool((request.headers.get('X-Tapis-Token') or '').strip())} "
+        f"authorization_present={bool((request.headers.get('Authorization') or '').strip())} "
+        f"actor={getattr(actor, 'username', None)} role={getattr(actor, 'role', None)}",
+        flush=True,
+    )
     async with pool.acquire() as conn:
         conversation_id, answer, model_used, citations, messages, starters, intent, tool_cards, suggested_actions, handoff, execution = await answer_question(
             conn,
@@ -46,7 +64,7 @@ async def ask_patra_chat(
             reset=payload.reset,
             request_tapis_token=(request.headers.get("X-Tapis-Token") or "").strip() or None,
         )
-    return AskPatraChatResponse(
+    response = AskPatraChatResponse(
         conversation_id=conversation_id,
         answer=answer,
         mode="llm" if model_used else "code_fallback",
@@ -61,14 +79,72 @@ async def ask_patra_chat(
         handoff=handoff,
         execution=execution,
     )
+    log.info(
+        "ask_patra.chat.done conversation_id=%s mode=%s model_used=%s citations=%s intent=%s tool_cards=%s",
+        conversation_id,
+        response.mode,
+        model_used,
+        len(citations),
+        getattr(intent, "category", None),
+        len(tool_cards),
+    )
+    return response
+
+
+@router.post("", response_model=AskPatraChatResponse, include_in_schema=False)
+async def ask_patra_chat_legacy(
+    payload: AskPatraChatRequest,
+    request: Request,
+    actor=Depends(get_request_actor),
+    pool: asyncpg.Pool = Depends(get_pool),
+):
+    log.warning("ask_patra.chat.legacy_endpoint_used path=%s", request.url.path)
+    return await _ask_patra_chat_impl(payload, request, actor, pool)
+
+
+@router.post("/", response_model=AskPatraChatResponse, include_in_schema=False)
+async def ask_patra_chat_legacy_slash(
+    payload: AskPatraChatRequest,
+    request: Request,
+    actor=Depends(get_request_actor),
+    pool: asyncpg.Pool = Depends(get_pool),
+):
+    log.warning("ask_patra.chat.legacy_slash_endpoint_used path=%s", request.url.path)
+    return await _ask_patra_chat_impl(payload, request, actor, pool)
+
+
+@router.post("/chat", response_model=AskPatraChatResponse)
+async def ask_patra_chat(
+    payload: AskPatraChatRequest,
+    request: Request,
+    actor=Depends(get_request_actor),
+    pool: asyncpg.Pool = Depends(get_pool),
+):
+    return await _ask_patra_chat_impl(payload, request, actor, pool)
 
 
 @router.post("/execute", response_model=AskPatraExecuteResponse)
 async def ask_patra_execute(
     payload: AskPatraExecuteRequest,
+    request: Request,
     actor=Depends(get_request_actor),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
+    log.info(
+        "ask_patra.execute.start actor=%s role=%s tool_id=%s conversation_id=%s",
+        getattr(actor, "username", None),
+        getattr(actor, "role", None),
+        payload.tool_id,
+        payload.conversation_id,
+    )
+    print(
+        "ask_patra.execute_route_debug "
+        f"path={request.url.path} tool_id={payload.tool_id} "
+        f"x_tapis_token_present={bool((request.headers.get('X-Tapis-Token') or '').strip())} "
+        f"authorization_present={bool((request.headers.get('Authorization') or '').strip())} "
+        f"actor={getattr(actor, 'username', None)} role={getattr(actor, 'role', None)}",
+        flush=True,
+    )
     conversation_id, messages, execution = await execute_tool_action(
         actor=actor,
         tool_id=payload.tool_id,
@@ -78,9 +154,17 @@ async def ask_patra_execute(
         query=payload.query,
         prefilled_payload=payload.prefilled_payload,
         disable_llm=payload.disable_llm,
+        request_tapis_token=(request.headers.get("X-Tapis-Token") or "").strip() or None,
     )
-    return AskPatraExecuteResponse(
+    response = AskPatraExecuteResponse(
         conversation_id=conversation_id,
         messages=messages,
         execution=execution,
     )
+    log.info(
+        "ask_patra.execute.done conversation_id=%s tool_id=%s state=%s",
+        conversation_id,
+        payload.tool_id,
+        execution.state,
+    )
+    return response

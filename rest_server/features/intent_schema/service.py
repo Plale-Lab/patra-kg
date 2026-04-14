@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 
@@ -17,6 +18,7 @@ from rest_server.features.shared.openai_compat import chat_text_with_model_fallb
 _CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 _ENUM_TOKEN_RE = re.compile(r"'([^']+)'|\"([^\"]+)\"|([A-Za-z0-9_./:+-]+)")
 _DATE_HINT_RE = re.compile(r"\b(date|time|month|day|year|timestamp|season)\b", re.IGNORECASE)
+log = logging.getLogger(__name__)
 
 
 def _env_flag(name: str, default: bool = False) -> bool:
@@ -55,6 +57,67 @@ def _llm_api_key() -> str | None:
         return configured
     inherited = os.getenv("ASK_PATRA_LLM_API_KEY", "").strip()
     return inherited or None
+
+
+def _llm_service_tapis_token() -> str:
+    for name in (
+        "INTENT_SCHEMA_TAPIS_TOKEN",
+        "ASK_PATRA_TAPIS_TOKEN",
+        "LITELLM_TAPIS_TOKEN",
+        "PATRA_LITELLM_TAPIS_TOKEN",
+    ):
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return ""
+
+
+def _looks_like_placeholder_token(value: str) -> bool:
+    normalized = value.strip().lower()
+    return (
+        not normalized
+        or normalized.startswith("<")
+        or "valid tapis jwt" in normalized
+        or "service token" in normalized
+        or "replace" in normalized
+        or "your-token" in normalized
+    )
+
+
+def _resolve_llm_auth(api_base: str, request_tapis_token: str | None = None) -> tuple[str | None, dict[str, str]]:
+    extra_headers: dict[str, str] = {}
+    lowered = (api_base or "").lower()
+    service_tapis_token = _llm_service_tapis_token()
+    request_token = (request_tapis_token or "").strip()
+    service_token_usable = bool(service_tapis_token) and not _looks_like_placeholder_token(service_tapis_token)
+    request_token_usable = bool(request_token) and not _looks_like_placeholder_token(request_token)
+    if "litellm.pods.tacc.tapis.io" in lowered:
+        token = service_tapis_token if service_token_usable else request_token if request_token_usable else ""
+        selected = "service" if service_token_usable else "request" if request_token_usable else "none"
+        print(
+            "intent_schema.auth_debug "
+            f"litellm=True service_token_present={bool(service_tapis_token)} "
+            f"service_token_usable={service_token_usable} "
+            f"request_token_present={bool(request_token)} request_token_usable={request_token_usable} "
+            f"selected={selected}",
+            flush=True,
+        )
+        if token:
+            extra_headers["X-Tapis-Token"] = token
+            log.info(
+                "intent_schema.resolve_llm_auth using %s tapis token for LiteLLM auth_mode=tapis_x_header",
+                selected,
+            )
+            return None, extra_headers
+    api_key = _llm_api_key()
+    print(
+        "intent_schema.auth_debug "
+        f"litellm={'litellm.pods.tacc.tapis.io' in lowered} api_key_present={bool(api_key)} "
+        f"extra_headers={sorted(extra_headers.keys())}",
+        flush=True,
+    )
+    log.info("intent_schema.resolve_llm_auth using api_key=%s extra_headers=%s", bool(api_key), sorted(extra_headers.keys()))
+    return api_key, extra_headers
 
 
 def _provider_label(api_base: str) -> str:
@@ -361,11 +424,20 @@ def _fallback_schema(intent_text: str, max_fields: int) -> IntentSchemaResult:
     )
 
 
-def _generate_with_llm(intent_text: str, context: str | None, max_fields: int) -> tuple[IntentSchemaResult, str | None]:
+def _generate_with_llm(
+    intent_text: str,
+    context: str | None,
+    max_fields: int,
+    *,
+    request_tapis_token: str | None = None,
+) -> tuple[IntentSchemaResult, str | None]:
+    api_base = _llm_api_base()
+    api_key, extra_headers = _resolve_llm_auth(api_base, request_tapis_token)
     raw_text, model_used = chat_text_with_model_fallback(
-        api_base=_llm_api_base(),
+        api_base=api_base,
         model=_llm_model(),
-        api_key=_llm_api_key(),
+        api_key=api_key,
+        extra_headers=extra_headers,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": build_generation_prompt(intent_text=intent_text, context=context, max_fields=max_fields)},
@@ -392,13 +464,25 @@ def bootstrap_payload() -> IntentSchemaBootstrapResponse:
     )
 
 
-def generate_schema(*, intent_text: str, context: str | None, max_fields: int, disable_llm: bool = False) -> IntentSchemaResponse:
+def generate_schema(
+    *,
+    intent_text: str,
+    context: str | None,
+    max_fields: int,
+    disable_llm: bool = False,
+    request_tapis_token: str | None = None,
+) -> IntentSchemaResponse:
     enabled = _env_flag("ENABLE_INTENT_SCHEMA", default=False)
     provider = _provider_label(_llm_api_base()) if enabled else "PATRA AI (code fallback)"
 
     if enabled and not disable_llm:
         try:
-            result, model_used = _generate_with_llm(intent_text=intent_text, context=context, max_fields=max_fields)
+            result, model_used = _generate_with_llm(
+                intent_text=intent_text,
+                context=context,
+                max_fields=max_fields,
+                request_tapis_token=request_tapis_token,
+            )
             return IntentSchemaResponse(
                 **result.model_dump(),
                 mode="llm",
@@ -407,7 +491,7 @@ def generate_schema(*, intent_text: str, context: str | None, max_fields: int, d
                 starter_prompts=STARTER_PROMPTS,
             )
         except Exception:
-            pass
+            log.exception("intent_schema.generate_schema.llm_failed mode=code_fallback")
 
     fallback = _normalize_result(_fallback_schema(intent_text=intent_text, max_fields=max_fields))
     return IntentSchemaResponse(
