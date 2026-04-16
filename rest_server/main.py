@@ -1,36 +1,36 @@
 from contextlib import asynccontextmanager
 import asyncio
 import logging
-import os
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import asyncpg
 
 from rest_server.database import close_pool, get_pool, init_pool
-from rest_server.routes import agent_tools, ask_patra, assets, automated_ingestion, datasheets, experiments, model_cards, submissions, tickets
+from rest_server.errors import database_unavailable
+from rest_server.routes import agent_tools, ask_patra, assets, automated_ingestion, datasheets, experiments, model_cards, tickets
+from shared.config import (
+    get_asset_periodic_backup_interval_seconds,
+    get_db_startup_timeout_seconds,
+    is_ask_patra_enabled,
+    is_automated_ingestion_enabled,
+    is_domain_experiments_enabled,
+)
 
 log = logging.getLogger(__name__)
-
-
-def _env_flag(name: str, default: bool = False) -> bool:
-    value = os.getenv(name)
-    if value is None or value == "":
-        return default
-    return value.strip().lower() == "true"
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("Starting Patra FastAPI backend")
     pool = None
-    db_startup_timeout = int(os.getenv("DB_STARTUP_TIMEOUT_SECONDS", "12") or "12")
+    db_startup_timeout = get_db_startup_timeout_seconds()
     try:
         pool = await asyncio.wait_for(init_pool(), timeout=db_startup_timeout)
     except Exception:
         log.exception("Database initialization failed within startup timeout; starting in degraded mode")
     backup_task = None
-    interval_seconds = int(os.getenv("ASSET_PERIODIC_BACKUP_INTERVAL_SECONDS", "0") or "0")
+    interval_seconds = get_asset_periodic_backup_interval_seconds()
     if interval_seconds > 0 and pool is not None:
         async def _backup_loop():
             while True:
@@ -74,21 +74,20 @@ app.include_router(datasheets.router)
 app.include_router(assets.router)
 app.include_router(tickets.router)
 app.include_router(agent_tools.router)
-app.include_router(submissions.router)
 
-if _env_flag("ENABLE_ASK_PATRA", default=False):
+if is_ask_patra_enabled():
     app.include_router(ask_patra.router)
     log.info("Ask Patra routes enabled")
 else:
     log.info("Ask Patra routes disabled")
 
-if _env_flag("ENABLE_AUTOMATED_INGESTION", default=False):
+if is_automated_ingestion_enabled():
     app.include_router(automated_ingestion.router)
     log.info("Automated ingestion routes enabled")
 else:
     log.info("Automated ingestion routes disabled")
 
-if _env_flag("ENABLE_DOMAIN_EXPERIMENTS", default=False):
+if is_domain_experiments_enabled():
     app.include_router(experiments.router)
     log.info("Experiment routes enabled")
 else:
@@ -114,7 +113,7 @@ async def readyz(pool: asyncpg.Pool = Depends(get_pool)):
             value = await conn.fetchval("SELECT 1")
     except Exception as exc:
         log.exception("Readiness check failed: %s", exc)
-        raise HTTPException(status_code=503, detail="database unavailable")
+        raise database_unavailable()
     if value != 1:
-        raise HTTPException(status_code=503, detail="database unavailable")
+        raise database_unavailable()
     return {"status": "ok"}

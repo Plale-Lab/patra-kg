@@ -19,9 +19,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - default
-      - ckn-network
+    # To join an external network (e.g. for CKN integration), run:
+    #   docker network create ckn-network
+    # Then uncomment the networks block below.
+    # networks:
+    #   - default
+    #   - ckn-network
 
   patra-backend:
     build:
@@ -38,10 +41,6 @@ services:
       PATRA_ASSET_INGEST_KEYS_JSON: '{"org-a":"change-me"}'
     ports:
       - "${BACKEND_PORT:-8000}:8000"
-    volumes:
-      - ../../src:/app/src:ro
-      - ../../PATRA:/app/PATRA
-      - ./rest_server:/app/rest_server:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
       interval: 30s
@@ -74,10 +73,11 @@ services:
       postgres:
         condition: service_healthy
 
-networks:
-  ckn-network:
-    external: true
-    name: ckn-network
+# Uncomment to enable external network for CKN integration:
+# networks:
+#   ckn-network:
+#     external: true
+#     name: ckn-network
 
 volumes:
   patra_postgres_data:

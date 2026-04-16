@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, sta
 from rest_server.asset_backups import ensure_initial_backup, record_backup
 from rest_server.database import get_pool
 from rest_server.deps import AssetIngestPrincipal, get_request_actor, require_asset_ingest_principal
-from rest_server.ingest_models import (
+from rest_server.asset_create_models import (
     AssetBulkDatasheetCreate,
     AssetBulkIngestResult,
     AssetBulkItemResult,

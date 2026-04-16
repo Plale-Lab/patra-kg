@@ -1,12 +1,11 @@
 import json
-import os
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
 import asyncpg
 
-DEFAULT_BACKUP_DIR = "/tmp/patra-asset-backups"
+from shared.config import get_asset_backup_dir
 
 
 def _json_default(value):
@@ -18,7 +17,7 @@ def _json_default(value):
 
 
 def get_backup_dir() -> Path:
-    return Path(os.getenv("ASSET_BACKUP_DIR", DEFAULT_BACKUP_DIR)).expanduser()
+    return Path(get_asset_backup_dir()).expanduser()
 
 
 async def ensure_initial_backup(conn: asyncpg.Connection, asset_type: str, asset_id: int, asset_version: int, snapshot: dict) -> int | None:

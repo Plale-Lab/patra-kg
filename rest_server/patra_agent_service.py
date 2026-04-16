@@ -11,14 +11,16 @@ from pathlib import Path
 from typing import Any
 import os
 
+from shared.config import get_llm_api_base, get_llm_model, get_llm_api_key
+
 
 class AgentServiceError(RuntimeError):
     pass
 
 
-DEFAULT_LLM_API_BASE = os.getenv("PATRA_AGENT_LLM_API_BASE", "http://127.0.0.1:1234/v1")
-DEFAULT_LLM_MODEL = os.getenv("PATRA_AGENT_LLM_MODEL", "qwen/qwen3.5-9b")
-DEFAULT_LLM_API_KEY = os.getenv("PATRA_AGENT_LLM_API_KEY", "lm-studio")
+DEFAULT_LLM_API_BASE = get_llm_api_base()
+DEFAULT_LLM_MODEL = get_llm_model()
+DEFAULT_LLM_API_KEY = get_llm_api_key()
 
 
 class _HtmlTableParser(HTMLParser):

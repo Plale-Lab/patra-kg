@@ -2,22 +2,21 @@ import logging
 import hashlib
 import hmac
 import json
-import os
 from dataclasses import dataclass
 from functools import lru_cache
 
 from fastapi import Header, HTTPException, Request
+
+from shared.config import get_admin_users_csv, get_asset_ingest_keys_json, get_default_admin_users
+from rest_server.errors import auth_required, admin_required, service_not_configured
 
 log = logging.getLogger(__name__)
 
 TAPIS_TOKEN_HEADER = "X-Tapis-Token"
 ASSET_INGEST_ORG_HEADER = "X-Asset-Org"
 ASSET_INGEST_KEY_HEADER = "X-Asset-Api-Key"
-ASSET_INGEST_KEYS_ENV = "PATRA_ASSET_INGEST_KEYS_JSON"
 PATRA_USERNAME_HEADER = "X-Patra-Username"
 PATRA_ROLE_HEADER = "X-Patra-Role"
-PATRA_ADMIN_USERS_ENV = "PATRA_ADMIN_USERS"
-DEFAULT_ADMIN_USERS = frozenset({"williamq96"})
 
 
 @dataclass(frozen=True)
@@ -57,9 +56,9 @@ def get_include_private(request: Request) -> bool:
 
 @lru_cache(maxsize=1)
 def get_admin_users() -> set[str]:
-    configured = os.getenv(PATRA_ADMIN_USERS_ENV, "").strip()
+    configured = get_admin_users_csv()
     values = {item.strip().lower() for item in configured.split(",") if item.strip()}
-    return set(DEFAULT_ADMIN_USERS) | values
+    return set(get_default_admin_users()) | values
 
 
 def get_request_actor(request: Request) -> PatraActor:
@@ -83,32 +82,32 @@ def require_authenticated_actor(request: Request) -> PatraActor:
     """Return the actor if authenticated, otherwise raise 401."""
     actor = get_request_actor(request)
     if not actor.is_authenticated:
-        raise HTTPException(status_code=401, detail="Authentication required")
+        raise auth_required()
     return actor
 
 
 def require_admin_actor(request: Request) -> PatraActor:
     actor = get_request_actor(request)
     if not actor.is_admin:
-        raise HTTPException(status_code=403, detail="Admin privileges required")
+        raise admin_required()
     return actor
 
 
 @lru_cache(maxsize=1)
 def get_asset_ingest_keys() -> dict[str, str]:
-    raw = os.getenv(ASSET_INGEST_KEYS_ENV, "").strip()
+    raw = get_asset_ingest_keys_json()
     if not raw:
         return {}
     try:
         config = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise RuntimeError(f"{ASSET_INGEST_KEYS_ENV} must be valid JSON") from exc
+        raise RuntimeError("PATRA_ASSET_INGEST_KEYS_JSON must be valid JSON") from exc
     if not isinstance(config, dict):
-        raise RuntimeError(f"{ASSET_INGEST_KEYS_ENV} must be a JSON object")
+        raise RuntimeError("PATRA_ASSET_INGEST_KEYS_JSON must be a JSON object")
     normalized: dict[str, str] = {}
     for org, secret in config.items():
         if not isinstance(org, str) or not isinstance(secret, str) or not org.strip() or not secret.strip():
-            raise RuntimeError(f"{ASSET_INGEST_KEYS_ENV} entries must map non-empty strings to non-empty strings")
+            raise RuntimeError("PATRA_ASSET_INGEST_KEYS_JSON entries must map non-empty strings to non-empty strings")
         normalized[org.strip()] = secret.strip()
     return normalized
 
@@ -144,9 +143,9 @@ def require_asset_ingest_principal(
         configured_keys = get_asset_ingest_keys()
     except RuntimeError as exc:
         log.error("Asset ingest auth config invalid: %s", exc)
-        raise HTTPException(status_code=503, detail="Asset ingest API is not configured")
+        raise service_not_configured("Asset ingest API")
     if not configured_keys:
-        raise HTTPException(status_code=503, detail="Asset ingest API is not configured")
+        raise service_not_configured("Asset ingest API")
     organization = (x_asset_org or "").strip()
     presented_key = _extract_asset_api_key(authorization, x_asset_api_key)
     if not organization or not presented_key:

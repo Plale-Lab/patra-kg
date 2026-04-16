@@ -1,8 +1,9 @@
 import asyncpg
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
+from fastapi import APIRouter, Depends, Path, Query, Request, status
 
 from rest_server.database import get_pool
 from rest_server.deps import get_request_actor, require_admin_actor
+from rest_server.errors import not_found
 from rest_server.workflow_models import TicketCreate, TicketRecord, TicketUpdate
 
 router = APIRouter(tags=["tickets"])
@@ -121,5 +122,5 @@ async def update_ticket(
             reviewed_by,
         )
     if not row:
-        raise HTTPException(status_code=404, detail="Ticket not found")
+        raise not_found("Ticket")
     return _row_to_ticket(row)

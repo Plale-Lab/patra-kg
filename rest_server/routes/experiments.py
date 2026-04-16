@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 import asyncpg
 
 from rest_server.database import get_pool
+from rest_server.errors import not_found
 from rest_server.models import (
     DeploymentDetail,
     ExperimentDetail,
@@ -12,19 +13,9 @@ from rest_server.models import (
     ExperimentSummary,
     ExperimentUser,
 )
+from shared.constants import DOMAIN_TABLES
 
 router = APIRouter(prefix="/experiments", tags=["experiments"])
-
-DOMAIN_TABLES = {
-    "animal-ecology": {
-        "events": "camera_trap_events",
-        "power": "camera_trap_power",
-    },
-    "digital-ag": {
-        "events": "digital_ag_events",
-        "power": "digital_ag_power",
-    },
-}
 
 
 def _resolve_tables(domain: str) -> tuple[str, str]:
@@ -147,7 +138,7 @@ async def get_experiment_detail(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(query, experiment_id)
     if not row:
-        raise HTTPException(status_code=404, detail="Experiment not found")
+        raise not_found("Experiment")
 
     return ExperimentDetail(
         experiment_id=row["experiment_id"],

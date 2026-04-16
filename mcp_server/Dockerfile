@@ -6,6 +6,7 @@ COPY mcp_server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY mcp_server/ mcp_server/
+COPY shared/ ./shared/
 
 RUN useradd --create-home mcp && chown -R mcp:mcp /app
 USER mcp
