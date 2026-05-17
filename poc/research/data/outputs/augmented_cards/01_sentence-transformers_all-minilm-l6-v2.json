@@ -1,0 +1,38 @@
+{
+  "name": "all-MiniLM-L6-v2",
+  "version": "1.0",
+  "short_description": "Then you can use the model like this:\n```python\nfrom sentence_transformers import SentenceTransformer\nsentences = [\"This is an example sentence\", \"Each sentence is converted\"]",
+  "full_description": "Then you can use the model like this:\n```python\nfrom sentence_transformers import SentenceTransformer\nsentences = [\"This is an example sentence\", \"Each sentence is converted\"] model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')\nembeddings = model.encode(sentences)\nprint(embeddings)\n``` print(\"Sentence embeddings:\")\nprint(sentence_embeddings)\n```",
+  "keywords": "sentence-transformers, pytorch, tf, rust, onnx, openvino, bert, feature-extraction, sentence-similarity, transformers, en, eval-results, text-embeddings-inference",
+  "author": "sentence-transformers",
+  "citation": "https://arxiv.org/abs/1904.06472",
+  "input_data": "https://huggingface.co/datasets/s2orc, https://huggingface.co/datasets/flax-sentence-embeddings/stackexchange_xml, https://huggingface.co/datasets/ms_marco, https://huggingface.co/datasets/gooaq, https://huggingface.co/datasets/yahoo_answers_topics, https://huggingface.co/datasets/code_search_net, https://huggingface.co/datasets/search_qa, https://huggingface.co/datasets/eli5, https://huggingface.co/datasets/snli, https://huggingface.co/datasets/multi_nli, https://huggingface.co/datasets/wikihow, https://huggingface.co/datasets/natural_questions, https://huggingface.co/datasets/trivia_qa, https://huggingface.co/datasets/embedding-data/sentence-compression, https://huggingface.co/datasets/embedding-data/flickr30k-captions, https://huggingface.co/datasets/embedding-data/altlex, https://huggingface.co/datasets/embedding-data/simple-wiki, https://huggingface.co/datasets/embedding-data/QQP, https://huggingface.co/datasets/embedding-data/SPECTER, https://huggingface.co/datasets/embedding-data/PAQ_pairs, https://huggingface.co/datasets/embedding-data/WikiAnswers",
+  "input_type": "Text",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "license": "apache-2.0",
+    "version": "1.0",
+    "description": "Then you can use the model like this:\n```python\nfrom sentence_transformers import SentenceTransformer\nsentences = [\"This is an example sentence\", \"Each sentence is converted\"]",
+    "owner": "sentence-transformers",
+    "location": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+    "name": "all-MiniLM-L6-v2"
+  },
+  "runtime": {
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.72342,
+      0.88596
+    ],
+    "expected_latency_ms": 55.0,
+    "typical_deployment_context": "Deployed on A100 hardware with high inference cost.",
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "high",
+    "expected_total_power_w": 194.529,
+    "known_failure_modes": "Mispredicts labels for non-text or mismatched language inputs."
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "name": "Qwen3-VL-2B-Instruct",
+  "author": "Qwen",
+  "model_type": "llm",
+  "license": "apache-2.0",
+  "inference_software_dependencies": null,
+  "pretraining_datasets": null,
+  "keywords": [
+    "transformers",
+    "qwen3_vl",
+    "image-text-to-text",
+    "conversational"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "ImageTextToText",
+    "VisualQuestionAnswering"
+  ],
+  "inference_hardware": {
+    "accelerators": [
+      {
+        "accelerator_type": "A100",
+        "cores": null,
+        "memory_gb": 80,
+        "system_requirements": []
+      }
+    ],
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 80
+  },
+  "inference_max_energy_consumption_watts": 242,
+  "inference_max_latency_ms": 160,
+  "inference_min_throughput": 6,
+  "inference_max_memory_usage_mb": 81920,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": null,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "text",
+      "shape": null
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "image-text",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": true,
+  "slimmed": null,
+  "supports_quantization": null,
+  "annotations": {
+    "provenance": "Patra card and README"
+  },
+  "training_distributed": null,
+  "pruned": null,
+  "finetuning_datasets": null,
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": true
+}

@@ -1,0 +1,411 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Patra Model Card",
+  "description": "Extended Patra Model Card schema. Base: patra_toolkit/schema/schema.json. Extensions: is_private + is_gated booleans; runtime block for M4 experiment-grounded runtime metrics. Versioning fields (asset_version, previous_version_id, root_version_id) intentionally omitted — this catalog instance does not track model-card revisions.",
+  "type": "object",
+  "commonFields": {
+    "urlOrDoi": {
+      "oneOf": [
+        {
+          "pattern": "^(https?|ftp):\\/\\/[^\\s/$.?#].[\\S]*$",
+          "description": "Must be a valid URL"
+        },
+        {
+          "pattern": "^10\\.\\d{4,9}/[^\\s]+$",
+          "description": "or valid DOI"
+        },
+        {
+          "enum": [""],
+          "description": "or empty"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The id of the Model Card"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the Model Card"
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Model Card"
+    },
+    "short_description": {
+      "type": "string",
+      "description": "A brief description of the Model Card"
+    },
+    "full_description": {
+      "type": "string",
+      "description": "A comprehensive description of the Model Card"
+    },
+    "keywords": {
+      "type": "string",
+      "description": "Keywords for the model card"
+    },
+    "author": {
+      "type": "string",
+      "description": "The author or creator of the Model Card"
+    },
+    "citation": {
+      "type": "string",
+      "description": "Citation information for the Model Card"
+    },
+    "input_data": {
+      "$ref": "#/commonFields/urlOrDoi"
+    },
+    "input_type": {
+      "type": "string",
+      "description": "Type of the input data"
+    },
+    "output_data": {
+      "$ref": "#/commonFields/urlOrDoi"
+    },
+    "foundational_model": {
+      "description": "If a foundational model has been used, provide the model ID",
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "classification",
+        "regression",
+        "clustering",
+        "anomaly detection",
+        "dimensionality reduction",
+        "reinforcement learning",
+        "natural language processing",
+        "computer vision",
+        "recommendation systems",
+        "time series forecasting",
+        "graph learning",
+        "graph neural networks",
+        "generative modeling",
+        "transfer learning",
+        "self-supervised learning",
+        "semi-supervised learning",
+        "unsupervised learning",
+        "causal inference",
+        "multi-task learning",
+        "metric learning",
+        "density estimation",
+        "multi-label classification",
+        "ranking",
+        "structured prediction",
+        "neural architecture search",
+        "sequence modeling",
+        "embedding learning",
+        "other"
+      ]
+    },
+    "documentation": {
+      "type": "string",
+      "description": "URL for documentation if available"
+    },
+    "is_private": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the card is visible only to its owner / privileged users. Public catalog search excludes private cards."
+    },
+    "is_gated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the underlying model download requires access approval. Card remains publicly discoverable."
+    },
+    "ai_model": {
+      "description": "Description of the AI Model",
+      "type": ["object"],
+      "properties": {
+        "name": {
+          "description": "The name of the model.",
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the Model"
+        },
+        "description": {
+          "description": "Description of the AI Model.",
+          "type": "string"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the Model"
+        },
+        "location": {
+          "description": "Downloadable URL of the model",
+          "type": "string"
+        },
+        "license": {
+          "description": "Licence the model",
+          "type": "string"
+        },
+        "model_structure": {
+          "description": "Structure of the model",
+          "type": "object"
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "sklearn",
+            "tensorflow",
+            "pytorch",
+            "other"
+          ]
+        },
+        "model_type": {
+          "type": "string",
+          "enum": [
+            "cnn",
+            "decision_tree",
+            "dnn",
+            "rnn",
+            "svm",
+            "kmeans",
+            "llm",
+            "random_forest",
+            "lstm",
+            "gnn",
+            "other"
+          ]
+        },
+        "test_accuracy": {
+          "description": "Accuracy of the model for the test data",
+          "type": "number"
+        },
+        "model_metrics": {
+          "description": "Metrics of the AI Model",
+          "type": "array",
+          "items": {
+            "$ref": "#/fields/metrics"
+          }
+        },
+        "inference_labels": {
+          "type": "string",
+          "description": "Inference label for the AI model"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "description",
+        "owner",
+        "location",
+        "license",
+        "framework",
+        "test_accuracy",
+        "model_type"
+      ]
+    },
+    "bias_analysis": {
+      "type": ["object", "null"],
+      "properties": {
+        "demographic_parity_diff": {
+          "type": "number"
+        },
+        "equal_odds_difference": {
+          "type": "number"
+        }
+      }
+    },
+    "xai_analysis": {
+      "description": "Explainability analysis of the Model Card.",
+      "type": ["object", "null"],
+      "properties": {
+        "bias_metrics": {
+          "description": "Metrics of the bias scanner",
+          "type": "array",
+          "items": {
+            "$ref": "#/fields/metrics"
+          }
+        }
+      }
+    },
+    "model_requirements": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "runtime": {
+      "description": "Runtime / deployment metrics streamed from the edge device via CKN. Each item in runtime.experiments corresponds to one experiment run on one edge_device, populated from the oracle-events Kafka topic (aggregates) + cameratraps-power-summary topic (power). Fields mirror those consumed by ckn_broker/neo4jsink-oracle-events-connector.json and ckn_broker/pgsink-power-summary-connector.json. Null or empty when the model has never been run on an edge device.",
+      "type": ["object", "null"],
+      "properties": {
+        "experiments": {
+          "description": "One entry per experiment run. Running-aggregate metrics settle to their terminal values once the experiment completes.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "properties": {
+              "experiment_id": {
+                "description": "CKN-assigned experiment identifier (human-readable string, e.g. 'googlenet-iu-animal-classification').",
+                "type": "string"
+              },
+              "device_id": {
+                "description": "CKN-assigned edge device identifier (e.g. 'iu-edge-server-cib').",
+                "type": "string"
+              },
+              "user_id": {
+                "description": "CKN-assigned user identifier (e.g. 'neelk').",
+                "type": "string"
+              },
+              "model_id": {
+                "description": "CKN-assigned model identifier. Typically matches the model card's identity but repeated here for traceability.",
+                "type": "string"
+              },
+              "image_receiving_timestamp": {
+                "description": "Timestamp of the first image received for this experiment.",
+                "type": ["string", "null"],
+                "format": "date-time"
+              },
+              "image_scoring_timestamp": {
+                "description": "Timestamp of the most recent image scoring event in this experiment.",
+                "type": ["string", "null"],
+                "format": "date-time"
+              },
+              "total_images": {
+                "description": "Total images processed by the experiment.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "total_predictions": {
+                "description": "Total predictions emitted by the model.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "total_ground_truth_objects": {
+                "description": "Total ground-truth objects available for comparison.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "true_positives": {
+                "description": "Count of correct positive predictions.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "false_positives": {
+                "description": "Count of incorrect positive predictions.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "false_negatives": {
+                "description": "Count of missed positives.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              },
+              "precision": {
+                "description": "Terminal precision (TP / (TP + FP)).",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "recall": {
+                "description": "Terminal recall (TP / (TP + FN)).",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "f1_score": {
+                "description": "Terminal F1 score.",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "mean_iou": {
+                "description": "Mean intersection-over-union, when applicable (null for non-detection models).",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "map_50": {
+                "description": "Mean Average Precision at IoU threshold 0.5 (object detection).",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "map_50_95": {
+                "description": "Mean Average Precision averaged across IoU thresholds 0.5–0.95 (object detection).",
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "power_summary": {
+                "description": "Per-plugin CPU/GPU power consumption (watts) from the cameratraps-power-summary topic. Emitted once per experiment, at shutdown.",
+                "type": ["object", "null"],
+                "properties": {
+                  "image_generating_plugin_cpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "image_generating_plugin_gpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "power_monitor_plugin_cpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "power_monitor_plugin_gpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "image_scoring_plugin_cpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "image_scoring_plugin_gpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "total_cpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  },
+                  "total_gpu_power_consumption": {
+                    "type": ["number", "null"],
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "required": ["experiment_id", "device_id", "user_id", "model_id"]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "short_description",
+    "full_description",
+    "author",
+    "keywords",
+    "input_data",
+    "input_type",
+    "output_data",
+    "ai_model"
+  ],
+  "fields": {
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Name of the metric",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value of the performance metric.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

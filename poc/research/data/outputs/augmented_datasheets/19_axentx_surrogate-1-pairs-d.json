@@ -1,0 +1,10 @@
+{
+  "title": "surrogate-1-pairs-D",
+  "description": "The surrogate-1-pairs-D dataset is likely used for training or testing machine learning models, possibly for a specific task or application. Without more information, the exact contents and use cases are unclear. The dataset may be related to the 'region:us' tag, suggesting a geographic focus. Further details are needed for a more precise description.",
+  "subjects": "machine learning, dataset, region:us",
+  "creator": "axentx",
+  "resource_type": "Dataset for machine learning model training or testing",
+  "resource_type_general": "Dataset",
+  "publication_year": "2026",
+  "version": "1"
+}

@@ -4,13 +4,17 @@ from fastapi.testclient import TestClient
 
 from rest_server.database import get_pool
 from rest_server.main import app
+from tests.conftest import uuid_for_id
+
+_TEST_MC_UUID = uuid_for_id(1)
 
 
 class MissingModelConn:
     async def fetchrow(self, query: str, *args):
-        if "FROM model_cards" in query and "WHERE id = $1" in query:
+        if "FROM model_cards" in query and "WHERE uuid = $1" in query:
             return {
                 "id": 1,
+                "uuid": _TEST_MC_UUID,
                 "name": "Segment Anything Model 3 (SAM 3)",
                 "version": "SAM3-ViT-L",
                 "short_description": "Foundation model for promptable concept segmentation.",
@@ -75,9 +79,9 @@ def test_model_detail_falls_back_to_external_metadata(monkeypatch):
     )
 
     with TestClient(app) as client:
-        detail = client.get("/modelcard/1")
-        download = client.get("/modelcard/1/download_url")
-        deployments = client.get("/modelcard/1/deployments")
+        detail = client.get(f"/modelcard/{_TEST_MC_UUID}")
+        download = client.get(f"/modelcard/{_TEST_MC_UUID}/download_url")
+        deployments = client.get(f"/modelcard/{_TEST_MC_UUID}/deployments")
 
     app.dependency_overrides.clear()
     app.router.lifespan_context = original_lifespan

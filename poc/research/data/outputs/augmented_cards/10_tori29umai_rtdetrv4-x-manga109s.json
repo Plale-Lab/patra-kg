@@ -1,0 +1,25 @@
+{
+  "name": "rtdetrv4-x-manga109s",
+  "version": "1.0",
+  "short_description": "**[\u65e5\u672c\u8a9e](#\u65e5\u672c\u8a9e) | [English](#english)**",
+  "full_description": "**[\u65e5\u672c\u8a9e](#\u65e5\u672c\u8a9e) | [English](#english)** \u6f2b\u753b\u30da\u30fc\u30b8\u304b\u3089 **\u30b3\u30de\u67a0 (frame) / \u4eba\u7269 (body) / \u53f0\u8a5e (text)** \u306e 3 \u30af\u30e9\u30b9\u3092\u691c\u51fa\u3059\u308b RT-DETRv4 (X size) \u30e2\u30c7\u30eb\u3002Manga109-s \u3092\u898b\u958b\u304d\u304b\u3089\u5358\u30da\u30fc\u30b8\u306b\u5206\u5272\u3057\u305f 15,264 \u679a\u3067 30 epoch \u30d5\u30a1\u30a4\u30f3\u30c1\u30e5\u30fc\u30f3\u3057\u305f\u3082\u306e\u3067\u3059\u3002 \u6f2b\u753b\u30da\u30fc\u30b8\u304b\u3089 3 \u30af\u30e9\u30b9 (\u30b3\u30de\u67a0\u30fb\u4eba\u7269\u30fb\u53f0\u8a5e) \u3092\u691c\u51fa\u3059\u308b RT-DETRv4 (X size) \u30e2\u30c7\u30eb:",
+  "keywords": "onnx, object-detection, manga, comic, rt-detr, rt-detrv4, d-fine, manga109, ja, en",
+  "author": "tori29umai",
+  "citation": "@article{multimedia_aizawa_2020,\n    author={Kiyoharu Aizawa and Azuma Fujimoto and Atsushi Otsubo and Toru Ogawa and Yusuke Matsui and Koki Tsubota and Hikaru Ikuta},\n    title={Building a Manga Dataset ``Manga109'' with Annotations for Multimedia Applications},\n    journal={IEEE MultiMedia},\n    volume={27},\n    number={2},\n    pages={8--18},\n    doi={10.1109/mmul.2020.2987895},\n    year={2020}\n}\n\n@article{mtap_matsui_2017,\n    author={Yusuke Matsui and Kota Ito and Yuji Aramaki and Azuma Fujimoto and Toru Ogawa and Toshihiko Yamasaki and Kiyoharu Aizawa},\n    title={Sketch-based Manga Retrieval using Manga109 Dataset},\n    journal={Multimedia Tools and Applications},\n    volume={76},\n    number={20},\n    pages={21811--21838},\n    doi={10.1007/s11042-016-4020-z},\n    year={2017}\n}",
+  "input_data": "https://huggingface.co/datasets/Manga109-s",
+  "input_type": "Image",
+  "output_data": "bounding boxes with class labels",
+  "category": "computer vision",
+  "documentation": "https://huggingface.co/tori29umai/rtdetrv4-x-manga109s",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "other",
+    "license": "apache-2.0",
+    "version": "1.0",
+    "description": "**[\u65e5\u672c\u8a9e](#\u65e5\u672c\u8a9e) | [English](#english)**",
+    "owner": "tori29umai",
+    "location": "https://huggingface.co/tori29umai/rtdetrv4-x-manga109s",
+    "name": "rtdetrv4-x-manga109s"
+  }
+}

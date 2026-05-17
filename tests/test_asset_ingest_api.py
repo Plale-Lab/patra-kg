@@ -31,9 +31,9 @@ class MockAssetConn:
         return None
 
     async def fetchval(self, query: str, *args):
-        if "SELECT id" in query and "FROM publishers" in query:
+        if "SELECT id" in query and "FROM datasheet_publishers" in query:
             return None
-        if "INSERT INTO publishers" in query:
+        if "INSERT INTO datasheet_publishers" in query:
             return 10
         if "INSERT INTO model_cards" in query:
             self.model_card_id_seq += 1

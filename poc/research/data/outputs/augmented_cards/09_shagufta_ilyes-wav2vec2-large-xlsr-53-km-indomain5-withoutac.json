@@ -1,0 +1,23 @@
+{
+  "name": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+  "version": "1.0",
+  "short_description": "This is the model card of a \ud83e\udd17 transformers model that has been pushed on the Hub. This model card has been automatically generated.",
+  "full_description": "This is the model card of a \ud83e\udd17 transformers model that has been pushed on the Hub. This model card has been automatically generated. Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations. Use the code below to get started with the model.",
+  "keywords": "transformers, wav2vec2, automatic-speech-recognition",
+  "author": "Shagufta",
+  "citation": "https://arxiv.org/abs/1910.09700",
+  "input_type": "Audio",
+  "output_data": "transcribed text",
+  "category": "classification",
+  "documentation": "https://huggingface.co/Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "version": "1.0",
+    "description": "This is the model card of a \ud83e\udd17 transformers model that has been pushed on the Hub. This model card has been automatically generated.",
+    "owner": "Shagufta",
+    "location": "https://huggingface.co/Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+    "name": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac"
+  }
+}

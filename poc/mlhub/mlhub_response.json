@@ -1,0 +1,814 @@
+{
+  "result": [
+    {
+      "name": "all-MiniLM-L6-v2",
+      "author": "sentence-transformers",
+      "model_type": "dnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": [
+        "https://huggingface.co/datasets/s2orc, https://huggingface.co/datasets/flax-sentence-embeddings/stackexchange_xml, https://huggingface.co/datasets/ms_marco, https://huggingface.co/datasets/gooaq, https://huggingface.co/datasets/yahoo_answers_topics, https://huggingface.co/datasets/code_search_net, https://huggingface.co/datasets/search_qa, https://huggingface.co/datasets/eli5, https://huggingface.co/datasets/snli, https://huggingface.co/datasets/multi_nli, https://huggingface.co/datasets/wikihow, https://huggingface.co/datasets/natural_questions, https://huggingface.co/datasets/trivia_qa, https://huggingface.co/datasets/embedding-data/sentence-compression, https://huggingface.co/datasets/embedding-data/flickr30k-captions, https://huggingface.co/datasets/embedding-data/altlex, https://huggingface.co/datasets/embedding-data/simple-wiki, https://huggingface.co/datasets/embedding-data/QQP, https://huggingface.co/datasets/embedding-data/SPECTER, https://huggingface.co/datasets/embedding-data/PAQ_pairs, https://huggingface.co/datasets/embedding-data/WikiAnswers"
+      ],
+      "keywords": [
+        "sentence-transformers",
+        "pytorch",
+        "tf",
+        "rust",
+        "onnx",
+        "openvino",
+        "bert",
+        "feature-extraction",
+        "sentence-similarity",
+        "transformers",
+        "en",
+        "eval-results",
+        "text-embeddings-inference"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_hardware": {
+        "accelerators": null,
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 16
+      },
+      "inference_max_energy_consumption_watts": 226,
+      "inference_max_latency_ms": 26,
+      "inference_min_throughput": 38,
+      "inference_max_memory_usage_mb": 16384,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "float32",
+          "shape": [
+            null,
+            384
+          ]
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "text",
+          "shape": [
+            null
+          ]
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": true,
+      "supports_quantization": null,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": null,
+      "pruned": null,
+      "finetuning_datasets": [
+        "s2orc",
+        "flax-sentence-embeddings/stackexchange_xml",
+        "ms_marco",
+        "gooaq",
+        "yahoo_answers_topics",
+        "code_search_net",
+        "search_qa",
+        "eli5",
+        "snli",
+        "multi_nli",
+        "wikihow",
+        "natural_questions",
+        "trivia_qa",
+        "embedding-data/sentence-compression",
+        "embedding-data/flickr30k-captions",
+        "embedding-data/altlex",
+        "embedding-data/simple-wiki",
+        "embedding-data/QQP",
+        "embedding-data/SPECTER",
+        "embedding-data/PAQ_pairs",
+        "embedding-data/WikiAnswers"
+      ],
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "Qwen3-VL-2B-Instruct",
+      "author": "Qwen",
+      "model_type": "llm",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "transformers",
+        "qwen3_vl",
+        "image-text-to-text",
+        "conversational"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "ImageTextToText",
+        "VisualQuestionAnswering"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "A100",
+            "cores": null,
+            "memory_gb": 80,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 80
+      },
+      "inference_max_energy_consumption_watts": 242,
+      "inference_max_latency_ms": 160,
+      "inference_min_throughput": 6,
+      "inference_max_memory_usage_mb": 81920,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": null,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "image-text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": true,
+      "slimmed": null,
+      "supports_quantization": null,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": null,
+      "pruned": null,
+      "finetuning_datasets": null,
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": true
+    },
+    {
+      "name": "bert-base-uncased",
+      "author": "google-bert",
+      "model_type": "dnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": [
+        "https://huggingface.co/datasets/bookcorpus, https://huggingface.co/datasets/wikipedia"
+      ],
+      "keywords": [
+        "transformers",
+        "pytorch",
+        "tf",
+        "jax",
+        "rust",
+        "coreml",
+        "onnx",
+        "bert",
+        "fill-mask",
+        "exbert",
+        "en"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "A100",
+            "cores": null,
+            "memory_gb": 80,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 80
+      },
+      "inference_max_energy_consumption_watts": 306,
+      "inference_max_latency_ms": 90,
+      "inference_min_throughput": 11,
+      "inference_max_memory_usage_mb": 81920,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "predicted token",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "Text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": false,
+      "supports_quantization": null,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": true,
+      "pruned": false,
+      "finetuning_datasets": [],
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "electra-base-discriminator",
+      "author": "google",
+      "model_type": "dnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "transformers",
+        "pytorch",
+        "tf",
+        "jax",
+        "rust",
+        "electra",
+        "pretraining",
+        "en"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_max_memory_usage_mb": null,
+      "inference_max_latency_ms": null,
+      "inference_max_energy_consumption_watts": null,
+      "inference_distributed": null,
+      "inference_hardware": null,
+      "inference_min_throughput": null,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "probability",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": "https://huggingface.co/front/thumbnails/google.png",
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": false,
+      "supports_quantization": null,
+      "annotations": {},
+      "training_distributed": null,
+      "pruned": false,
+      "finetuning_datasets": [
+        "GLUE",
+        "SQuAD",
+        "text chunking"
+      ],
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "paraphrase-multilingual-MiniLM-L12-v2",
+      "author": "sentence-transformers",
+      "model_type": "dnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "sentence-transformers",
+        "pytorch",
+        "tf",
+        "onnx",
+        "openvino",
+        "bert",
+        "feature-extraction",
+        "sentence-similarity",
+        "transformers",
+        "multilingual",
+        "ar",
+        "bg",
+        "ca",
+        "cs",
+        "da"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_hardware": {
+        "accelerators": null,
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 16
+      },
+      "inference_max_energy_consumption_watts": 206,
+      "inference_max_latency_ms": 28,
+      "inference_min_throughput": 35,
+      "inference_max_memory_usage_mb": 16384,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "float32",
+          "shape": [
+            384
+          ]
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": true,
+      "supports_quantization": true,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": null,
+      "pruned": false,
+      "finetuning_datasets": null,
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "Hexis-Vesper-12B",
+      "author": "WasamiKirua",
+      "model_type": "llm",
+      "license": null,
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "transformers",
+        "mistral",
+        "text-generation",
+        "mergekit",
+        "merge",
+        "sentient",
+        "roleplay",
+        "melancholic",
+        "untimate",
+        "conversational",
+        "it",
+        "en"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "A100",
+            "cores": null,
+            "memory_gb": 80,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 80
+      },
+      "inference_max_energy_consumption_watts": 309,
+      "inference_max_latency_ms": 245,
+      "inference_min_throughput": 4,
+      "inference_max_memory_usage_mb": 81920,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": null,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": "https://i.postimg.cc/4yWDYhTd/Gemini-Generated-Image-sjelsasjelsasjel.png",
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": null,
+      "supports_quantization": null,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": null,
+      "pruned": null,
+      "finetuning_datasets": null,
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "fashion-mnist-mlp",
+      "author": "donaldsebleung",
+      "model_type": "dnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": [
+        "https://huggingface.co/datasets/zalando-datasets/fashion_mnist"
+      ],
+      "keywords": [
+        "onnx",
+        "image-classification",
+        "en"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "ImageClassification"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "Jetson Nano",
+            "cores": null,
+            "memory_gb": 4,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 4
+      },
+      "inference_max_energy_consumption_watts": 19,
+      "inference_max_latency_ms": 60,
+      "inference_min_throughput": 16,
+      "inference_max_memory_usage_mb": 4096,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": false,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "class label",
+          "shape": [
+            10
+          ]
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "Image",
+          "shape": [
+            784
+          ]
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": true,
+      "slimmed": false,
+      "supports_quantization": null,
+      "annotations": {
+        "source": "Patra card and README"
+      },
+      "training_distributed": false,
+      "pruned": false,
+      "finetuning_datasets": [],
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "en_child_mlm_42_english8192",
+      "author": "Haerim",
+      "model_type": "llm",
+      "license": null,
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "transformers",
+        "roberta",
+        "fill-mask",
+        "generated_from_trainer"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "TextClassification",
+        "FillMask",
+        "TextGeneration"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "A100",
+            "cores": null,
+            "memory_gb": 80,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 80
+      },
+      "inference_max_energy_consumption_watts": 253,
+      "inference_max_latency_ms": 95,
+      "inference_min_throughput": 10,
+      "inference_max_memory_usage_mb": 81920,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "predicted token",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": false,
+      "slimmed": false,
+      "supports_quantization": null,
+      "annotations": {
+        "source": "Patra card and README"
+      },
+      "training_distributed": null,
+      "pruned": false,
+      "finetuning_datasets": [],
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+      "author": "Shagufta",
+      "model_type": "dnn",
+      "license": null,
+      "inference_software_dependencies": null,
+      "pretraining_datasets": null,
+      "keywords": [
+        "transformers",
+        "wav2vec2",
+        "automatic-speech-recognition"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "AudioClassification"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "A100",
+            "cores": null,
+            "memory_gb": 80,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 80
+      },
+      "inference_max_energy_consumption_watts": 218,
+      "inference_max_latency_ms": 185,
+      "inference_min_throughput": 5,
+      "inference_max_memory_usage_mb": 81920,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": null,
+      "training_precision": null,
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "text",
+          "shape": null
+        }
+      ],
+      "inference_precision": null,
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "audio",
+          "shape": null
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": null,
+      "slimmed": false,
+      "supports_quantization": null,
+      "annotations": {},
+      "training_distributed": null,
+      "pruned": false,
+      "finetuning_datasets": null,
+      "training_hardware": null,
+      "regulatory": [],
+      "multi_modal": false
+    },
+    {
+      "name": "littercam-yolov9c",
+      "author": "aryanshh",
+      "model_type": "cnn",
+      "license": "apache-2.0",
+      "inference_software_dependencies": null,
+      "pretraining_datasets": [
+        "https://huggingface.co/datasets/taco, https://huggingface.co/datasets/openlittermap"
+      ],
+      "keywords": [
+        "object-detection",
+        "yolov9",
+        "litter-detection",
+        "waste-detection",
+        "littercam",
+        "computer-vision"
+      ],
+      "libraries": [
+        "pytorch"
+      ],
+      "task_types": [
+        "ImageClassification",
+        "ObjectDetection"
+      ],
+      "inference_hardware": {
+        "accelerators": [
+          {
+            "accelerator_type": "Jetson Nano",
+            "cores": null,
+            "memory_gb": 4,
+            "system_requirements": []
+          }
+        ],
+        "architectures": null,
+        "cpus": null,
+        "disk_gb": null,
+        "memory_gb": 4
+      },
+      "inference_max_energy_consumption_watts": 222,
+      "inference_max_latency_ms": 28,
+      "inference_min_throughput": 35,
+      "inference_max_memory_usage_mb": 4096,
+      "inference_distributed": false,
+      "bias_evaluation_score": null,
+      "pretrained": true,
+      "quantization_aware": false,
+      "training_precision": "fp16",
+      "training_time": null,
+      "model_outputs": [
+        {
+          "data_type": "float32",
+          "shape": [
+            1,
+            8400,
+            4
+          ]
+        }
+      ],
+      "inference_precision": "fp16",
+      "image": null,
+      "inference_max_compute_utilization_percentage": null,
+      "model_inputs": [
+        {
+          "data_type": "uint8",
+          "shape": [
+            1,
+            3,
+            640,
+            640
+          ]
+        }
+      ],
+      "training_max_energy_consumption_watts": null,
+      "edge_optimized": true,
+      "slimmed": false,
+      "supports_quantization": true,
+      "annotations": {
+        "provenance": "Patra card and README"
+      },
+      "training_distributed": false,
+      "pruned": false,
+      "finetuning_datasets": [
+        "TACO",
+        "OpenLitterMap",
+        "Road Waste"
+      ],
+      "training_hardware": {
+        "gpu": "Dual T4"
+      },
+      "regulatory": [],
+      "multi_modal": false
+    }
+  ],
+  "status": 200,
+  "message": "Augmented 10 card(s) from Patra via M4: Patra\u2192MLHub",
+  "metadata": {
+    "source": "patra",
+    "pipeline": "M4: Patra\u2192MLHub",
+    "n_cards": 10
+  },
+  "version": "0.1.0"
+}

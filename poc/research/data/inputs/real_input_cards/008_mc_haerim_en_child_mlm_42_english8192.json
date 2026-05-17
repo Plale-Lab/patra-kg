@@ -1,0 +1,21 @@
+{
+  "_id": "69f42798bc6a036e3955034a",
+  "id": "Haerim/en_child_mlm_42_english8192",
+  "lastModified": "2026-05-01T05:04:53.000Z",
+  "likes": 0,
+  "private": false,
+  "downloads": 0,
+  "tags": [
+    "transformers",
+    "safetensors",
+    "roberta",
+    "fill-mask",
+    "generated_from_trainer",
+    "endpoints_compatible",
+    "region:us"
+  ],
+  "pipeline_tag": "fill-mask",
+  "library_name": "transformers",
+  "createdAt": "2026-05-01T04:10:00.000Z",
+  "modelId": "Haerim/en_child_mlm_42_english8192"
+}

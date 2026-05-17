@@ -150,7 +150,6 @@ class GeneratedArtifactSummary(BaseModel):
     rejected_fields: list[str] = Field(default_factory=list)
     output_csv_download_url: str
     output_schema_download_url: str
-    review_submission_id: str | None = None
 
 
 class SynthesizeDatasetRequest(BaseModel):
@@ -181,18 +180,3 @@ class SynthesizeDatasetResponse(BaseModel):
     plan: SynthesisPlanModel
     validation_issues: list[ValidationIssueModel] = Field(default_factory=list)
     preview_rows: list[dict[str, Any]] = Field(default_factory=list)
-
-
-class SubmitGeneratedArtifactRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    submitted_by: str = Field(min_length=1, max_length=255)
-    title: str | None = Field(default=None, max_length=255)
-    notes: str | None = None
-
-
-class SubmitGeneratedArtifactResponse(BaseModel):
-    status: ToolStatus
-    message: str
-    artifact_key: str
-    submission_id: str

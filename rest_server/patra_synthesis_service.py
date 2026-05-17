@@ -849,7 +849,6 @@ def generate_synthesized_dataset(
             "rejected_fields": plan["rejected_fields"],
             "output_csv_download_url": f"/agent-tools/generated-artifacts/{artifact_key}/download.csv",
             "output_schema_download_url": f"/agent-tools/generated-artifacts/{artifact_key}/download-schema",
-            "review_submission_id": None,
         },
         "plan": plan,
         "validation_issues": validation_issues,

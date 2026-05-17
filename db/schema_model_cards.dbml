@@ -1,0 +1,118 @@
+Project patra_model_cards {
+  database_type: "PostgreSQL"
+}
+
+Table users {
+  id bigint [pk, increment]
+}
+
+Table edge_devices {
+  id bigint [pk, increment]
+}
+
+Table model_cards {
+  id bigint [pk, increment]
+  uuid uuid [not null, unique, default: `gen_random_uuid()`]
+  name text [not null]
+  version text
+  is_private boolean [not null, default: false]
+  is_gated boolean [not null, default: false]
+  short_description text
+  full_description text
+  keywords text
+  author text
+  citation text
+  input_data text
+  input_type text
+  output_data text
+  foundational_model text
+  category text
+  documentation text
+  model_requirements text[]
+  bias_analysis jsonb
+  xai_analysis jsonb
+}
+
+Table models {
+  id bigint [pk, increment]
+  name text [not null]
+  version text
+  description text
+  owner text
+  location text
+  license text
+  framework text
+  model_type text
+  test_accuracy numeric(6,5)
+  model_metrics jsonb
+  inference_labels jsonb
+  model_structure jsonb
+
+  model_card_id bigint [not null, unique, ref: > model_cards.id]
+
+  indexes {
+    (model_card_id)
+  }
+}
+
+Table experiments {
+  id bigint [pk, increment]
+  start_at timestamptz [not null]
+  submitted_at timestamptz
+  executed_at timestamptz
+  model_used_at timestamptz
+
+  total_images integer
+  total_predictions integer
+  total_ground_truth_objects integer
+  true_positives integer
+  false_positives integer
+  false_negatives integer
+  precision numeric(6,5)
+  recall numeric(6,5)
+  f1_score numeric(6,5)
+  mean_iou numeric(6,5)
+  map_50 numeric(6,5)
+  map_50_95 numeric(6,5)
+
+  user_id bigint [not null, ref: > users.id]
+  edge_device_id bigint [not null, ref: > edge_devices.id]
+  model_id bigint [not null, ref: > models.id]
+
+  indexes {
+    (user_id)
+    (edge_device_id)
+    (model_id)
+    (start_at)
+  }
+}
+
+Table raw_images {
+  id bigint [pk, increment]
+  image_name text [not null]
+  ground_truth jsonb
+}
+
+Table experiment_images {
+  id bigint [pk, increment]
+  experiment_id bigint [not null, ref: > experiments.id]
+  raw_image_id bigint [not null, ref: > raw_images.id]
+
+  image_count integer
+  image_received_at timestamptz
+  image_scored_at timestamptz
+  image_store_deleted_at timestamptz
+  image_decision text
+  top_label text
+  top_probability numeric(8,7)
+  ingested_at timestamptz [not null]
+  scores jsonb
+
+  indexes {
+    (experiment_id)
+    (raw_image_id)
+    (experiment_id, raw_image_id) [unique]
+    (image_received_at)
+    (ingested_at)
+  }
+}

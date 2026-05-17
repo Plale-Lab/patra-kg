@@ -1,0 +1,25 @@
+{
+  "name": "Qwen3-VL-2B-Instruct",
+  "version": "1.0",
+  "short_description": "Meet Qwen3-VL \u2014 the most powerful vision-language model in the Qwen series to date.",
+  "full_description": "Meet Qwen3-VL \u2014 the most powerful vision-language model in the Qwen series to date. This generation delivers comprehensive upgrades across the board: superior text understanding & generation, deeper visual perception & reasoning, extended context length, enhanced spatial and video dynamics comprehension, and stronger agent interaction capabilities. Available in Dense and MoE architectures that scale from edge to cloud, with Instruct and reasoning\u2011enhanced Thinking editions for flexible, on\u2011demand deployment.",
+  "keywords": "transformers, qwen3_vl, image-text-to-text, conversational",
+  "author": "Qwen",
+  "citation": "https://arxiv.org/abs/2505.09388",
+  "input_type": "Multimodal",
+  "output_data": "generated text",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "license": "apache-2.0",
+    "model_type": "llm",
+    "version": "1.0",
+    "description": "Meet Qwen3-VL \u2014 the most powerful vision-language model in the Qwen series to date.",
+    "owner": "Qwen",
+    "location": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+    "name": "Qwen3-VL-2B-Instruct"
+  }
+}

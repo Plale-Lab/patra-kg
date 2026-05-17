@@ -1,0 +1,71 @@
+{
+  "external_id": 42,
+  "uuid": "11111111-2222-3333-4444-555555555555",
+  "name": "MegaDetector",
+  "version": "5.0",
+  "short_description": "Camera-trap detector for animal/human/vehicle classification",
+  "full_description": "MegaDetector v5 is a YOLOv5-based detector trained by Microsoft AI for Earth on millions of camera-trap images.",
+  "keywords": "camera-trap, object-detection, wildlife, megadetector, yolov5",
+  "author": "0000-0001-2345-6789",
+  "input_data": "https://lila.science/datasets/camera-traps-community-datasets",
+  "input_type": "Image",
+  "output_data": "bounding-box + class label",
+  "categories": "ObjectDetection",
+  "citation": "Beery et al. (2019)",
+  "foundational_model": "YOLOv5",
+  "is_private": false,
+  "is_gated": false,
+  "model_artifact_hash": "sha256:8e3f5d1a2b4c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f",
+  "model_requirements": ["torch==2.1.0", "torchvision==0.16.0", "yolov5==7.0"],
+  "bias_analysis": {
+    "demographic_parity_diff": 0.01,
+    "equal_odds_difference": 0.02,
+    "evaluation_dataset": "Snapshot Wisconsin held-out test set"
+  },
+  "xai_analysis": {
+    "method": "GradCAM",
+    "coverage": 0.88
+  },
+  "limitations": "Trained primarily on diurnal images; nighttime and IR-illuminated frames have reduced accuracy. Bounding boxes for small distant animals (<32 px) are unreliable.",
+  "compliance_tags": ["IRB-approved", "open-research"],
+  "ai_model": {
+    "model_id": 99,
+    "name": "MegaDetector",
+    "version": "5.0-pt",
+    "description": "YOLOv5-based detector",
+    "owner": "Microsoft AI for Earth",
+    "location": "https://github.com/microsoft/CameraTraps/releases/tag/v5.0",
+    "license": "MIT",
+    "framework": "pytorch",
+    "model_type": "cnn",
+    "test_accuracy": 0.943
+  },
+  "experiments": [
+    {
+      "experiment_id": "iu-stewart-snapshot-wi-2024-q1",
+      "edge_device_id": 1,
+      "f1_score": 0.94,
+      "precision": 0.95,
+      "recall": 0.93,
+      "map_50": 0.94,
+      "map_50_95": 0.72,
+      "power_summary": {
+        "total_cpu_power_consumption": 8.0,
+        "total_gpu_power_consumption": 14.5
+      }
+    },
+    {
+      "experiment_id": "osu-stewart-drone-trial-2024-q2",
+      "edge_device_id": 2,
+      "f1_score": 0.91,
+      "precision": 0.92,
+      "recall": 0.90,
+      "map_50": 0.92,
+      "map_50_95": 0.69,
+      "power_summary": {
+        "total_cpu_power_consumption": 12.0,
+        "total_gpu_power_consumption": 18.0
+      }
+    }
+  ]
+}

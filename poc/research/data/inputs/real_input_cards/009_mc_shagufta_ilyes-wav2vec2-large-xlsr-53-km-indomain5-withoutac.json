@@ -1,0 +1,21 @@
+{
+  "_id": "69f43838ee1d16ec78d28b45",
+  "id": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+  "lastModified": "2026-05-01T08:09:06.000Z",
+  "likes": 0,
+  "private": false,
+  "downloads": 0,
+  "tags": [
+    "transformers",
+    "safetensors",
+    "wav2vec2",
+    "automatic-speech-recognition",
+    "arxiv:1910.09700",
+    "endpoints_compatible",
+    "region:us"
+  ],
+  "pipeline_tag": "automatic-speech-recognition",
+  "library_name": "transformers",
+  "createdAt": "2026-05-01T05:20:56.000Z",
+  "modelId": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac"
+}

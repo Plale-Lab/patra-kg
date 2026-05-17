@@ -1,0 +1,26 @@
+{
+  "_id": "68f4e3f4f82416217114139c",
+  "id": "Qwen/Qwen3-VL-2B-Instruct",
+  "likes": 383,
+  "private": false,
+  "downloads": 186238424,
+  "tags": [
+    "transformers",
+    "safetensors",
+    "qwen3_vl",
+    "image-text-to-text",
+    "conversational",
+    "arxiv:2505.09388",
+    "arxiv:2502.13923",
+    "arxiv:2409.12191",
+    "arxiv:2308.12966",
+    "license:apache-2.0",
+    "endpoints_compatible",
+    "deploy:azure",
+    "region:us"
+  ],
+  "pipeline_tag": "image-text-to-text",
+  "library_name": "transformers",
+  "createdAt": "2025-10-19T13:13:24.000Z",
+  "modelId": "Qwen/Qwen3-VL-2B-Instruct"
+}

@@ -1,0 +1,220 @@
+{
+  "1": {
+    "repo_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "similar_model_ids": [
+      102,
+      103,
+      104,
+      106
+    ],
+    "reference_experiments": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      19,
+      20
+    ],
+    "cold_start": false,
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.72342,
+      0.88596
+    ],
+    "expected_latency_ms": 55,
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "high",
+    "expected_total_power_w": 194.529
+  },
+  "2": {
+    "repo_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "similar_model_ids": [],
+    "reference_experiments": [],
+    "cold_start": true,
+    "suggested_hardware": null,
+    "expected_f1_range": null,
+    "expected_latency_ms": null,
+    "deployment_maturity": null,
+    "recommended_min_ram_mb": null,
+    "inference_cost_class": null,
+    "expected_total_power_w": null
+  },
+  "3": {
+    "repo_id": "google-bert/bert-base-uncased",
+    "similar_model_ids": [
+      100,
+      103,
+      104,
+      106
+    ],
+    "reference_experiments": [
+      1,
+      2,
+      3,
+      10,
+      11,
+      12,
+      13,
+      14,
+      19,
+      20
+    ],
+    "cold_start": false,
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.71052,
+      0.78078
+    ],
+    "expected_latency_ms": 27.0,
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 113.704
+  },
+  "5": {
+    "repo_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "similar_model_ids": [
+      100,
+      102,
+      104,
+      106
+    ],
+    "reference_experiments": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      13,
+      14,
+      19,
+      20
+    ],
+    "cold_start": false,
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.72342,
+      0.88596
+    ],
+    "expected_latency_ms": 55,
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "high",
+    "expected_total_power_w": 194.529
+  },
+  "6": {
+    "repo_id": "WasamiKirua/Hexis-Vesper-12B",
+    "similar_model_ids": [
+      100,
+      102,
+      103,
+      106
+    ],
+    "reference_experiments": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      19,
+      20
+    ],
+    "cold_start": false,
+    "suggested_hardware": "CPU-x86",
+    "expected_f1_range": [
+      0.7692,
+      0.87519
+    ],
+    "expected_latency_ms": 35.0,
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 20.152
+  },
+  "7": {
+    "repo_id": "donaldsebleung/fashion-mnist-mlp",
+    "similar_model_ids": [],
+    "reference_experiments": [],
+    "cold_start": true,
+    "suggested_hardware": null,
+    "expected_f1_range": null,
+    "expected_latency_ms": null,
+    "deployment_maturity": null,
+    "recommended_min_ram_mb": null,
+    "inference_cost_class": null,
+    "expected_total_power_w": null
+  },
+  "8": {
+    "repo_id": "Haerim/en_child_mlm_42_english8192",
+    "similar_model_ids": [
+      100,
+      102,
+      103,
+      104
+    ],
+    "reference_experiments": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "cold_start": false,
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.7692,
+      0.87519
+    ],
+    "expected_latency_ms": 35.0,
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 106.701
+  },
+  "9": {
+    "repo_id": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+    "similar_model_ids": [],
+    "reference_experiments": [],
+    "cold_start": true,
+    "suggested_hardware": null,
+    "expected_f1_range": null,
+    "expected_latency_ms": null,
+    "deployment_maturity": null,
+    "recommended_min_ram_mb": null,
+    "inference_cost_class": null,
+    "expected_total_power_w": null
+  },
+  "10": {
+    "repo_id": "aryanshh/littercam-yolov9c",
+    "similar_model_ids": [],
+    "reference_experiments": [],
+    "cold_start": true,
+    "suggested_hardware": null,
+    "expected_f1_range": null,
+    "expected_latency_ms": null,
+    "deployment_maturity": null,
+    "recommended_min_ram_mb": null,
+    "inference_cost_class": null,
+    "expected_total_power_w": null
+  }
+}

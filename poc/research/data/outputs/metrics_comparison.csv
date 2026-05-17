@@ -1,0 +1,242 @@
+phase,asset_type,field,extraction_method,n,attr_confidence,composite,exact_pct,semantic_overlap,coverage_pct
+M1: Structured Extraction,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,short_description,deterministic,10,0.900,0.904,0.0,0.00,100.0
+M1: Structured Extraction,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M1: Structured Extraction,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M1: Structured Extraction,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,citation,mixed,10,0.720,0.572,20.0,0.00,80.0
+M1: Structured Extraction,model_card,input_data,mixed,10,0.360,0.376,60.0,0.00,40.0
+M1: Structured Extraction,model_card,input_type,mixed,10,0.755,0.796,20.0,0.00,80.0
+M1: Structured Extraction,model_card,output_data,mixed,10,0.665,0.658,30.0,0.00,70.0
+M1: Structured Extraction,model_card,foundational_model,mixed,10,0.180,0.200,80.0,0.00,20.0
+M1: Structured Extraction,model_card,category,mixed,10,0.760,0.798,20.0,0.00,80.0
+M1: Structured Extraction,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_framework,mixed,10,0.785,0.900,10.0,0.00,90.0
+M1: Structured Extraction,model_card,ai_model_license,mixed,10,0.720,0.752,20.0,0.00,80.0
+M1: Structured Extraction,model_card,ai_model_model_type,mixed,10,0.560,0.594,40.0,0.00,60.0
+M1: Structured Extraction,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_description,deterministic,10,0.900,0.904,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,both,version,mixed,20,0.500,0.470,50.0,0.00,50.0
+M1: Structured Extraction,model_card,short_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M1: Structured Extraction,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M1: Structured Extraction,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,citation,mixed,10,0.540,0.384,40.0,0.00,60.0
+M1: Structured Extraction,model_card,input_data,mixed,10,0.360,0.376,60.0,0.00,40.0
+M1: Structured Extraction,model_card,input_type,mixed,10,0.945,0.992,0.0,0.00,100.0
+M1: Structured Extraction,model_card,output_data,mixed,10,0.665,0.658,30.0,0.00,70.0
+M1: Structured Extraction,model_card,foundational_model,mixed,10,0.180,0.158,80.0,0.00,20.0
+M1: Structured Extraction,model_card,category,mixed,10,0.940,0.990,0.0,0.00,100.0
+M1: Structured Extraction,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_framework,mixed,10,0.760,0.800,20.0,0.00,80.0
+M1: Structured Extraction,model_card,ai_model_license,mixed,10,0.630,0.658,30.0,0.00,70.0
+M1: Structured Extraction,model_card,ai_model_model_type,mixed,10,0.545,0.584,40.0,0.00,60.0
+M1: Structured Extraction,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M1: Structured Extraction,datasheet,title,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M1: Structured Extraction,datasheet,description,llm,10,0.530,0.590,30.0,0.00,70.0
+M1: Structured Extraction,datasheet,subjects,llm,10,0.545,0.602,30.0,0.00,70.0
+M1: Structured Extraction,datasheet,creator,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M1: Structured Extraction,datasheet,publisher,llm,10,0.385,0.424,50.0,0.00,50.0
+M1: Structured Extraction,datasheet,resource_type,llm,10,0.580,0.610,30.0,0.00,70.0
+M1: Structured Extraction,datasheet,resource_type_general,llm,10,0.625,0.670,30.0,0.00,70.0
+M1: Structured Extraction,datasheet,publication_year,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M1: Structured Extraction,datasheet,size,llm,10,0.250,0.262,70.0,0.00,30.0
+M1: Structured Extraction,datasheet,format,llm,10,0.330,0.246,60.0,0.00,40.0
+M1: Structured Extraction,datasheet,license,llm,10,0.180,0.180,80.0,0.00,20.0
+M2: Few-Shot Retrieval,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,both,version,mixed,20,0.900,0.900,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,short_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,citation,mixed,10,0.540,0.384,40.0,0.00,60.0
+M2: Few-Shot Retrieval,model_card,input_data,mixed,10,0.440,0.490,50.0,0.00,50.0
+M2: Few-Shot Retrieval,model_card,input_type,mixed,10,0.935,0.988,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,output_data,mixed,10,0.935,0.928,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,foundational_model,mixed,10,0.795,0.816,10.0,0.00,90.0
+M2: Few-Shot Retrieval,model_card,category,mixed,10,0.945,0.992,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_framework,mixed,10,0.945,0.994,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_license,mixed,10,0.715,0.770,20.0,0.00,80.0
+M2: Few-Shot Retrieval,model_card,ai_model_model_type,mixed,10,0.890,0.962,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,title,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,description,llm,10,0.835,0.874,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,subjects,llm,10,0.840,0.936,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,creator,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,publisher,llm,10,0.860,0.884,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,resource_type,llm,10,0.845,0.878,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,resource_type_general,llm,10,0.865,0.946,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,publication_year,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M2: Few-Shot Retrieval,datasheet,size,llm,10,0.255,0.264,70.0,0.00,30.0
+M2: Few-Shot Retrieval,datasheet,format,llm,10,0.475,0.382,40.0,0.00,60.0
+M2: Few-Shot Retrieval,datasheet,license,llm,10,0.455,0.506,40.0,0.00,60.0
+M3: Chain-of-Thought,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,both,version,mixed,20,0.500,0.470,50.0,0.00,50.0
+M3: Chain-of-Thought,model_card,short_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,citation,mixed,10,0.540,0.384,40.0,0.00,60.0
+M3: Chain-of-Thought,model_card,input_data,mixed,10,0.360,0.376,60.0,0.00,40.0
+M3: Chain-of-Thought,model_card,input_type,mixed,10,0.940,0.990,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,output_data,mixed,10,0.925,0.924,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,foundational_model,mixed,10,0.875,0.748,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,category,mixed,10,0.950,0.994,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_framework,mixed,10,0.935,0.990,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_license,mixed,10,0.630,0.658,30.0,0.00,70.0
+M3: Chain-of-Thought,model_card,ai_model_model_type,mixed,10,0.900,0.966,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,datasheet,title,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,datasheet,description,llm,10,0.595,0.670,20.0,0.00,80.0
+M3: Chain-of-Thought,datasheet,subjects,llm,10,0.665,0.770,10.0,0.00,90.0
+M3: Chain-of-Thought,datasheet,creator,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M3: Chain-of-Thought,datasheet,publisher,llm,10,0.250,0.262,70.0,0.00,30.0
+M3: Chain-of-Thought,datasheet,resource_type,llm,10,0.740,0.746,10.0,0.00,90.0
+M3: Chain-of-Thought,datasheet,resource_type_general,llm,10,0.835,0.934,0.0,0.00,100.0
+M3: Chain-of-Thought,datasheet,publication_year,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M3: Chain-of-Thought,datasheet,size,llm,10,0.160,0.172,80.0,0.00,20.0
+M3: Chain-of-Thought,datasheet,format,llm,10,0.140,0.176,80.0,0.00,20.0
+M3: Chain-of-Thought,datasheet,license,llm,10,0.270,0.270,70.0,0.00,30.0
+M4: Experiment-Grounded,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,both,version,mixed,20,0.500,0.470,50.0,0.00,50.0
+M4: Experiment-Grounded,model_card,short_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,citation,mixed,10,0.540,0.384,40.0,0.00,60.0
+M4: Experiment-Grounded,model_card,input_data,mixed,10,0.360,0.376,60.0,0.00,40.0
+M4: Experiment-Grounded,model_card,input_type,mixed,10,0.855,0.900,10.0,0.00,90.0
+M4: Experiment-Grounded,model_card,output_data,mixed,10,0.665,0.658,30.0,0.00,70.0
+M4: Experiment-Grounded,model_card,foundational_model,mixed,10,0.180,0.158,80.0,0.00,20.0
+M4: Experiment-Grounded,model_card,category,mixed,10,0.855,0.900,10.0,0.00,90.0
+M4: Experiment-Grounded,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_framework,mixed,10,0.760,0.800,20.0,0.00,80.0
+M4: Experiment-Grounded,model_card,ai_model_license,mixed,10,0.630,0.658,30.0,0.00,70.0
+M4: Experiment-Grounded,model_card,ai_model_model_type,mixed,10,0.285,0.300,70.0,0.00,30.0
+M4: Experiment-Grounded,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,title,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,description,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,subjects,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,creator,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,publisher,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,resource_type,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,resource_type_general,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,publication_year,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,size,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,format,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,datasheet,license,llm,10,0.000,0.000,100.0,0.00,0.0
+M4: Experiment-Grounded,model_card,runtime_suggested_hardware,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_f1_range,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_latency_ms,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_typical_deployment_context,experiment_llm,10,0.425,0.425,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_deployment_maturity,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_recommended_min_ram_mb,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_inference_cost_class,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_total_power_w,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_known_failure_modes,experiment_llm,10,0.425,0.425,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,name,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,both,version,mixed,20,0.530,0.509,45.0,0.00,55.0
+M4: Experiment-Grounded,model_card,short_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,full_description,deterministic,10,0.900,0.898,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,keywords,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,author,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,citation,mixed,10,0.540,0.384,40.0,0.00,60.0
+M4: Experiment-Grounded,model_card,input_data,mixed,10,0.360,0.376,60.0,0.00,40.0
+M4: Experiment-Grounded,model_card,input_type,mixed,10,0.945,0.996,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,output_data,mixed,10,0.665,0.658,30.0,0.00,70.0
+M4: Experiment-Grounded,model_card,foundational_model,mixed,10,0.180,0.158,80.0,0.00,20.0
+M4: Experiment-Grounded,model_card,category,mixed,10,0.950,0.998,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,documentation,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,is_private,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,is_gated,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_framework,mixed,10,0.760,0.800,20.0,0.00,80.0
+M4: Experiment-Grounded,model_card,ai_model_license,mixed,10,0.630,0.658,30.0,0.00,70.0
+M4: Experiment-Grounded,model_card,ai_model_model_type,mixed,10,0.380,0.398,60.0,0.00,40.0
+M4: Experiment-Grounded,model_card,ai_model_version,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_description,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_owner,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,model_card,ai_model_location,deterministic,10,1.000,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,title,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,description,llm,10,0.500,0.578,30.0,0.00,70.0
+M4: Experiment-Grounded,datasheet,subjects,llm,10,0.465,0.546,40.0,0.00,60.0
+M4: Experiment-Grounded,datasheet,creator,deterministic,10,0.900,0.940,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,publisher,llm,10,0.450,0.504,40.0,0.00,60.0
+M4: Experiment-Grounded,datasheet,resource_type,llm,10,0.560,0.602,30.0,0.00,70.0
+M4: Experiment-Grounded,datasheet,resource_type_general,llm,10,0.635,0.674,30.0,0.00,70.0
+M4: Experiment-Grounded,datasheet,publication_year,deterministic,10,0.900,1.000,0.0,0.00,100.0
+M4: Experiment-Grounded,datasheet,size,llm,10,0.170,0.176,80.0,0.00,20.0
+M4: Experiment-Grounded,datasheet,format,llm,10,0.250,0.196,70.0,0.00,30.0
+M4: Experiment-Grounded,datasheet,license,llm,10,0.180,0.180,80.0,0.00,20.0
+M4: Experiment-Grounded,model_card,runtime_suggested_hardware,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_f1_range,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_latency_ms,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_typical_deployment_context,experiment_llm,10,0.425,0.425,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_deployment_maturity,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_recommended_min_ram_mb,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_inference_cost_class,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_expected_total_power_w,experiment_deterministic,10,0.475,0.475,0.0,0.00,50.0
+M4: Experiment-Grounded,model_card,runtime_known_failure_modes,experiment_llm,10,0.425,0.425,0.0,0.00,50.0
+M4: Patra→MLHub,model_card,name,patra_direct,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,author,patra_direct,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,model_type,patra_direct,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,license,patra_direct,10,0.700,0.700,0.0,0.00,70.0
+M4: Patra→MLHub,model_card,task_types,patra_lookup,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,inference_software_dependencies,patra_direct,10,0.000,0.000,0.0,0.00,0.0
+M4: Patra→MLHub,model_card,pretraining_datasets,patra_direct,10,0.400,0.400,0.0,0.00,40.0
+M4: Patra→MLHub,model_card,keywords,patra_direct,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,libraries,patra_direct,10,1.000,1.000,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,inference_hardware,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,inference_max_energy_consumption_watts,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,inference_max_latency_ms,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,inference_min_throughput,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,inference_max_memory_usage_mb,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,inference_distributed,experiment_formula,10,0.795,0.795,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,image,patra_llm,10,0.170,0.170,0.0,0.00,20.0
+M4: Patra→MLHub,model_card,multi_modal,patra_llm,10,0.850,0.850,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,model_inputs,patra_llm,10,0.725,0.725,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,model_outputs,patra_llm,10,0.650,0.650,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,inference_precision,patra_llm,10,0.085,0.085,0.0,0.00,10.0
+M4: Patra→MLHub,model_card,inference_max_compute_utilization_percentage,patra_llm,10,0.000,0.000,0.0,0.00,0.0
+M4: Patra→MLHub,model_card,pretrained,patra_llm,10,0.800,0.800,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,edge_optimized,patra_llm,10,0.545,0.545,0.0,0.00,90.0
+M4: Patra→MLHub,model_card,quantization_aware,patra_llm,10,0.320,0.320,0.0,0.00,70.0
+M4: Patra→MLHub,model_card,supports_quantization,patra_llm,10,0.145,0.145,0.0,0.00,20.0
+M4: Patra→MLHub,model_card,pruned,patra_llm,10,0.340,0.340,0.0,0.00,70.0
+M4: Patra→MLHub,model_card,slimmed,patra_llm,10,0.420,0.420,0.0,0.00,80.0
+M4: Patra→MLHub,model_card,training_time,patra_llm,10,0.000,0.000,0.0,0.00,0.0
+M4: Patra→MLHub,model_card,training_precision,patra_llm,10,0.060,0.060,0.0,0.00,10.0
+M4: Patra→MLHub,model_card,training_hardware,patra_llm,10,0.085,0.085,0.0,0.00,10.0
+M4: Patra→MLHub,model_card,training_max_energy_consumption_watts,patra_llm,10,0.000,0.000,0.0,0.00,0.0
+M4: Patra→MLHub,model_card,training_distributed,patra_llm,10,0.160,0.160,0.0,0.00,30.0
+M4: Patra→MLHub,model_card,finetuning_datasets,patra_llm,10,0.435,0.435,0.0,0.00,60.0
+M4: Patra→MLHub,model_card,regulatory,patra_llm,10,0.440,0.440,0.0,0.00,100.0
+M4: Patra→MLHub,model_card,bias_evaluation_score,patra_llm,10,0.000,0.000,0.0,0.00,0.0
+M4: Patra→MLHub,model_card,annotations,patra_llm,10,0.760,0.760,0.0,0.00,100.0

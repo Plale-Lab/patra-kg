@@ -1,0 +1,67 @@
+{
+  "name": "electra-base-discriminator",
+  "author": "google",
+  "model_type": "dnn",
+  "license": "apache-2.0",
+  "inference_software_dependencies": null,
+  "pretraining_datasets": null,
+  "keywords": [
+    "transformers",
+    "pytorch",
+    "tf",
+    "jax",
+    "rust",
+    "electra",
+    "pretraining",
+    "en"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "TextClassification",
+    "FillMask",
+    "TextGeneration"
+  ],
+  "inference_max_memory_usage_mb": null,
+  "inference_max_latency_ms": null,
+  "inference_max_energy_consumption_watts": null,
+  "inference_distributed": null,
+  "inference_hardware": null,
+  "inference_min_throughput": null,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": false,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "probability",
+      "shape": null
+    }
+  ],
+  "inference_precision": null,
+  "image": "https://huggingface.co/front/thumbnails/google.png",
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "text",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": false,
+  "slimmed": false,
+  "supports_quantization": null,
+  "annotations": {},
+  "training_distributed": null,
+  "pruned": false,
+  "finetuning_datasets": [
+    "GLUE",
+    "SQuAD",
+    "text chunking"
+  ],
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

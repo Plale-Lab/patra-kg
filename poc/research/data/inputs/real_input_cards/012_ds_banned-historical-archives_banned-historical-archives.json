@@ -1,0 +1,23 @@
+{
+  "_id": "657f09ec3e3b5bea663e53c3",
+  "id": "banned-historical-archives/banned-historical-archives",
+  "author": "banned-historical-archives",
+  "disabled": false,
+  "gated": false,
+  "lastModified": "2025-10-19T15:21:40.000Z",
+  "likes": 28,
+  "private": false,
+  "sha": "7ee825405a889ac77b0d404fac868f9813da0c83",
+  "description": "\n\t\n\t\t\n\t\t\u548c\u8c10\u5386\u53f2\u6863\u6848\u9986\u6570\u636e\u96c6 - Banned Historical Archives Datasets\n\t\n\n\u548c\u8c10\u5386\u53f2\u6863\u6848\u9986\u6570\u636e\u96c6\u5305\u542b\u5df2\u5f55\u5165 https://banned-historical-archives.github.io \u548c\u6682\u672a\u672a\u5f55\u5165\u7684\u539f\u59cb\u6587\u4ef6\u3002\n\n\t\n\t\t\n\t\t\u76ee\u5f55\u7ed3\u6784\n\t\n\n\nbanned-historical-archives.github.io # \u5df2\u5f55\u5165\u8be5\u7f51\u7ad9\u7684\u539f\u59cb\u6570\u636e\uff0c\u4e0d\u5b9a\u671f\u4ece github \u4ed3\u5e93\u4e2d\u540c\u6b65\nraw # \u539f\u59cb\u6587\u4ef6\nconfig # \u914d\u7f6e\u6587\u4ef6\n\n\ntodo # \u5b58\u653e\u6682\u672a\u5f55\u5165\u7f51\u7ad9\u7684\u6587\u4ef6\n\n\u90e8\u5206\u62a5\u7eb8\u548c\u56fe\u7247\u8d44\u6599\u5b58\u653e\u5728\u5355\u72ec\u7684\u4ed3\u5e93:\n\n\t\n\t\t\n\u540d\u79f0\n\u5730\u5740\n\u72b6\u6001\n\n\n\t\t\n\u53c2\u8003\u6d88\u606f\nhttps://huggingface.co/datasets/banned-historical-archives/ckxx\n\u672a\u5f55\u5165\n\n\n\u4eba\u6c11\u65e5\u62a5\nhttps://huggingface.co/datasets/banned-historical-archives/rmrb\n\u5df2\u7cbe\u9009\u91cd\u8981\u7684\u6587\u7ae0\u5f55\u5165\n\n\n\u6587\u6c47\u62a5\u2026 See the full description on the dataset page: https://huggingface.co/datasets/banned-historical-archives/banned-historical-archives.",
+  "downloads": 1858168,
+  "tags": [
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+  ],
+  "createdAt": "2023-12-17T14:47:08.000Z",
+  "key": ""
+}

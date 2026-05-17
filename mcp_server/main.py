@@ -11,12 +11,12 @@ from mcp.server.fastmcp import FastMCP
 from starlette.middleware.cors import CORSMiddleware
 
 from mcp_server.db import (
-    DOMAIN_TABLES,
     _serialize_row,
     close_pool,
     get_pool,
     init_pool,
 )
+from shared.constants import VALID_DOMAINS
 
 log = logging.getLogger(__name__)
 
@@ -100,12 +100,12 @@ async def modelcard_deployments_resource(mc_id: int) -> str:
             SELECT
                 e.id AS experiment_id,
                 e.edge_device_id AS device_id,
-                COALESCE(e.executed_at, e.model_used_at, e.start_at) AS timestamp,
+                COALESCE(e.executed_at, e.start_at) AS timestamp,
                 CASE WHEN e.executed_at IS NULL THEN 'active' ELSE 'completed' END AS status,
                 e.precision, e.recall, e.f1_score, e.map_50, e.map_50_95
             FROM experiments e
             WHERE e.model_id = $1
-            ORDER BY COALESCE(e.executed_at, e.model_used_at, e.start_at) DESC NULLS LAST, e.id DESC
+            ORDER BY COALESCE(e.executed_at, e.start_at) DESC NULLS LAST, e.id DESC
             LIMIT 50
             """,
             model["id"],
@@ -122,12 +122,12 @@ async def datasheet_resource(ds_id: int) -> str:
             """
             SELECT d.identifier, d.publication_year, d.resource_type,
                    d.resource_type_general, d.size, d.format, d.version,
-                   d.updated_at, d.dataset_schema_id,
+                   d.updated_at,
                    p.name AS publisher_name, p.publisher_identifier,
                    p.publisher_identifier_scheme, p.scheme_uri AS publisher_scheme_uri,
                    p.lang AS publisher_lang
             FROM datasheets d
-            LEFT JOIN publishers p ON p.id = d.publisher_id
+            LEFT JOIN datasheet_publishers p ON p.id = d.publisher_id
             WHERE d.identifier = $1 AND d.is_private = false
             """,
             ds_id,
@@ -297,12 +297,12 @@ async def get_datasheet(ds_id: int) -> str:
             """
             SELECT d.identifier, d.publication_year, d.resource_type,
                    d.resource_type_general, d.size, d.format, d.version,
-                   d.updated_at, d.dataset_schema_id,
+                   d.updated_at,
                    p.name AS publisher_name, p.publisher_identifier,
                    p.publisher_identifier_scheme, p.scheme_uri AS publisher_scheme_uri,
                    p.lang AS publisher_lang
             FROM datasheets d
-            LEFT JOIN publishers p ON p.id = d.publisher_id
+            LEFT JOIN datasheet_publishers p ON p.id = d.publisher_id
             WHERE d.identifier = $1 AND d.is_private = false
             """,
             ds_id,
@@ -395,16 +395,16 @@ async def get_datasheet(ds_id: int) -> str:
 async def list_experiment_users(domain: str) -> str:
     """List distinct users with experiment events in a domain."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     pool = get_pool()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(f"""
+        rows = await conn.fetch("""
             SELECT DISTINCT user_id, user_id AS username
-            FROM {tables['events']}
+            FROM events
+            WHERE domain = $1
             ORDER BY user_id
-        """)
+        """, domain)
     return json.dumps([_serialize_row(r) for r in rows])
 
 
@@ -412,12 +412,11 @@ async def list_experiment_users(domain: str) -> str:
 async def get_experiment_summary(domain: str, user_id: str) -> str:
     """Experiment summary table for a given user in a domain."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     pool = get_pool()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(f"""
+        rows = await conn.fetch("""
             SELECT
                 experiment_id, user_id, model_id, device_id,
                 MIN(image_receiving_timestamp) AS start_at,
@@ -426,11 +425,11 @@ async def get_experiment_summary(domain: str, user_id: str) -> str:
                 MAX(precision) AS precision,
                 MAX(recall) AS recall,
                 MAX(f1_score) AS f1_score
-            FROM {tables['events']}
-            WHERE user_id = $1
+            FROM events
+            WHERE domain = $1 AND user_id = $2
             GROUP BY experiment_id, user_id, model_id, device_id
             ORDER BY MIN(image_receiving_timestamp) DESC
-        """, user_id)
+        """, domain, user_id)
     return json.dumps([_serialize_row(r) for r in rows])
 
 
@@ -438,24 +437,23 @@ async def get_experiment_summary(domain: str, user_id: str) -> str:
 async def list_user_experiments(domain: str, user_id: str) -> str:
     """List experiments for a user in a domain (for experiment selector)."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     pool = get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            f"""
+            """
             SELECT DISTINCT
                 experiment_id,
                 MIN(image_receiving_timestamp) AS start_at,
                 device_id,
                 model_id
-            FROM {tables['events']}
-            WHERE user_id = $1
+            FROM events
+            WHERE domain = $1 AND user_id = $2
             GROUP BY experiment_id, device_id, model_id
             ORDER BY MIN(image_receiving_timestamp) DESC
             """,
-            user_id,
+            domain, user_id,
         )
     return json.dumps([_serialize_row(r) for r in rows])
 
@@ -464,17 +462,16 @@ async def list_user_experiments(domain: str, user_id: str) -> str:
 async def get_experiment_detail(domain: str, experiment_id: str) -> str:
     """Full experiment detail — latest metrics snapshot."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     pool = get_pool()
     async with pool.acquire() as conn:
-        r = await conn.fetchrow(f"""
-            SELECT * FROM {tables['events']}
-            WHERE experiment_id = $1
+        r = await conn.fetchrow("""
+            SELECT * FROM events
+            WHERE domain = $1 AND experiment_id = $2
             ORDER BY image_count DESC
             LIMIT 1
-        """, experiment_id)
+        """, domain, experiment_id)
     if not r:
         return json.dumps({"error": "Experiment not found"})
     return json.dumps(_serialize_row(r))
@@ -484,22 +481,21 @@ async def get_experiment_detail(domain: str, experiment_id: str) -> str:
 async def get_experiment_images(domain: str, experiment_id: str, skip: int = 0, limit: int = 100) -> str:
     """Raw image data table for an experiment (paginated)."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     limit = min(limit, 500)
     pool = get_pool()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(f"""
+        rows = await conn.fetch("""
             SELECT
                 image_name, ground_truth, label, probability,
                 image_decision, flattened_scores,
                 image_receiving_timestamp, image_scoring_timestamp
-            FROM {tables['events']}
-            WHERE experiment_id = $1
+            FROM events
+            WHERE domain = $1 AND experiment_id = $2
             ORDER BY image_receiving_timestamp ASC
-            LIMIT $2 OFFSET $3
-        """, experiment_id, limit, skip)
+            LIMIT $3 OFFSET $4
+        """, domain, experiment_id, limit, skip)
     return json.dumps([_serialize_row(r) for r in rows])
 
 
@@ -507,14 +503,13 @@ async def get_experiment_images(domain: str, experiment_id: str, skip: int = 0, 
 async def get_experiment_power(domain: str, experiment_id: str) -> str:
     """Power consumption breakdown for an experiment."""
     domain = "digital-ag" if domain == "digital-agriculture" else domain
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
-        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": list(DOMAIN_TABLES.keys())})
+    if domain not in VALID_DOMAINS:
+        return json.dumps({"error": f"Unknown domain: {domain}", "valid_domains": sorted(VALID_DOMAINS)})
     pool = get_pool()
     async with pool.acquire() as conn:
         r = await conn.fetchrow(
-            f"SELECT * FROM {tables['power']} WHERE experiment_id = $1",
-            experiment_id,
+            "SELECT * FROM power_summary WHERE domain = $1 AND experiment_id = $2",
+            domain, experiment_id,
         )
     if not r:
         return json.dumps(None)

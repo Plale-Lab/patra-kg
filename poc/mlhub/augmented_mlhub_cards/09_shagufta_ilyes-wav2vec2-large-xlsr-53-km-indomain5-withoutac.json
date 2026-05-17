@@ -1,0 +1,69 @@
+{
+  "name": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+  "author": "Shagufta",
+  "model_type": "dnn",
+  "license": null,
+  "inference_software_dependencies": null,
+  "pretraining_datasets": null,
+  "keywords": [
+    "transformers",
+    "wav2vec2",
+    "automatic-speech-recognition"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "AudioClassification"
+  ],
+  "inference_hardware": {
+    "accelerators": [
+      {
+        "accelerator_type": "A100",
+        "cores": null,
+        "memory_gb": 80,
+        "system_requirements": []
+      }
+    ],
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 80
+  },
+  "inference_max_energy_consumption_watts": 218,
+  "inference_max_latency_ms": 185,
+  "inference_min_throughput": 5,
+  "inference_max_memory_usage_mb": 81920,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": null,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "text",
+      "shape": null
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "audio",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": null,
+  "slimmed": false,
+  "supports_quantization": null,
+  "annotations": {},
+  "training_distributed": null,
+  "pruned": false,
+  "finetuning_datasets": null,
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

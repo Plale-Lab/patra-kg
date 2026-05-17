@@ -1,0 +1,24 @@
+{
+  "_id": "621ffdc136468d709f17b61d",
+  "id": "google/electra-base-discriminator",
+  "likes": 100,
+  "private": false,
+  "downloads": 53385313,
+  "tags": [
+    "transformers",
+    "pytorch",
+    "tf",
+    "jax",
+    "rust",
+    "electra",
+    "pretraining",
+    "en",
+    "arxiv:1406.2661",
+    "license:apache-2.0",
+    "endpoints_compatible",
+    "region:us"
+  ],
+  "library_name": "transformers",
+  "createdAt": "2022-03-02T23:29:05.000Z",
+  "modelId": "google/electra-base-discriminator"
+}

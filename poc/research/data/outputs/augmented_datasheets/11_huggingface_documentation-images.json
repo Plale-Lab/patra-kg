@@ -1,0 +1,13 @@
+{
+  "title": "documentation-images",
+  "description": "This dataset contains images used in the documentation of HuggingFace's libraries, optimized for web use. The images are stored in an image folder format and are licensed under CC-BY-NC-SA-4.0. The dataset is relatively small, with less than 1,000 images. It can be used for testing or demonstration purposes.",
+  "subjects": "HuggingFace, documentation, images, libraries",
+  "creator": "huggingface",
+  "publisher": "HuggingFace",
+  "resource_type": "Annotated image dataset for documentation",
+  "resource_type_general": "Dataset",
+  "publication_year": "2022",
+  "size": "n<1K images",
+  "format": "ImageFolder",
+  "license": "cc-by-nc-sa-4.0"
+}

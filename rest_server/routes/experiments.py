@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 import asyncpg
 
 from rest_server.database import get_pool
+from rest_server.errors import not_found
 from rest_server.models import (
     DeploymentDetail,
     ExperimentDetail,
@@ -12,26 +13,15 @@ from rest_server.models import (
     ExperimentSummary,
     ExperimentUser,
 )
+from shared.constants import VALID_DOMAINS
 
 router = APIRouter(prefix="/experiments", tags=["experiments"])
 
-DOMAIN_TABLES = {
-    "animal-ecology": {
-        "events": "camera_trap_events",
-        "power": "camera_trap_power",
-    },
-    "digital-ag": {
-        "events": "digital_ag_events",
-        "power": "digital_ag_power",
-    },
-}
 
-
-def _resolve_tables(domain: str) -> tuple[str, str]:
-    tables = DOMAIN_TABLES.get(domain)
-    if not tables:
+def _validate_domain(domain: str) -> str:
+    if domain not in VALID_DOMAINS:
         raise HTTPException(status_code=404, detail=f"Unknown domain: {domain}")
-    return tables["events"], tables["power"]
+    return domain
 
 
 def _float(value):
@@ -43,14 +33,15 @@ async def list_experiment_users(
     domain: str = Path(...),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    events_table, _ = _resolve_tables(domain)
-    query = f"""
+    _validate_domain(domain)
+    query = """
         SELECT DISTINCT user_id, user_id AS username
-        FROM {events_table}
+        FROM events
+        WHERE domain = $1
         ORDER BY user_id
     """
     async with pool.acquire() as conn:
-        rows = await conn.fetch(query)
+        rows = await conn.fetch(query, domain)
     return [ExperimentUser(user_id=row["user_id"], username=row["username"]) for row in rows]
 
 
@@ -60,8 +51,8 @@ async def get_user_experiment_summary(
     user_id: str = Path(...),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    events_table, _ = _resolve_tables(domain)
-    query = f"""
+    _validate_domain(domain)
+    query = """
         SELECT
             experiment_id,
             user_id,
@@ -73,13 +64,13 @@ async def get_user_experiment_summary(
             MAX(precision) AS precision,
             MAX(recall) AS recall,
             MAX(f1_score) AS f1_score
-        FROM {events_table}
-        WHERE user_id = $1
+        FROM events
+        WHERE domain = $1 AND user_id = $2
         GROUP BY experiment_id, user_id, model_id, device_id
         ORDER BY MIN(image_receiving_timestamp) DESC
     """
     async with pool.acquire() as conn:
-        rows = await conn.fetch(query, user_id)
+        rows = await conn.fetch(query, domain, user_id)
 
     return [
         ExperimentSummary(
@@ -104,20 +95,20 @@ async def list_user_experiments(
     user_id: str = Path(...),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    events_table, _ = _resolve_tables(domain)
-    query = f"""
+    _validate_domain(domain)
+    query = """
         SELECT DISTINCT
             experiment_id,
             MIN(image_receiving_timestamp) AS start_at,
             device_id,
             model_id
-        FROM {events_table}
-        WHERE user_id = $1
+        FROM events
+        WHERE domain = $1 AND user_id = $2
         GROUP BY experiment_id, device_id, model_id
         ORDER BY MIN(image_receiving_timestamp) DESC
     """
     async with pool.acquire() as conn:
-        rows = await conn.fetch(query, user_id)
+        rows = await conn.fetch(query, domain, user_id)
 
     return [
         ExperimentListItem(
@@ -136,18 +127,18 @@ async def get_experiment_detail(
     experiment_id: str = Path(...),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    events_table, _ = _resolve_tables(domain)
-    query = f"""
+    _validate_domain(domain)
+    query = """
         SELECT *
-        FROM {events_table}
-        WHERE experiment_id = $1
+        FROM events
+        WHERE domain = $1 AND experiment_id = $2
         ORDER BY image_count DESC
         LIMIT 1
     """
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(query, experiment_id)
+        row = await conn.fetchrow(query, domain, experiment_id)
     if not row:
-        raise HTTPException(status_code=404, detail="Experiment not found")
+        raise not_found("Experiment")
 
     return ExperimentDetail(
         experiment_id=row["experiment_id"],
@@ -177,19 +168,19 @@ async def get_experiment_images(
     limit: int = Query(100, ge=1, le=500),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    events_table, _ = _resolve_tables(domain)
-    query = f"""
+    _validate_domain(domain)
+    query = """
         SELECT
             image_name, ground_truth, label, probability,
             image_decision, flattened_scores,
             image_receiving_timestamp, image_scoring_timestamp
-        FROM {events_table}
-        WHERE experiment_id = $1
+        FROM events
+        WHERE domain = $1 AND experiment_id = $2
         ORDER BY image_receiving_timestamp ASC
-        LIMIT $2 OFFSET $3
+        LIMIT $3 OFFSET $4
     """
     async with pool.acquire() as conn:
-        rows = await conn.fetch(query, experiment_id, limit, skip)
+        rows = await conn.fetch(query, domain, experiment_id, limit, skip)
 
     return [
         ExperimentImage(
@@ -212,10 +203,10 @@ async def get_experiment_power(
     experiment_id: str = Path(...),
     pool: asyncpg.Pool = Depends(get_pool),
 ):
-    _, power_table = _resolve_tables(domain)
-    query = f"SELECT * FROM {power_table} WHERE experiment_id = $1"
+    _validate_domain(domain)
+    query = "SELECT * FROM power_summary WHERE domain = $1 AND experiment_id = $2"
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(query, experiment_id)
+        row = await conn.fetchrow(query, domain, experiment_id)
     if not row:
         return None
 

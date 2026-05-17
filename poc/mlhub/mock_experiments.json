@@ -1,0 +1,3014 @@
+{
+  "edge_devices": [
+    {
+      "id": 1,
+      "device_type": "Jetson Nano",
+      "ram_mb": 4096,
+      "class": "edge",
+      "gpu": true
+    },
+    {
+      "id": 2,
+      "device_type": "A100",
+      "ram_mb": 81920,
+      "class": "datacenter",
+      "gpu": true
+    },
+    {
+      "id": 3,
+      "device_type": "CPU-x86",
+      "ram_mb": 16384,
+      "class": "cpu",
+      "gpu": false
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "user_name_ckn": "neelk"
+    },
+    {
+      "id": 2,
+      "user_name_ckn": "swithana"
+    },
+    {
+      "id": 3,
+      "user_name_ckn": "beckstei"
+    }
+  ],
+  "model_id_map": {
+    "1": 100,
+    "2": 101,
+    "3": 102,
+    "5": 103,
+    "6": 104,
+    "7": 105,
+    "8": 106,
+    "9": 107,
+    "10": 108
+  },
+  "card_category_index": {
+    "1": {
+      "category": "natural language processing",
+      "input_type": "Text",
+      "model_id": 100
+    },
+    "2": {
+      "category": "natural language processing",
+      "input_type": "Multimodal",
+      "model_id": 101
+    },
+    "3": {
+      "category": "natural language processing",
+      "input_type": "Text",
+      "model_id": 102
+    },
+    "5": {
+      "category": "natural language processing",
+      "input_type": "Text",
+      "model_id": 103
+    },
+    "6": {
+      "category": "natural language processing",
+      "input_type": "Text",
+      "model_id": 104
+    },
+    "7": {
+      "category": "classification",
+      "input_type": "Image",
+      "model_id": 105
+    },
+    "8": {
+      "category": "natural language processing",
+      "input_type": "Text",
+      "model_id": 106
+    },
+    "9": {
+      "category": "classification",
+      "input_type": "Audio",
+      "model_id": 107
+    },
+    "10": {
+      "category": "computer vision",
+      "input_type": "Image",
+      "model_id": 108
+    }
+  },
+  "experiments": [
+    {
+      "id": 1,
+      "ckn_experiment_id": "all-minilm-l6-v2-run1",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 100,
+      "model_id_ckn": "sentence-transformers/all-MiniLM-L6-v2",
+      "start_at": "2026-03-01T11:00:00+00:00",
+      "submitted_at": "2026-03-01T11:00:18+00:00",
+      "executed_at": "2026-03-01T11:00:21.600000+00:00",
+      "model_used_at": "2026-03-01T11:00:19+00:00",
+      "total_images": 200,
+      "total_predictions": 204,
+      "total_ground_truth_objects": 200,
+      "true_positives": 163,
+      "false_positives": 41,
+      "false_negatives": 37,
+      "precision": 0.79873,
+      "recall": 0.81873,
+      "f1_score": 0.83673,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 15.116,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 18,
+      "created_at": "2026-03-01T11:00:21.600000+00:00",
+      "updated_at": "2026-03-01T11:00:21.600000+00:00"
+    },
+    {
+      "id": 2,
+      "ckn_experiment_id": "all-minilm-l6-v2-run2",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 100,
+      "model_id_ckn": "sentence-transformers/all-MiniLM-L6-v2",
+      "start_at": "2026-03-02T08:00:00+00:00",
+      "submitted_at": "2026-03-02T08:00:18+00:00",
+      "executed_at": "2026-03-02T08:00:22.400000+00:00",
+      "model_used_at": "2026-03-02T08:00:19+00:00",
+      "total_images": 200,
+      "total_predictions": 191,
+      "total_ground_truth_objects": 200,
+      "true_positives": 146,
+      "false_positives": 45,
+      "false_negatives": 54,
+      "precision": 0.76419,
+      "recall": 0.73282,
+      "f1_score": 0.77043,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 15.861,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 22,
+      "created_at": "2026-03-02T08:00:22.400000+00:00",
+      "updated_at": "2026-03-02T08:00:22.400000+00:00"
+    },
+    {
+      "id": 3,
+      "ckn_experiment_id": "all-minilm-l6-v2-run3",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 100,
+      "model_id_ckn": "sentence-transformers/all-MiniLM-L6-v2",
+      "start_at": "2026-03-03T08:00:00+00:00",
+      "submitted_at": "2026-03-03T08:00:06+00:00",
+      "executed_at": "2026-03-03T08:00:11.200000+00:00",
+      "model_used_at": "2026-03-03T08:00:07+00:00",
+      "total_images": 200,
+      "total_predictions": 197,
+      "total_ground_truth_objects": 200,
+      "true_positives": 157,
+      "false_positives": 40,
+      "false_negatives": 43,
+      "precision": 0.79585,
+      "recall": 0.78746,
+      "f1_score": 0.78386,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 7.348,
+      "total_gpu_power_w": 218.947,
+      "per_image_latency_ms": 26,
+      "created_at": "2026-03-03T08:00:11.200000+00:00",
+      "updated_at": "2026-03-03T08:00:11.200000+00:00"
+    },
+    {
+      "id": 4,
+      "ckn_experiment_id": "qwen3-vl-2b-instruct-run1",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 101,
+      "model_id_ckn": "Qwen/Qwen3-VL-2B-Instruct",
+      "start_at": "2026-03-04T19:00:00+00:00",
+      "submitted_at": "2026-03-04T19:00:12+00:00",
+      "executed_at": "2026-03-04T19:01:22+00:00",
+      "model_used_at": "2026-03-04T19:00:13+00:00",
+      "total_images": 500,
+      "total_predictions": 489,
+      "total_ground_truth_objects": 500,
+      "true_positives": 348,
+      "false_positives": 141,
+      "false_negatives": 152,
+      "precision": 0.711,
+      "recall": 0.69622,
+      "f1_score": 0.72378,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.307,
+      "total_gpu_power_w": 233.19,
+      "per_image_latency_ms": 140,
+      "created_at": "2026-03-04T19:01:22+00:00",
+      "updated_at": "2026-03-04T19:01:22+00:00"
+    },
+    {
+      "id": 5,
+      "ckn_experiment_id": "qwen3-vl-2b-instruct-run2",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 101,
+      "model_id_ckn": "Qwen/Qwen3-VL-2B-Instruct",
+      "start_at": "2026-03-06T01:00:00+00:00",
+      "submitted_at": "2026-03-06T01:00:10+00:00",
+      "executed_at": "2026-03-06T01:00:26+00:00",
+      "model_used_at": "2026-03-06T01:00:11+00:00",
+      "total_images": 100,
+      "total_predictions": 99,
+      "total_ground_truth_objects": 100,
+      "true_positives": 73,
+      "false_positives": 26,
+      "false_negatives": 27,
+      "precision": 0.73702,
+      "recall": 0.73083,
+      "f1_score": 0.71245,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 8.919,
+      "total_gpu_power_w": 232.995,
+      "per_image_latency_ms": 160,
+      "created_at": "2026-03-06T01:00:26+00:00",
+      "updated_at": "2026-03-06T01:00:26+00:00"
+    },
+    {
+      "id": 6,
+      "ckn_experiment_id": "bert-base-uncased-run1",
+      "user_id": 2,
+      "user_name_ckn": "swithana",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 102,
+      "model_id_ckn": "google-bert/bert-base-uncased",
+      "start_at": "2026-03-06T15:00:00+00:00",
+      "submitted_at": "2026-03-06T15:00:10+00:00",
+      "executed_at": "2026-03-06T15:00:19+00:00",
+      "model_used_at": "2026-03-06T15:00:11+00:00",
+      "total_images": 200,
+      "total_predictions": 203,
+      "total_ground_truth_objects": 200,
+      "true_positives": 189,
+      "false_positives": 14,
+      "false_negatives": 11,
+      "precision": 0.92901,
+      "recall": 0.94847,
+      "f1_score": 0.91953,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 8.114,
+      "total_gpu_power_w": 186.415,
+      "per_image_latency_ms": 45,
+      "created_at": "2026-03-06T15:00:19+00:00",
+      "updated_at": "2026-03-06T15:00:19+00:00"
+    },
+    {
+      "id": 7,
+      "ckn_experiment_id": "bert-base-uncased-run2",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 102,
+      "model_id_ckn": "google-bert/bert-base-uncased",
+      "start_at": "2026-03-07T19:00:00+00:00",
+      "submitted_at": "2026-03-07T19:00:06+00:00",
+      "executed_at": "2026-03-07T19:01:36+00:00",
+      "model_used_at": "2026-03-07T19:00:07+00:00",
+      "total_images": 1000,
+      "total_predictions": 1000,
+      "total_ground_truth_objects": 1000,
+      "true_positives": 967,
+      "false_positives": 33,
+      "false_negatives": 33,
+      "precision": 0.96665,
+      "recall": 0.96755,
+      "f1_score": 0.93823,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 16.224,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 90,
+      "created_at": "2026-03-07T19:01:36+00:00",
+      "updated_at": "2026-03-07T19:01:36+00:00"
+    },
+    {
+      "id": 8,
+      "ckn_experiment_id": "bert-base-uncased-run3",
+      "user_id": 2,
+      "user_name_ckn": "swithana",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 102,
+      "model_id_ckn": "google-bert/bert-base-uncased",
+      "start_at": "2026-03-08T13:00:00+00:00",
+      "submitted_at": "2026-03-08T13:00:18+00:00",
+      "executed_at": "2026-03-08T13:00:26.800000+00:00",
+      "model_used_at": "2026-03-08T13:00:19+00:00",
+      "total_images": 100,
+      "total_predictions": 99,
+      "total_ground_truth_objects": 100,
+      "true_positives": 84,
+      "false_positives": 15,
+      "false_negatives": 16,
+      "precision": 0.84118,
+      "recall": 0.84578,
+      "f1_score": 0.86442,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 18.873,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 88,
+      "created_at": "2026-03-08T13:00:26.800000+00:00",
+      "updated_at": "2026-03-08T13:00:26.800000+00:00"
+    },
+    {
+      "id": 9,
+      "ckn_experiment_id": "bert-base-uncased-run4",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 102,
+      "model_id_ckn": "google-bert/bert-base-uncased",
+      "start_at": "2026-03-09T09:00:00+00:00",
+      "submitted_at": "2026-03-09T09:00:08+00:00",
+      "executed_at": "2026-03-09T09:00:16.400000+00:00",
+      "model_used_at": "2026-03-09T09:00:09+00:00",
+      "total_images": 200,
+      "total_predictions": 203,
+      "total_ground_truth_objects": 200,
+      "true_positives": 179,
+      "false_positives": 24,
+      "false_negatives": 21,
+      "precision": 0.88057,
+      "recall": 0.89785,
+      "f1_score": 0.9075,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 8.054,
+      "total_gpu_power_w": 297.999,
+      "per_image_latency_ms": 42,
+      "created_at": "2026-03-09T09:00:16.400000+00:00",
+      "updated_at": "2026-03-09T09:00:16.400000+00:00"
+    },
+    {
+      "id": 10,
+      "ckn_experiment_id": "paraphrase-multilingual-minilm-l12-v2-run1",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 103,
+      "model_id_ckn": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "start_at": "2026-03-11T02:00:00+00:00",
+      "submitted_at": "2026-03-11T02:00:11+00:00",
+      "executed_at": "2026-03-11T02:00:13.400000+00:00",
+      "model_used_at": "2026-03-11T02:00:12+00:00",
+      "total_images": 100,
+      "total_predictions": 96,
+      "total_ground_truth_objects": 100,
+      "true_positives": 83,
+      "false_positives": 13,
+      "false_negatives": 17,
+      "precision": 0.86302,
+      "recall": 0.83071,
+      "f1_score": 0.83862,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 15.688,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 24,
+      "created_at": "2026-03-11T02:00:13.400000+00:00",
+      "updated_at": "2026-03-11T02:00:13.400000+00:00"
+    },
+    {
+      "id": 11,
+      "ckn_experiment_id": "paraphrase-multilingual-minilm-l12-v2-run2",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 103,
+      "model_id_ckn": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "start_at": "2026-03-12T01:00:00+00:00",
+      "submitted_at": "2026-03-12T01:00:18+00:00",
+      "executed_at": "2026-03-12T01:00:38+00:00",
+      "model_used_at": "2026-03-12T01:00:19+00:00",
+      "total_images": 1000,
+      "total_predictions": 1039,
+      "total_ground_truth_objects": 1000,
+      "true_positives": 796,
+      "false_positives": 243,
+      "false_negatives": 204,
+      "precision": 0.76545,
+      "recall": 0.79629,
+      "f1_score": 0.76552,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.429,
+      "total_gpu_power_w": 199.548,
+      "per_image_latency_ms": 20,
+      "created_at": "2026-03-12T01:00:38+00:00",
+      "updated_at": "2026-03-12T01:00:38+00:00"
+    },
+    {
+      "id": 12,
+      "ckn_experiment_id": "paraphrase-multilingual-minilm-l12-v2-run3",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 103,
+      "model_id_ckn": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "start_at": "2026-03-12T12:00:00+00:00",
+      "submitted_at": "2026-03-12T12:00:17+00:00",
+      "executed_at": "2026-03-12T12:00:45+00:00",
+      "model_used_at": "2026-03-12T12:00:18+00:00",
+      "total_images": 1000,
+      "total_predictions": 1031,
+      "total_ground_truth_objects": 1000,
+      "true_positives": 803,
+      "false_positives": 228,
+      "false_negatives": 197,
+      "precision": 0.7783,
+      "recall": 0.80335,
+      "f1_score": 0.77153,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 16.896,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 28,
+      "created_at": "2026-03-12T12:00:45+00:00",
+      "updated_at": "2026-03-12T12:00:45+00:00"
+    },
+    {
+      "id": 13,
+      "ckn_experiment_id": "hexis-vesper-12b-run1",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 104,
+      "model_id_ckn": "WasamiKirua/Hexis-Vesper-12B",
+      "start_at": "2026-03-13T21:00:00+00:00",
+      "submitted_at": "2026-03-13T21:00:20+00:00",
+      "executed_at": "2026-03-13T21:01:02+00:00",
+      "model_used_at": "2026-03-13T21:00:21+00:00",
+      "total_images": 200,
+      "total_predictions": 201,
+      "total_ground_truth_objects": 200,
+      "true_positives": 155,
+      "false_positives": 46,
+      "false_negatives": 45,
+      "precision": 0.76968,
+      "recall": 0.77811,
+      "f1_score": 0.74922,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 7.882,
+      "total_gpu_power_w": 290.891,
+      "per_image_latency_ms": 210,
+      "created_at": "2026-03-13T21:01:02+00:00",
+      "updated_at": "2026-03-13T21:01:02+00:00"
+    },
+    {
+      "id": 14,
+      "ckn_experiment_id": "hexis-vesper-12b-run2",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 104,
+      "model_id_ckn": "WasamiKirua/Hexis-Vesper-12B",
+      "start_at": "2026-03-14T08:00:00+00:00",
+      "submitted_at": "2026-03-14T08:00:04+00:00",
+      "executed_at": "2026-03-14T08:02:06.500000+00:00",
+      "model_used_at": "2026-03-14T08:00:05+00:00",
+      "total_images": 500,
+      "total_predictions": 534,
+      "total_ground_truth_objects": 500,
+      "true_positives": 368,
+      "false_positives": 166,
+      "false_negatives": 132,
+      "precision": 0.68815,
+      "recall": 0.73731,
+      "f1_score": 0.69762,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 8.913,
+      "total_gpu_power_w": 300.509,
+      "per_image_latency_ms": 245,
+      "created_at": "2026-03-14T08:02:06.500000+00:00",
+      "updated_at": "2026-03-14T08:02:06.500000+00:00"
+    },
+    {
+      "id": 15,
+      "ckn_experiment_id": "fashion-mnist-mlp-run1",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 105,
+      "model_id_ckn": "donaldsebleung/fashion-mnist-mlp",
+      "start_at": "2026-03-15T22:00:00+00:00",
+      "submitted_at": "2026-03-15T22:00:01+00:00",
+      "executed_at": "2026-03-15T22:00:18.500000+00:00",
+      "model_used_at": "2026-03-15T22:00:02+00:00",
+      "total_images": 500,
+      "total_predictions": 487,
+      "total_ground_truth_objects": 500,
+      "true_positives": 461,
+      "false_positives": 26,
+      "false_negatives": 39,
+      "precision": 0.94476,
+      "recall": 0.92315,
+      "f1_score": 0.94181,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 2.167,
+      "total_gpu_power_w": 6.174,
+      "per_image_latency_ms": 35,
+      "created_at": "2026-03-15T22:00:18.500000+00:00",
+      "updated_at": "2026-03-15T22:00:18.500000+00:00"
+    },
+    {
+      "id": 16,
+      "ckn_experiment_id": "fashion-mnist-mlp-run2",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 105,
+      "model_id_ckn": "donaldsebleung/fashion-mnist-mlp",
+      "start_at": "2026-03-16T17:00:00+00:00",
+      "submitted_at": "2026-03-16T17:00:17+00:00",
+      "executed_at": "2026-03-16T17:00:25+00:00",
+      "model_used_at": "2026-03-16T17:00:18+00:00",
+      "total_images": 200,
+      "total_predictions": 192,
+      "total_ground_truth_objects": 200,
+      "true_positives": 191,
+      "false_positives": 1,
+      "false_negatives": 9,
+      "precision": 0.99,
+      "recall": 0.95553,
+      "f1_score": 0.97446,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 2.762,
+      "total_gpu_power_w": 4.532,
+      "per_image_latency_ms": 40,
+      "created_at": "2026-03-16T17:00:25+00:00",
+      "updated_at": "2026-03-16T17:00:25+00:00"
+    },
+    {
+      "id": 17,
+      "ckn_experiment_id": "fashion-mnist-mlp-run3",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 105,
+      "model_id_ckn": "donaldsebleung/fashion-mnist-mlp",
+      "start_at": "2026-03-17T23:00:00+00:00",
+      "submitted_at": "2026-03-17T23:00:01+00:00",
+      "executed_at": "2026-03-17T23:00:07+00:00",
+      "model_used_at": "2026-03-17T23:00:02+00:00",
+      "total_images": 100,
+      "total_predictions": 104,
+      "total_ground_truth_objects": 100,
+      "true_positives": 95,
+      "false_positives": 9,
+      "false_negatives": 5,
+      "precision": 0.9053,
+      "recall": 0.95408,
+      "f1_score": 0.93308,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 18.792,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 60,
+      "created_at": "2026-03-17T23:00:07+00:00",
+      "updated_at": "2026-03-17T23:00:07+00:00"
+    },
+    {
+      "id": 18,
+      "ckn_experiment_id": "fashion-mnist-mlp-run4",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 105,
+      "model_id_ckn": "donaldsebleung/fashion-mnist-mlp",
+      "start_at": "2026-03-19T02:00:00+00:00",
+      "submitted_at": "2026-03-19T02:00:03+00:00",
+      "executed_at": "2026-03-19T02:00:22+00:00",
+      "model_used_at": "2026-03-19T02:00:04+00:00",
+      "total_images": 500,
+      "total_predictions": 528,
+      "total_ground_truth_objects": 500,
+      "true_positives": 456,
+      "false_positives": 72,
+      "false_negatives": 44,
+      "precision": 0.86246,
+      "recall": 0.91225,
+      "f1_score": 0.87342,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 2.359,
+      "total_gpu_power_w": 5.204,
+      "per_image_latency_ms": 38,
+      "created_at": "2026-03-19T02:00:22+00:00",
+      "updated_at": "2026-03-19T02:00:22+00:00"
+    },
+    {
+      "id": 19,
+      "ckn_experiment_id": "en_child_mlm_42_english8192-run1",
+      "user_id": 2,
+      "user_name_ckn": "swithana",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 106,
+      "model_id_ckn": "Haerim/en_child_mlm_42_english8192",
+      "start_at": "2026-03-20T01:00:00+00:00",
+      "submitted_at": "2026-03-20T01:00:06+00:00",
+      "executed_at": "2026-03-20T01:00:17+00:00",
+      "model_used_at": "2026-03-20T01:00:07+00:00",
+      "total_images": 200,
+      "total_predictions": 182,
+      "total_ground_truth_objects": 200,
+      "true_positives": 73,
+      "false_positives": 109,
+      "false_negatives": 127,
+      "precision": 0.39916,
+      "recall": 0.36582,
+      "f1_score": 0.40028,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.385,
+      "total_gpu_power_w": 246.54,
+      "per_image_latency_ms": 55,
+      "created_at": "2026-03-20T01:00:17+00:00",
+      "updated_at": "2026-03-20T01:00:17+00:00"
+    },
+    {
+      "id": 20,
+      "ckn_experiment_id": "en_child_mlm_42_english8192-run2",
+      "user_id": 2,
+      "user_name_ckn": "swithana",
+      "edge_device_id": 3,
+      "device_type_ckn": "cpu-x86",
+      "model_id": 106,
+      "model_id_ckn": "Haerim/en_child_mlm_42_english8192",
+      "start_at": "2026-03-20T14:00:00+00:00",
+      "submitted_at": "2026-03-20T14:00:10+00:00",
+      "executed_at": "2026-03-20T14:00:29+00:00",
+      "model_used_at": "2026-03-20T14:00:11+00:00",
+      "total_images": 200,
+      "total_predictions": 183,
+      "total_ground_truth_objects": 200,
+      "true_positives": 83,
+      "false_positives": 100,
+      "false_negatives": 117,
+      "precision": 0.4516,
+      "recall": 0.41566,
+      "f1_score": 0.42181,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 21.431,
+      "total_gpu_power_w": 0.0,
+      "per_image_latency_ms": 95,
+      "created_at": "2026-03-20T14:00:29+00:00",
+      "updated_at": "2026-03-20T14:00:29+00:00"
+    },
+    {
+      "id": 21,
+      "ckn_experiment_id": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac-run1",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 107,
+      "model_id_ckn": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+      "start_at": "2026-03-21T18:00:00+00:00",
+      "submitted_at": "2026-03-21T18:00:01+00:00",
+      "executed_at": "2026-03-21T18:03:01+00:00",
+      "model_used_at": "2026-03-21T18:00:02+00:00",
+      "total_images": 1000,
+      "total_predictions": 965,
+      "total_ground_truth_objects": 1000,
+      "true_positives": 697,
+      "false_positives": 268,
+      "false_negatives": 303,
+      "precision": 0.72161,
+      "recall": 0.69775,
+      "f1_score": 0.70788,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.363,
+      "total_gpu_power_w": 211.458,
+      "per_image_latency_ms": 180,
+      "created_at": "2026-03-21T18:03:01+00:00",
+      "updated_at": "2026-03-21T18:03:01+00:00"
+    },
+    {
+      "id": 22,
+      "ckn_experiment_id": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac-run2",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 107,
+      "model_id_ckn": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+      "start_at": "2026-03-22T10:00:00+00:00",
+      "submitted_at": "2026-03-22T10:00:02+00:00",
+      "executed_at": "2026-03-22T10:00:19.500000+00:00",
+      "model_used_at": "2026-03-22T10:00:03+00:00",
+      "total_images": 100,
+      "total_predictions": 98,
+      "total_ground_truth_objects": 100,
+      "true_positives": 70,
+      "false_positives": 28,
+      "false_negatives": 30,
+      "precision": 0.70901,
+      "recall": 0.70821,
+      "f1_score": 0.7306,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 8.124,
+      "total_gpu_power_w": 188.242,
+      "per_image_latency_ms": 175,
+      "created_at": "2026-03-22T10:00:19.500000+00:00",
+      "updated_at": "2026-03-22T10:00:19.500000+00:00"
+    },
+    {
+      "id": 23,
+      "ckn_experiment_id": "ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac-run3",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 107,
+      "model_id_ckn": "Shagufta/ilyes-wav2vec2-large-xlsr-53-km-indomain5-withoutac",
+      "start_at": "2026-03-24T02:00:00+00:00",
+      "submitted_at": "2026-03-24T02:00:19+00:00",
+      "executed_at": "2026-03-24T02:03:24+00:00",
+      "model_used_at": "2026-03-24T02:00:20+00:00",
+      "total_images": 1000,
+      "total_predictions": 1018,
+      "total_ground_truth_objects": 1000,
+      "true_positives": 742,
+      "false_positives": 276,
+      "false_negatives": 258,
+      "precision": 0.72882,
+      "recall": 0.7422,
+      "f1_score": 0.76316,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.643,
+      "total_gpu_power_w": 198.524,
+      "per_image_latency_ms": 185,
+      "created_at": "2026-03-24T02:03:24+00:00",
+      "updated_at": "2026-03-24T02:03:24+00:00"
+    },
+    {
+      "id": 24,
+      "ckn_experiment_id": "littercam-yolov9c-run1",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 108,
+      "model_id_ckn": "aryanshh/littercam-yolov9c",
+      "start_at": "2026-03-24T19:00:00+00:00",
+      "submitted_at": "2026-03-24T19:00:14+00:00",
+      "executed_at": "2026-03-24T19:00:18.400000+00:00",
+      "model_used_at": "2026-03-24T19:00:15+00:00",
+      "total_images": 200,
+      "total_predictions": 200,
+      "total_ground_truth_objects": 200,
+      "true_positives": 180,
+      "false_positives": 20,
+      "false_negatives": 20,
+      "precision": 0.89949,
+      "recall": 0.90132,
+      "f1_score": 0.87672,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 2.141,
+      "total_gpu_power_w": 7.295,
+      "per_image_latency_ms": 22,
+      "created_at": "2026-03-24T19:00:18.400000+00:00",
+      "updated_at": "2026-03-24T19:00:18.400000+00:00"
+    },
+    {
+      "id": 25,
+      "ckn_experiment_id": "littercam-yolov9c-run2",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 108,
+      "model_id_ckn": "aryanshh/littercam-yolov9c",
+      "start_at": "2026-03-25T11:00:00+00:00",
+      "submitted_at": "2026-03-25T11:00:08+00:00",
+      "executed_at": "2026-03-25T11:00:10.500000+00:00",
+      "model_used_at": "2026-03-25T11:00:09+00:00",
+      "total_images": 100,
+      "total_predictions": 92,
+      "total_ground_truth_objects": 100,
+      "true_positives": 83,
+      "false_positives": 9,
+      "false_negatives": 17,
+      "precision": 0.89844,
+      "recall": 0.83367,
+      "f1_score": 0.86933,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 2.091,
+      "total_gpu_power_w": 7.641,
+      "per_image_latency_ms": 25,
+      "created_at": "2026-03-25T11:00:10.500000+00:00",
+      "updated_at": "2026-03-25T11:00:10.500000+00:00"
+    },
+    {
+      "id": 26,
+      "ckn_experiment_id": "littercam-yolov9c-run3",
+      "user_id": 1,
+      "user_name_ckn": "neelk",
+      "edge_device_id": 2,
+      "device_type_ckn": "a100",
+      "model_id": 108,
+      "model_id_ckn": "aryanshh/littercam-yolov9c",
+      "start_at": "2026-03-26T10:00:00+00:00",
+      "submitted_at": "2026-03-26T10:00:15+00:00",
+      "executed_at": "2026-03-26T10:00:17.400000+00:00",
+      "model_used_at": "2026-03-26T10:00:16+00:00",
+      "total_images": 200,
+      "total_predictions": 191,
+      "total_ground_truth_objects": 200,
+      "true_positives": 162,
+      "false_positives": 29,
+      "false_negatives": 38,
+      "precision": 0.84589,
+      "recall": 0.81421,
+      "f1_score": 0.84299,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 6.836,
+      "total_gpu_power_w": 214.973,
+      "per_image_latency_ms": 12,
+      "created_at": "2026-03-26T10:00:17.400000+00:00",
+      "updated_at": "2026-03-26T10:00:17.400000+00:00"
+    },
+    {
+      "id": 27,
+      "ckn_experiment_id": "littercam-yolov9c-run4",
+      "user_id": 3,
+      "user_name_ckn": "beckstei",
+      "edge_device_id": 1,
+      "device_type_ckn": "jetson-nano",
+      "model_id": 108,
+      "model_id_ckn": "aryanshh/littercam-yolov9c",
+      "start_at": "2026-03-27T15:00:00+00:00",
+      "submitted_at": "2026-03-27T15:00:06+00:00",
+      "executed_at": "2026-03-27T15:00:08.800000+00:00",
+      "model_used_at": "2026-03-27T15:00:07+00:00",
+      "total_images": 100,
+      "total_predictions": 93,
+      "total_ground_truth_objects": 100,
+      "true_positives": 88,
+      "false_positives": 5,
+      "false_negatives": 12,
+      "precision": 0.94544,
+      "recall": 0.8848,
+      "f1_score": 0.91696,
+      "mean_iou": null,
+      "map_50": null,
+      "map_50_95": null,
+      "total_cpu_power_w": 3.453,
+      "total_gpu_power_w": 8.632,
+      "per_image_latency_ms": 28,
+      "created_at": "2026-03-27T15:00:08.800000+00:00",
+      "updated_at": "2026-03-27T15:00:08.800000+00:00"
+    }
+  ],
+  "experiment_images": [
+    {
+      "id": 1000,
+      "experiment_id": 19,
+      "raw_image_id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:53+00:00",
+      "image_scored_at": "2026-03-20T01:00:53.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:54.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3299819,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.32998
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.23099
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.16499
+        }
+      ]
+    },
+    {
+      "id": 1001,
+      "experiment_id": 19,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:10+00:00",
+      "image_scored_at": "2026-03-20T01:00:10.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:11.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.2766022,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.2766
+        },
+        {
+          "label": "code_python",
+          "probability": 0.19362
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.1383
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "experiment_id": 19,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:39+00:00",
+      "image_scored_at": "2026-03-20T01:00:39.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:40.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_python",
+      "top_probability": 0.3718862,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_python",
+          "probability": 0.37189
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.26032
+        },
+        {
+          "label": "code_python",
+          "probability": 0.18594
+        }
+      ]
+    },
+    {
+      "id": 1003,
+      "experiment_id": 19,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:11+00:00",
+      "image_scored_at": "2026-03-20T01:00:11.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:12.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.4413491,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.44135
+        },
+        {
+          "label": "code_java",
+          "probability": 0.30894
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.22067
+        }
+      ]
+    },
+    {
+      "id": 1004,
+      "experiment_id": 19,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:43+00:00",
+      "image_scored_at": "2026-03-20T01:00:43.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:44.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.464815,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.46481
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.32537
+        },
+        {
+          "label": "code_python",
+          "probability": 0.23241
+        }
+      ]
+    },
+    {
+      "id": 1005,
+      "experiment_id": 19,
+      "raw_image_id": 209,
+      "image_name": "sample_009.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:44+00:00",
+      "image_scored_at": "2026-03-20T01:00:44.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:45.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.3289985,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.329
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.2303
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.1645
+        }
+      ]
+    },
+    {
+      "id": 1006,
+      "experiment_id": 19,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:32+00:00",
+      "image_scored_at": "2026-03-20T01:00:32.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:33.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.2820583,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.28206
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.19744
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.14103
+        }
+      ]
+    },
+    {
+      "id": 1007,
+      "experiment_id": 19,
+      "raw_image_id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:01:06+00:00",
+      "image_scored_at": "2026-03-20T01:01:06.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:01:07.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.4615448,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.46154
+        },
+        {
+          "label": "code_java",
+          "probability": 0.32308
+        },
+        {
+          "label": "code_python",
+          "probability": 0.23077
+        }
+      ]
+    },
+    {
+      "id": 1008,
+      "experiment_id": 19,
+      "raw_image_id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:20+00:00",
+      "image_scored_at": "2026-03-20T01:00:20.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:21.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.2390478,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.23905
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.16733
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.11952
+        }
+      ]
+    },
+    {
+      "id": 1009,
+      "experiment_id": 19,
+      "raw_image_id": 205,
+      "image_name": "sample_005.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T01:00:30+00:00",
+      "image_scored_at": "2026-03-20T01:00:30.055000+00:00",
+      "image_store_deleted_at": "2026-03-20T01:00:31.055000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.4486103,
+      "ingested_at": "2026-03-20T01:00:17+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.44861
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.31403
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.22431
+        }
+      ]
+    },
+    {
+      "id": 1010,
+      "experiment_id": 20,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:01:02+00:00",
+      "image_scored_at": "2026-03-20T14:01:02.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:01:03.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3790362,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.37904
+        },
+        {
+          "label": "code_python",
+          "probability": 0.26533
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.18952
+        }
+      ]
+    },
+    {
+      "id": 1011,
+      "experiment_id": 20,
+      "raw_image_id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:01:07+00:00",
+      "image_scored_at": "2026-03-20T14:01:07.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:01:08.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.2887611,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.28876
+        },
+        {
+          "label": "code_java",
+          "probability": 0.20213
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.14438
+        }
+      ]
+    },
+    {
+      "id": 1012,
+      "experiment_id": 20,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:56+00:00",
+      "image_scored_at": "2026-03-20T14:00:56.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:57.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3772558,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.37726
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.26408
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.18863
+        }
+      ]
+    },
+    {
+      "id": 1013,
+      "experiment_id": 20,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:01:09+00:00",
+      "image_scored_at": "2026-03-20T14:01:09.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:01:10.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_km",
+      "top_probability": 0.2852915,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.28529
+        },
+        {
+          "label": "code_python",
+          "probability": 0.1997
+        },
+        {
+          "label": "code_java",
+          "probability": 0.14265
+        }
+      ]
+    },
+    {
+      "id": 1014,
+      "experiment_id": 20,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:32+00:00",
+      "image_scored_at": "2026-03-20T14:00:32.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:33.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.2314626,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.23146
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.16202
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.11573
+        }
+      ]
+    },
+    {
+      "id": 1015,
+      "experiment_id": 20,
+      "raw_image_id": 202,
+      "image_name": "sample_002.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:38+00:00",
+      "image_scored_at": "2026-03-20T14:00:38.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:39.095000+00:00",
+      "image_decision": "Saved",
+      "top_label": "speech_km",
+      "top_probability": 0.6603361,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.66034
+        },
+        {
+          "label": "code_python",
+          "probability": 0.46224
+        },
+        {
+          "label": "code_java",
+          "probability": 0.33017
+        }
+      ]
+    },
+    {
+      "id": 1016,
+      "experiment_id": 20,
+      "raw_image_id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:01:04+00:00",
+      "image_scored_at": "2026-03-20T14:01:04.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:01:05.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.3618535,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.36185
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.2533
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.18093
+        }
+      ]
+    },
+    {
+      "id": 1017,
+      "experiment_id": 20,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:34+00:00",
+      "image_scored_at": "2026-03-20T14:00:34.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:35.095000+00:00",
+      "image_decision": "Saved",
+      "top_label": "night_scene",
+      "top_probability": 0.5583658,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.55837
+        },
+        {
+          "label": "code_python",
+          "probability": 0.39086
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.27918
+        }
+      ]
+    },
+    {
+      "id": 1018,
+      "experiment_id": 20,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:33+00:00",
+      "image_scored_at": "2026-03-20T14:00:33.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:34.095000+00:00",
+      "image_decision": "Saved",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.6833867,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.68339
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.47837
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.34169
+        }
+      ]
+    },
+    {
+      "id": 1019,
+      "experiment_id": 20,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:01:02+00:00",
+      "image_scored_at": "2026-03-20T14:01:02.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:01:03.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.4738136,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.47381
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.33167
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.23691
+        }
+      ]
+    },
+    {
+      "id": 1020,
+      "experiment_id": 20,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-20T14:00:32+00:00",
+      "image_scored_at": "2026-03-20T14:00:32.095000+00:00",
+      "image_store_deleted_at": "2026-03-20T14:00:33.095000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.4115068,
+      "ingested_at": "2026-03-20T14:00:29+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.41151
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.28805
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.20575
+        }
+      ]
+    },
+    {
+      "id": 1021,
+      "experiment_id": 14,
+      "raw_image_id": 202,
+      "image_name": "sample_002.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:07+00:00",
+      "image_scored_at": "2026-03-14T08:00:07.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:08.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.3194608,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.31946
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.22362
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.15973
+        }
+      ]
+    },
+    {
+      "id": 1022,
+      "experiment_id": 14,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:57+00:00",
+      "image_scored_at": "2026-03-14T08:00:57.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:58.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_km",
+      "top_probability": 0.3109112,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.31091
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.21764
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.15546
+        }
+      ]
+    },
+    {
+      "id": 1023,
+      "experiment_id": 14,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:22+00:00",
+      "image_scored_at": "2026-03-14T08:00:22.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:23.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.3236012,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.3236
+        },
+        {
+          "label": "code_java",
+          "probability": 0.22652
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.1618
+        }
+      ]
+    },
+    {
+      "id": 1024,
+      "experiment_id": 14,
+      "raw_image_id": 205,
+      "image_name": "sample_005.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:58+00:00",
+      "image_scored_at": "2026-03-14T08:00:58.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:59.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_en",
+      "top_probability": 0.3966747,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.39667
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.27767
+        },
+        {
+          "label": "code_python",
+          "probability": 0.19834
+        }
+      ]
+    },
+    {
+      "id": 1025,
+      "experiment_id": 14,
+      "raw_image_id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:21+00:00",
+      "image_scored_at": "2026-03-14T08:00:21.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:22.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.2664276,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.26643
+        },
+        {
+          "label": "code_python",
+          "probability": 0.1865
+        },
+        {
+          "label": "code_java",
+          "probability": 0.13321
+        }
+      ]
+    },
+    {
+      "id": 1026,
+      "experiment_id": 14,
+      "raw_image_id": 209,
+      "image_name": "sample_009.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:55+00:00",
+      "image_scored_at": "2026-03-14T08:00:55.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:56.245000+00:00",
+      "image_decision": "Saved",
+      "top_label": "speech_en",
+      "top_probability": 0.6191374,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.61914
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.4334
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.30957
+        }
+      ]
+    },
+    {
+      "id": 1027,
+      "experiment_id": 14,
+      "raw_image_id": 209,
+      "image_name": "sample_009.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:41+00:00",
+      "image_scored_at": "2026-03-14T08:00:41.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:42.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.3201508,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.32015
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.22411
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.16008
+        }
+      ]
+    },
+    {
+      "id": 1028,
+      "experiment_id": 14,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:01:04+00:00",
+      "image_scored_at": "2026-03-14T08:01:04.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:01:05.245000+00:00",
+      "image_decision": "Saved",
+      "top_label": "speech_en",
+      "top_probability": 0.5503383,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.55034
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.38524
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.27517
+        }
+      ]
+    },
+    {
+      "id": 1029,
+      "experiment_id": 14,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:01:03+00:00",
+      "image_scored_at": "2026-03-14T08:01:03.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:01:04.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.4667074,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.46671
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.3267
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.23335
+        }
+      ]
+    },
+    {
+      "id": 1030,
+      "experiment_id": 14,
+      "raw_image_id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-14T08:00:47+00:00",
+      "image_scored_at": "2026-03-14T08:00:47.245000+00:00",
+      "image_store_deleted_at": "2026-03-14T08:00:48.245000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3518519,
+      "ingested_at": "2026-03-14T08:02:06.500000+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.35185
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.2463
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.17593
+        }
+      ]
+    },
+    {
+      "id": 1031,
+      "experiment_id": 21,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:44+00:00",
+      "image_scored_at": "2026-03-21T18:00:44.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:45.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.2698784,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.26988
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.18891
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.13494
+        }
+      ]
+    },
+    {
+      "id": 1032,
+      "experiment_id": 21,
+      "raw_image_id": 209,
+      "image_name": "sample_009.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:55+00:00",
+      "image_scored_at": "2026-03-21T18:00:55.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:56.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3255795,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.32558
+        },
+        {
+          "label": "code_python",
+          "probability": 0.22791
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.16279
+        }
+      ]
+    },
+    {
+      "id": 1033,
+      "experiment_id": 21,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:39+00:00",
+      "image_scored_at": "2026-03-21T18:00:39.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:40.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.3317709,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.33177
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.23224
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.16589
+        }
+      ]
+    },
+    {
+      "id": 1034,
+      "experiment_id": 21,
+      "raw_image_id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:34+00:00",
+      "image_scored_at": "2026-03-21T18:00:34.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:35.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_km",
+      "top_probability": 0.3956631,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.39566
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.27696
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.19783
+        }
+      ]
+    },
+    {
+      "id": 1035,
+      "experiment_id": 21,
+      "raw_image_id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:42+00:00",
+      "image_scored_at": "2026-03-21T18:00:42.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:43.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.3540175,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.35402
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.24781
+        },
+        {
+          "label": "code_java",
+          "probability": 0.17701
+        }
+      ]
+    },
+    {
+      "id": 1036,
+      "experiment_id": 21,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:14+00:00",
+      "image_scored_at": "2026-03-21T18:00:14.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:15.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "animal_deer",
+      "top_probability": 0.2784066,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "animal_deer",
+          "probability": 0.27841
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.19488
+        },
+        {
+          "label": "code_python",
+          "probability": 0.1392
+        }
+      ]
+    },
+    {
+      "id": 1037,
+      "experiment_id": 21,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:41+00:00",
+      "image_scored_at": "2026-03-21T18:00:41.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:42.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.4758234,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.47582
+        },
+        {
+          "label": "code_java",
+          "probability": 0.33308
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.23791
+        }
+      ]
+    },
+    {
+      "id": 1038,
+      "experiment_id": 21,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:26+00:00",
+      "image_scored_at": "2026-03-21T18:00:26.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:27.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.4067699,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.40677
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.28474
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.20338
+        }
+      ]
+    },
+    {
+      "id": 1039,
+      "experiment_id": 21,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:02+00:00",
+      "image_scored_at": "2026-03-21T18:00:02.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:03.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.3905751,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.39058
+        },
+        {
+          "label": "code_java",
+          "probability": 0.2734
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.19529
+        }
+      ]
+    },
+    {
+      "id": 1040,
+      "experiment_id": 21,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:46+00:00",
+      "image_scored_at": "2026-03-21T18:00:46.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:47.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.4290686,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.42907
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.30035
+        },
+        {
+          "label": "code_python",
+          "probability": 0.21453
+        }
+      ]
+    },
+    {
+      "id": 1041,
+      "experiment_id": 21,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-21T18:00:09+00:00",
+      "image_scored_at": "2026-03-21T18:00:09.180000+00:00",
+      "image_store_deleted_at": "2026-03-21T18:00:10.180000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.4585422,
+      "ingested_at": "2026-03-21T18:03:01+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.45854
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.32098
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.22927
+        }
+      ]
+    },
+    {
+      "id": 1042,
+      "experiment_id": 5,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:01:08+00:00",
+      "image_scored_at": "2026-03-06T01:01:08.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:01:09.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.4670103,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.46701
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.32691
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.23351
+        }
+      ]
+    },
+    {
+      "id": 1043,
+      "experiment_id": 5,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:58+00:00",
+      "image_scored_at": "2026-03-06T01:00:58.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:59.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_km",
+      "top_probability": 0.4532741,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.45327
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.31729
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.22664
+        }
+      ]
+    },
+    {
+      "id": 1044,
+      "experiment_id": 5,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:28+00:00",
+      "image_scored_at": "2026-03-06T01:00:28.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:29.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.4383644,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.43836
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.30686
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.21918
+        }
+      ]
+    },
+    {
+      "id": 1045,
+      "experiment_id": 5,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:29+00:00",
+      "image_scored_at": "2026-03-06T01:00:29.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:30.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_km",
+      "top_probability": 0.2401457,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_km",
+          "probability": 0.24015
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.1681
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.12007
+        }
+      ]
+    },
+    {
+      "id": 1046,
+      "experiment_id": 5,
+      "raw_image_id": 205,
+      "image_name": "sample_005.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:16+00:00",
+      "image_scored_at": "2026-03-06T01:00:16.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:17.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.452187,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.45219
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.31653
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.22609
+        }
+      ]
+    },
+    {
+      "id": 1047,
+      "experiment_id": 5,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:56+00:00",
+      "image_scored_at": "2026-03-06T01:00:56.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:57.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_en",
+      "top_probability": 0.400427,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.40043
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.2803
+        },
+        {
+          "label": "code_java",
+          "probability": 0.20021
+        }
+      ]
+    },
+    {
+      "id": 1048,
+      "experiment_id": 5,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:40+00:00",
+      "image_scored_at": "2026-03-06T01:00:40.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:41.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_en",
+      "top_probability": 0.3060292,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.30603
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.21422
+        },
+        {
+          "label": "code_python",
+          "probability": 0.15301
+        }
+      ]
+    },
+    {
+      "id": 1049,
+      "experiment_id": 5,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:01:00+00:00",
+      "image_scored_at": "2026-03-06T01:01:00.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:01:01.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "speech_en",
+      "top_probability": 0.321264,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.32126
+        },
+        {
+          "label": "code_python",
+          "probability": 0.22488
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.16063
+        }
+      ]
+    },
+    {
+      "id": 1050,
+      "experiment_id": 5,
+      "raw_image_id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:30+00:00",
+      "image_scored_at": "2026-03-06T01:00:30.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:31.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_python",
+      "top_probability": 0.4651128,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "code_python",
+          "probability": 0.46511
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.32558
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.23256
+        }
+      ]
+    },
+    {
+      "id": 1051,
+      "experiment_id": 5,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:28+00:00",
+      "image_scored_at": "2026-03-06T01:00:28.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:29.160000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.3469397,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.34694
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.24286
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.17347
+        }
+      ]
+    },
+    {
+      "id": 1052,
+      "experiment_id": 5,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-06T01:00:54+00:00",
+      "image_scored_at": "2026-03-06T01:00:54.160000+00:00",
+      "image_store_deleted_at": "2026-03-06T01:00:55.160000+00:00",
+      "image_decision": "Saved",
+      "top_label": "speech_en",
+      "top_probability": 0.6172259,
+      "ingested_at": "2026-03-06T01:00:26+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.61723
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.43206
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.30861
+        }
+      ]
+    },
+    {
+      "id": 1053,
+      "experiment_id": 4,
+      "raw_image_id": 202,
+      "image_name": "sample_002.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:50+00:00",
+      "image_scored_at": "2026-03-04T19:00:50.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:51.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_python",
+      "top_probability": 0.4558015,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "code_python",
+          "probability": 0.4558
+        },
+        {
+          "label": "code_python",
+          "probability": 0.31906
+        },
+        {
+          "label": "code_java",
+          "probability": 0.2279
+        }
+      ]
+    },
+    {
+      "id": 1054,
+      "experiment_id": 4,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:24+00:00",
+      "image_scored_at": "2026-03-04T19:00:24.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:25.140000+00:00",
+      "image_decision": "Saved",
+      "top_label": "night_scene",
+      "top_probability": 0.7233703,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.72337
+        },
+        {
+          "label": "code_python",
+          "probability": 0.50636
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.36169
+        }
+      ]
+    },
+    {
+      "id": 1055,
+      "experiment_id": 4,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:33+00:00",
+      "image_scored_at": "2026-03-04T19:00:33.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:34.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.2750317,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.27503
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.19252
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.13752
+        }
+      ]
+    },
+    {
+      "id": 1056,
+      "experiment_id": 4,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:18+00:00",
+      "image_scored_at": "2026-03-04T19:00:18.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:19.140000+00:00",
+      "image_decision": "Saved",
+      "top_label": "speech_en",
+      "top_probability": 0.6004543,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "speech_en",
+          "probability": 0.60045
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.42032
+        },
+        {
+          "label": "code_python",
+          "probability": 0.30023
+        }
+      ]
+    },
+    {
+      "id": 1057,
+      "experiment_id": 4,
+      "raw_image_id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:35+00:00",
+      "image_scored_at": "2026-03-04T19:00:35.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:36.140000+00:00",
+      "image_decision": "Saved",
+      "top_label": "code_python",
+      "top_probability": 0.7499816,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "code_python",
+          "probability": 0.74998
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.52499
+        },
+        {
+          "label": "code_java",
+          "probability": 0.37499
+        }
+      ]
+    },
+    {
+      "id": 1058,
+      "experiment_id": 4,
+      "raw_image_id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:25+00:00",
+      "image_scored_at": "2026-03-04T19:00:25.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:26.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_python",
+      "top_probability": 0.4668991,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "code_python",
+          "probability": 0.4669
+        },
+        {
+          "label": "code_python",
+          "probability": 0.32683
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.23345
+        }
+      ]
+    },
+    {
+      "id": 1059,
+      "experiment_id": 4,
+      "raw_image_id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:20+00:00",
+      "image_scored_at": "2026-03-04T19:00:20.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:21.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "night_scene",
+      "top_probability": 0.3431259,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "night_scene",
+          "probability": 0.34313
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.24019
+        },
+        {
+          "label": "speech_km",
+          "probability": 0.17156
+        }
+      ]
+    },
+    {
+      "id": 1060,
+      "experiment_id": 4,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:51+00:00",
+      "image_scored_at": "2026-03-04T19:00:51.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:52.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "urban_litter",
+      "top_probability": 0.2636252,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "urban_litter",
+          "probability": 0.26363
+        },
+        {
+          "label": "code_java",
+          "probability": 0.18454
+        },
+        {
+          "label": "night_scene",
+          "probability": 0.13181
+        }
+      ]
+    },
+    {
+      "id": 1061,
+      "experiment_id": 4,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:01:12+00:00",
+      "image_scored_at": "2026-03-04T19:01:12.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:01:13.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.370458,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.37046
+        },
+        {
+          "label": "animal_deer",
+          "probability": 0.25932
+        },
+        {
+          "label": "speech_en",
+          "probability": 0.18523
+        }
+      ]
+    },
+    {
+      "id": 1062,
+      "experiment_id": 4,
+      "raw_image_id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:57+00:00",
+      "image_scored_at": "2026-03-04T19:00:57.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:58.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "wildlife_empty",
+      "top_probability": 0.2397591,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "wildlife_empty",
+          "probability": 0.23976
+        },
+        {
+          "label": "wildlife_empty",
+          "probability": 0.16783
+        },
+        {
+          "label": "code_java",
+          "probability": 0.11988
+        }
+      ]
+    },
+    {
+      "id": 1063,
+      "experiment_id": 4,
+      "raw_image_id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "image_count": 1,
+      "image_received_at": "2026-03-04T19:00:49+00:00",
+      "image_scored_at": "2026-03-04T19:00:49.140000+00:00",
+      "image_store_deleted_at": "2026-03-04T19:00:50.140000+00:00",
+      "image_decision": "Deleted",
+      "top_label": "code_java",
+      "top_probability": 0.4270191,
+      "ingested_at": "2026-03-04T19:01:22+00:00",
+      "scores": [
+        {
+          "label": "code_java",
+          "probability": 0.42702
+        },
+        {
+          "label": "code_python",
+          "probability": 0.29891
+        },
+        {
+          "label": "urban_litter",
+          "probability": 0.21351
+        }
+      ]
+    }
+  ],
+  "raw_images": [
+    {
+      "id": 200,
+      "image_name": "sample_000.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 201,
+      "image_name": "sample_001.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 202,
+      "image_name": "sample_002.jpg",
+      "ground_truth": {
+        "label": "speech_km"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 203,
+      "image_name": "sample_003.jpg",
+      "ground_truth": {
+        "label": "wildlife_empty"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 204,
+      "image_name": "sample_004.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 205,
+      "image_name": "sample_005.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 206,
+      "image_name": "sample_006.jpg",
+      "ground_truth": {
+        "label": "night_scene"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 207,
+      "image_name": "sample_007.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 208,
+      "image_name": "sample_008.jpg",
+      "ground_truth": {
+        "label": "code_python"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    },
+    {
+      "id": 209,
+      "image_name": "sample_009.jpg",
+      "ground_truth": {
+        "label": "speech_en"
+      },
+      "created_at": "2026-03-01T00:00:00+00:00",
+      "updated_at": "2026-03-01T00:00:00+00:00"
+    }
+  ]
+}

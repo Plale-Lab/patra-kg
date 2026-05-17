@@ -1,0 +1,10 @@
+{
+  "title": "qwen35-9b-verilog-sft-logs",
+  "description": "This dataset contains logs related to the fine-tuning of the Qwen35-9b model for Verilog tasks. It is intended for researchers and developers working on hardware description language processing and related AI applications. The dataset can be used to understand the training process and performance of the model on specific tasks. It may also serve as a starting point for further fine-tuning or analysis.",
+  "subjects": "Verilog, Hardware Description Language, AI for Hardware, Model Fine-tuning",
+  "creator": "yil384",
+  "publisher": "HuggingFace",
+  "resource_type": "Fine-tuning logs for AI model training",
+  "resource_type_general": "Dataset",
+  "publication_year": "2026"
+}

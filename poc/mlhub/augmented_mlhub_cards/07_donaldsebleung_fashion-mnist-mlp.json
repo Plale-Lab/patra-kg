@@ -1,0 +1,77 @@
+{
+  "name": "fashion-mnist-mlp",
+  "author": "donaldsebleung",
+  "model_type": "dnn",
+  "license": "apache-2.0",
+  "inference_software_dependencies": null,
+  "pretraining_datasets": [
+    "https://huggingface.co/datasets/zalando-datasets/fashion_mnist"
+  ],
+  "keywords": [
+    "onnx",
+    "image-classification",
+    "en"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "ImageClassification"
+  ],
+  "inference_hardware": {
+    "accelerators": [
+      {
+        "accelerator_type": "Jetson Nano",
+        "cores": null,
+        "memory_gb": 4,
+        "system_requirements": []
+      }
+    ],
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 4
+  },
+  "inference_max_energy_consumption_watts": 19,
+  "inference_max_latency_ms": 60,
+  "inference_min_throughput": 16,
+  "inference_max_memory_usage_mb": 4096,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": false,
+  "quantization_aware": false,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "class label",
+      "shape": [
+        10
+      ]
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "Image",
+      "shape": [
+        784
+      ]
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": true,
+  "slimmed": false,
+  "supports_quantization": null,
+  "annotations": {
+    "source": "Patra card and README"
+  },
+  "training_distributed": false,
+  "pruned": false,
+  "finetuning_datasets": [],
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

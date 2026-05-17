@@ -1,0 +1,356 @@
+{
+    "_id": "67f574be34cfa4626fb82748",
+    "id": "ICICLE-AI/FoodFlow_GNN_Model",
+    "private": false,
+    "pipeline_tag": "graph-ml",
+    "tags": [
+        "GNN",
+        "trade_flow",
+        "food_security",
+        "pytorch",
+        "regression",
+        "graph-ml",
+        "en",
+        "license:mit",
+        "region:us"
+    ],
+    "downloads": 0,
+    "likes": 0,
+    "modelId": "ICICLE-AI/FoodFlow_GNN_Model",
+    "author": "ICICLE-AI",
+    "sha": "72eda7ff6125998f1f62179aec5c2769135d6ae1",
+    "lastModified": "2026-03-18T19:58:35.000Z",
+    "gated": "auto",
+    "disabled": false,
+    "model-index": null,
+    "config": {},
+    "cardData": {
+        "license": "mit",
+        "version": 1.5,
+        "language": [
+            "en"
+        ],
+        "metrics": [
+            "accuracy"
+        ],
+        "pipeline_tag": "graph-ml",
+        "tags": [
+            "GNN",
+            "trade_flow",
+            "food_security",
+            "pytorch",
+            "regression"
+        ]
+    },
+    "siblings": [
+        {
+            "rfilename": ".DS_Store"
+        },
+        {
+            "rfilename": ".gitattributes"
+        },
+        {
+            "rfilename": "FAF_level(Old)/.DS_Store"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/FAF5_SCTG1.csv"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/FAF_distance_matrix.csv"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/dataTransformation.ipynb"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/faf_features.csv"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/.DS_Store"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF.cpg"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF.dbf"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF.prj"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF.shp"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF.shx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/2017_CFS_Metro_Areas_with_FAF/2017_CFS_Metro_Areas_with_FAF_Table.xlsx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/CFS-area-code-FAF5-zone-id.xlsx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.cpg"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.dbf"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.prj"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.shp"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.shp.ea.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.shp.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.shp.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2017_us_county_500k.shx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.cpg"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.dbf"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.prj"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.shp.ea.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.shp.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2017_us_county_500k/cb_2018_us_state_20m/cb_2018_us_state_20m.shx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.cpg"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.dbf"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.prj"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp.ea.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shp.iso.xml"
+        },
+        {
+            "rfilename": "FAF_level(Old)/data/shapefiles/cb_2018_us_state_20m/cb_2018_us_state_20m.shx"
+        },
+        {
+            "rfilename": "FAF_level(Old)/gat_model.pt"
+        },
+        {
+            "rfilename": "FAF_level(Old)/gcn_model.pt"
+        },
+        {
+            "rfilename": "FAF_level(Old)/model.py"
+        },
+        {
+            "rfilename": "FAF_level(Old)/test_model.py"
+        },
+        {
+            "rfilename": "FAF_level(Old)/training.ipynb"
+        },
+        {
+            "rfilename": "FAF_level(Old)/utils.py"
+        },
+        {
+            "rfilename": "LICENSE"
+        },
+        {
+            "rfilename": "ParallelModels/.DS_Store"
+        },
+        {
+            "rfilename": "ParallelModels/README.md"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/county_infer_parallel.cpython-310.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/county_infer_parallel.cpython-39.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/faf_infer_parallel.cpython-310.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/model.cpython-310.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/model.cpython-39.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/train_parallel.cpython-310.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/__pycache__/train_parallel.cpython-39.pyc"
+        },
+        {
+            "rfilename": "ParallelModels/county_infer_parallel.py"
+        },
+        {
+            "rfilename": "ParallelModels/faf_infer_parallel.py"
+        },
+        {
+            "rfilename": "ParallelModels/model.py"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model1_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model2_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model3_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model4_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model5_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model6_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/best_model7_gcn_par.pth"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg1.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg2.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg3.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg4.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg5.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg6.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/county_predictions_sctg7.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/faf_predictions.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/timing_county_infer.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/timing_faf_infer.csv"
+        },
+        {
+            "rfilename": "ParallelModels/models/timing_train.csv"
+        },
+        {
+            "rfilename": "ParallelModels/train_parallel.py"
+        },
+        {
+            "rfilename": "README.md"
+        },
+        {
+            "rfilename": "code/data-postprocess.ipynb"
+        },
+        {
+            "rfilename": "code/inference.ipynb"
+        },
+        {
+            "rfilename": "code/model.py"
+        },
+        {
+            "rfilename": "code/training.ipynb"
+        },
+        {
+            "rfilename": "code/utils.py"
+        },
+        {
+            "rfilename": "data/.DS_Store"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG1.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG2.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG3.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG4.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG5.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG6.csv"
+        },
+        {
+            "rfilename": "data/FAF5_SCTG7.csv"
+        },
+        {
+            "rfilename": "data/FAF_distance_matrix.csv"
+        },
+        {
+            "rfilename": "data/county_aligned_filtered.csv.zip"
+        },
+        {
+            "rfilename": "data/faf_features_aligned_filtered.csv"
+        },
+        {
+            "rfilename": "model.yaml"
+        },
+        {
+            "rfilename": "models/.DS_Store"
+        },
+        {
+            "rfilename": "models/best_model1_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model2_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model3_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model4_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model5_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model6_gcn.pth"
+        },
+        {
+            "rfilename": "models/best_model7_gcn.pth"
+        },
+        {
+            "rfilename": "requirements.txt"
+        }
+    ],
+    "spaces": [],
+    "createdAt": "2025-04-08T19:10:54.000Z",
+    "usedStorage": 1465955172
+}

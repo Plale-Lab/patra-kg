@@ -1,0 +1,83 @@
+{
+  "name": "bert-base-uncased",
+  "author": "google-bert",
+  "model_type": "dnn",
+  "license": "apache-2.0",
+  "inference_software_dependencies": null,
+  "pretraining_datasets": [
+    "https://huggingface.co/datasets/bookcorpus, https://huggingface.co/datasets/wikipedia"
+  ],
+  "keywords": [
+    "transformers",
+    "pytorch",
+    "tf",
+    "jax",
+    "rust",
+    "coreml",
+    "onnx",
+    "bert",
+    "fill-mask",
+    "exbert",
+    "en"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "TextClassification",
+    "FillMask",
+    "TextGeneration"
+  ],
+  "inference_hardware": {
+    "accelerators": [
+      {
+        "accelerator_type": "A100",
+        "cores": null,
+        "memory_gb": 80,
+        "system_requirements": []
+      }
+    ],
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 80
+  },
+  "inference_max_energy_consumption_watts": 306,
+  "inference_max_latency_ms": 90,
+  "inference_min_throughput": 11,
+  "inference_max_memory_usage_mb": 81920,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": false,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "predicted token",
+      "shape": null
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "Text",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": false,
+  "slimmed": false,
+  "supports_quantization": null,
+  "annotations": {
+    "provenance": "Patra card and README"
+  },
+  "training_distributed": true,
+  "pruned": false,
+  "finetuning_datasets": [],
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

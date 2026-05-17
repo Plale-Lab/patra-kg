@@ -1,0 +1,83 @@
+graph TB
+    %% ── Clients ─────────────────────────────────
+    subgraph Clients
+        Agent["ACAI Agent"]
+        ADP["ADP Portal"]
+        ChatBot["RAG Chat Bot"]
+    end
+
+    %% ── ACAI RAG ────────────────────────────────
+    subgraph RAG["ACAI RAG Platform"]
+        KB["KB Service"]
+        AGW["Agent Gateway<br/>(MCP)"]
+        KB_PG[("PostgreSQL")]
+        KB --> KB_PG
+        AGW --> KB
+    end
+
+    %% ── Embedding Platform ──────────────────────
+    subgraph EP["Embedding Platform"]
+        EP_SDK["EP SDK"]
+        EP_CTRL["EP Controller"]
+        FP["Feature Platform"]
+        EP_ONLINE["Online Service"]
+        MILVUS[("Milvus")]
+        EP_SDK --> EP_CTRL
+        EP_SDK --> FP
+        EP_SDK --> EP_ONLINE
+        EP_ONLINE --> MILVUS
+        FP --> MILVUS
+    end
+
+    %% ── Compute ─────────────────────────────────
+    subgraph Compute
+        OPTIMIZER["ACAI Optimizer"]
+        RAY["Ray<br/>(batch-inference)"]
+        SPARK["Spark Uploader"]
+        OPTIMIZER --> RAY
+    end
+
+    %% ── Storage ─────────────────────────────────
+    CONDUCTOR[("Conductor")]
+    ICEBERG[("Iceberg")]
+
+    %% ── Auth ────────────────────────────────────
+    subgraph Auth
+        ADAM["ADAM / Ranger"]
+        ADR["ADR"]
+    end
+
+    %% ── Client → RAG ────────────────────────────
+    Agent --> AGW
+    ADP --> KB
+    ChatBot --> KB
+
+    %% ── KB → EP (via SDK) ───────────────────────
+    KB --> EP_SDK
+
+    %% ── Ingestion flow ──────────────────────────
+    KB --> CONDUCTOR
+    EP_CTRL --> OPTIMIZER
+    RAY --> CONDUCTOR
+    RAY --> ICEBERG
+    FP --> SPARK
+    SPARK --> ICEBERG
+
+    %% ── Auth ────────────────────────────────────
+    KB -.-> ADAM
+    KB -.-> ADR
+
+    %% ── Styles ──────────────────────────────────
+    classDef svc fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,color:#000
+    classDef db fill:#fef7e0,stroke:#f9ab00,stroke-width:2px,color:#000
+    classDef compute fill:#fce8e6,stroke:#ea4335,stroke-width:1px,color:#000
+    classDef client fill:#e6f4ea,stroke:#34a853,stroke-width:1px,color:#000
+    classDef auth fill:#f3e8ff,stroke:#9334e6,stroke-width:1px,color:#000
+    classDef storage fill:#fff3e0,stroke:#e65100,stroke-width:1px,color:#000
+
+    class KB,AGW,EP_SDK,EP_CTRL,FP,EP_ONLINE svc
+    class KB_PG,MILVUS db
+    class OPTIMIZER,RAY,SPARK compute
+    class Agent,ADP,ChatBot client
+    class ADAM,ADR auth
+    class CONDUCTOR,ICEBERG storage

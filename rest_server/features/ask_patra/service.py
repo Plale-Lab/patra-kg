@@ -146,40 +146,27 @@ async def search_pattra_records(
     query_tokens = _tokenize_query(query)
     if not query_tokens:
         return []
-    model_filter = "" if include_private else "AND mc.is_private = false"
+    model_filter = "" if include_private else "WHERE mc.is_private = false"
     datasheet_filter = "" if include_private else "AND d.is_private = false"
     model_rows = await conn.fetch(
         f"""
-        WITH ranked AS (
-            SELECT mc.id, mc.name, mc.author, mc.short_description, mc.full_description, mc.keywords,
-                   mc.category, mc.input_data, mc.output_data, mc.foundational_model, mc.asset_version,
-                   ROW_NUMBER() OVER (PARTITION BY COALESCE(mc.root_version_id, mc.id) ORDER BY mc.asset_version DESC, mc.id DESC) AS rn
-            FROM model_cards mc
-            WHERE mc.status = 'approved' {model_filter}
-        )
-        SELECT r.id, r.name, r.author, r.short_description, r.full_description, r.keywords, r.category,
-               r.input_data, r.output_data, r.foundational_model
-        FROM ranked r
-        WHERE r.rn = 1
+        SELECT mc.id, mc.name, mc.author, mc.short_description, mc.full_description, mc.keywords, mc.category,
+               mc.input_data, mc.output_data, mc.foundational_model
+        FROM model_cards mc
+        {model_filter}
         LIMIT $1
         """,
         max(limit_per_type * 10, 40),
     )
     datasheet_rows = await conn.fetch(
         f"""
-        WITH ranked AS (
-            SELECT d.identifier, d.asset_version,
-                   ROW_NUMBER() OVER (PARTITION BY COALESCE(d.root_version_id, d.identifier) ORDER BY d.asset_version DESC, d.identifier DESC) AS rn
-            FROM datasheets d
-            WHERE d.status = 'approved' {datasheet_filter}
-        )
-        SELECT r.identifier,
-               (SELECT title FROM datasheet_titles WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS title,
-               (SELECT creator_name FROM datasheet_creators WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS creator,
-               (SELECT description FROM datasheet_descriptions WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS description,
-               (SELECT subject FROM datasheet_subjects WHERE datasheet_id = r.identifier ORDER BY id LIMIT 1) AS subject
-        FROM ranked r
-        WHERE r.rn = 1
+        SELECT d.identifier,
+               (SELECT title FROM datasheet_titles WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1) AS title,
+               (SELECT creator_name FROM datasheet_creators WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1) AS creator,
+               (SELECT description FROM datasheet_descriptions WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1) AS description,
+               (SELECT subject FROM datasheet_subjects WHERE datasheet_id = d.identifier ORDER BY id LIMIT 1) AS subject
+        FROM datasheets d
+        WHERE d.status = 'approved' {datasheet_filter}
         LIMIT $1
         """,
         max(limit_per_type * 10, 40),

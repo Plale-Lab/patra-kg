@@ -1,4 +1,5 @@
 import json
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
@@ -86,28 +87,13 @@ async def list_datasheets(
     where = f"WHERE {' AND '.join(filters)}" if filters else ""
     params.extend([limit, skip])
     query = f"""
-        WITH ranked AS (
-            SELECT
-                d.identifier,
-                d.asset_version,
-                d.previous_version_id,
-                COALESCE(d.root_version_id, d.identifier) AS root_version_id,
-                ROW_NUMBER() OVER (
-                    PARTITION BY COALESCE(d.root_version_id, d.identifier)
-                    ORDER BY d.asset_version DESC, d.identifier DESC
-                ) AS rn
-            FROM datasheets d
-            {where}
-        )
         SELECT
             d.identifier,
-            d.asset_version,
-            d.previous_version_id,
-            d.root_version_id,
+            d.uuid,
             t.title,
             c.creator,
             s.subject AS category
-        FROM ranked d
+        FROM datasheets d
         LEFT JOIN LATERAL (
             SELECT title
             FROM datasheet_titles
@@ -129,7 +115,7 @@ async def list_datasheets(
             ORDER BY id
             LIMIT 1
         ) AS s ON TRUE
-        WHERE d.rn = 1
+        {where}
         ORDER BY LOWER(COALESCE(t.title, '')), d.identifier
         LIMIT ${len(params) - 1} OFFSET ${len(params)}
     """
@@ -138,27 +124,26 @@ async def list_datasheets(
     return [
         DatasheetSummary(
             identifier=r["identifier"],
+            uuid=str(r["uuid"]),
             title=r["title"] or "",
             creator=r["creator"],
             category=r["category"],
-            asset_version=int(r["asset_version"] or 1),
-            previous_version_id=int(r["previous_version_id"]) if r["previous_version_id"] is not None else None,
-            root_version_id=int(r["root_version_id"]) if r["root_version_id"] is not None else None,
         )
         for r in rows
     ]
 
 
-@router.get("/datasheet/{identifier}", response_model=DatasheetDetail)
+@router.get("/datasheet/{uuid}", response_model=DatasheetDetail)
 async def get_datasheet(
-    identifier: int,
+    uuid: UUID,
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
 ):
-    """Get a single datasheet by identifier. Returns 404 if private and caller has no JWT."""
+    """Get a single datasheet by UUID. Returns 404 if private and caller has no JWT."""
     core_query = """
         SELECT
             d.identifier,
+            d.uuid,
             d.publication_year,
             d.resource_type,
             d.resource_type_general,
@@ -167,25 +152,23 @@ async def get_datasheet(
             d.version,
             d.is_private,
             d.updated_at,
-            d.dataset_schema_id,
-            d.asset_version,
-            d.previous_version_id,
-            COALESCE(d.root_version_id, d.identifier) AS root_version_id,
             p.name AS publisher_name,
             p.publisher_identifier,
             p.publisher_identifier_scheme,
             p.scheme_uri AS publisher_scheme_uri,
             p.lang AS publisher_lang
         FROM datasheets d
-        LEFT JOIN publishers p ON p.id = d.publisher_id
-        WHERE d.identifier = $1
+        LEFT JOIN datasheet_publishers p ON p.id = d.publisher_id
+        WHERE d.uuid = $1
     """
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(core_query, identifier)
+        row = await conn.fetchrow(core_query, uuid)
     if not row:
         raise asset_not_available_or_visible()
     if row["is_private"] and not include_private:
         raise asset_not_available_or_visible()
+
+    identifier = int(row["identifier"])
 
     async with pool.acquire() as conn:
         creators_rows = await conn.fetch(
@@ -315,6 +298,7 @@ async def get_datasheet(
 
     return DatasheetDetail(
         identifier=row["identifier"],
+        uuid=str(row["uuid"]),
         publication_year=row["publication_year"],
         resource_type=row["resource_type"],
         resource_type_general=row["resource_type_general"],
@@ -323,10 +307,6 @@ async def get_datasheet(
         version=row["version"],
         is_private=row["is_private"],
         updated_at=row["updated_at"].isoformat() if row["updated_at"] else None,
-        dataset_schema_id=row["dataset_schema_id"],
-        asset_version=int(row["asset_version"] or 1),
-        previous_version_id=int(row["previous_version_id"]) if row["previous_version_id"] is not None else None,
-        root_version_id=int(row["root_version_id"]) if row["root_version_id"] is not None else None,
         creators=[
             DatasheetCreator(
                 creator_name=r["creator_name"],
@@ -462,21 +442,29 @@ _DS_UPDATE_COLUMNS = {
 }
 
 
-@router.put("/datasheet/{identifier}", response_model=DatasheetDetail)
+@router.put("/datasheet/{uuid}", response_model=DatasheetDetail)
 async def update_datasheet(
     body: DatasheetUpdate,
-    identifier: int,
+    uuid: UUID,
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
     actor: PatraActor = Depends(require_authenticated_actor),
 ):
     """Update a datasheet (authenticated users only)."""
+    async with pool.acquire() as conn:
+        identifier_val = await conn.fetchval(
+            "SELECT identifier FROM datasheets WHERE uuid = $1", uuid
+        )
+    if identifier_val is None:
+        raise asset_not_available_or_visible()
+    identifier = int(identifier_val)
+
     updates = body.model_dump(exclude_none=True)
     title_val = updates.pop("title", None)
     description_val = updates.pop("description", None)
 
     if not updates and title_val is None and description_val is None:
-        return await get_datasheet(identifier=identifier, pool=pool, include_private=include_private)
+        return await get_datasheet(uuid=uuid, pool=pool, include_private=include_private)
 
     async with pool.acquire() as conn:
         # Update core datasheet columns
@@ -533,4 +521,4 @@ async def update_datasheet(
                     identifier, description_val,
                 )
 
-    return await get_datasheet(identifier=identifier, pool=pool, include_private=include_private)
+    return await get_datasheet(uuid=uuid, pool=pool, include_private=include_private)

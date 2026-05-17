@@ -3,10 +3,11 @@ import ssl
 import pytest
 
 from rest_server import database
+from shared.db import build_connection_options
 
 
 def test_build_connection_options_rewrites_tapis_pods_to_443_without_direct_tls():
-    dsn, ssl_arg, direct_tls = database._build_connection_options(
+    dsn, ssl_arg, direct_tls = build_connection_options(
         "postgresql://user:pass@patradb.pods.icicleai.tapis.io:5432/patradb?sslmode=require"
     )
 
@@ -16,7 +17,7 @@ def test_build_connection_options_rewrites_tapis_pods_to_443_without_direct_tls(
 
 
 def test_build_connection_options_uses_regular_tls_for_non_pod_hosts():
-    dsn, ssl_arg, direct_tls = database._build_connection_options(
+    dsn, ssl_arg, direct_tls = build_connection_options(
         "postgresql://user:pass@localhost:5432/patradb?sslmode=require"
     )
 

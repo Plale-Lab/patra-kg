@@ -1,0 +1,13 @@
+{
+  "title": "wikitext",
+  "description": "The WikiText dataset is a collection of over 100 million tokens extracted from verified Good and Featured articles on Wikipedia, available under the Creative Commons Attribution-ShareAlike License. It is used for language modeling tasks and is significantly larger than the Penn Treebank dataset. The dataset is available in different sizes, including WikiText-2 and WikiText-103. It can be used for training and evaluating language models.",
+  "subjects": "language modeling, natural language processing, Wikipedia, text dataset",
+  "creator": "Salesforce",
+  "publisher": "Salesforce",
+  "resource_type": "Text dataset for language modeling",
+  "resource_type_general": "Dataset",
+  "publication_year": "2022",
+  "size": "1M<n<10M",
+  "format": "Parquet",
+  "license": "cc-by-sa-3.0"
+}

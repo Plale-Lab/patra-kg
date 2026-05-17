@@ -5,6 +5,7 @@ from functools import lru_cache
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, Query
 
@@ -204,20 +205,18 @@ async def _fetch_external_model_metadata(model_card_row: asyncpg.Record) -> dict
     return {"location": source_url}
 
 
-async def _get_model_card_base_row(conn: asyncpg.Connection, model_card_id: int) -> asyncpg.Record | None:
+async def _get_model_card_base_row(conn: asyncpg.Connection, model_card_uuid: UUID) -> asyncpg.Record | None:
     return await conn.fetchrow(
         """
-        SELECT id, name, version, short_description,
+        SELECT id, uuid, name, version, short_description,
                full_description, keywords, author, citation,
                input_data, input_type, output_data,
                foundational_model, category, documentation,
-               is_private, is_gated,
-               asset_version, previous_version_id,
-               COALESCE(root_version_id, id) AS root_version_id
+               is_private, is_gated
         FROM model_cards
-        WHERE id = $1
+        WHERE uuid = $1
         """,
-        model_card_id,
+        model_card_uuid,
     )
 
 
@@ -329,21 +328,9 @@ async def list_model_cards(
     where = f"WHERE {' AND '.join(filters)}" if filters else ""
     params.extend([limit, skip])
     query = f"""
-        WITH ranked AS (
-            SELECT
-                id, name, category, author, version, short_description, is_gated,
-                asset_version, previous_version_id, COALESCE(root_version_id, id) AS root_version_id,
-                ROW_NUMBER() OVER (
-                    PARTITION BY COALESCE(root_version_id, id)
-                    ORDER BY asset_version DESC, id DESC
-                ) AS rn
-            FROM model_cards
-            {where}
-        )
-        SELECT id, name, category, author, version, short_description, is_gated,
-               asset_version, previous_version_id, root_version_id
-        FROM ranked
-        WHERE rn = 1
+        SELECT id, uuid, name, category, author, version, short_description, is_gated
+        FROM model_cards
+        {where}
         ORDER BY LOWER(name), id
         LIMIT ${len(params) - 1} OFFSET ${len(params)}
     """
@@ -351,33 +338,34 @@ async def list_model_cards(
         rows = await conn.fetch(query, *params)
     return [
         ModelCardSummary(
-            mc_id=int(r["id"]),
+            id=int(r["id"]),
+            uuid=str(r["uuid"]),
             name=r["name"],
             categories=r["category"],
             author=r["author"],
             version=r["version"],
             short_description=r["short_description"],
             is_gated=r["is_gated"],
-            asset_version=int(r["asset_version"] or 1),
-            previous_version_id=int(r["previous_version_id"]) if r["previous_version_id"] is not None else None,
-            root_version_id=int(r["root_version_id"]) if r["root_version_id"] is not None else None,
         )
         for r in rows
     ]
 
 
-@router.get("/modelcard/{id}", response_model=ModelCardDetail)
+@router.get("/modelcard/{uuid}", response_model=ModelCardDetail)
 async def get_model_card(
-    id: int = Path(..., description="Model card ID (integer)"),
+    uuid: UUID = Path(..., description="Model card UUID"),
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
 ):
-    """Get a single model card by ID (integer). Returns 404 if private and caller has no JWT."""
+    """Get a single model card by UUID. Returns 404 if private and caller has no JWT."""
     async with pool.acquire() as conn:
-        model_card_row = await _get_model_card_base_row(conn, id)
-        model_row = await _get_linked_model_row(conn, id) if model_card_row else None
+        model_card_row = await _get_model_card_base_row(conn, uuid)
+        if not model_card_row:
+            raise asset_not_available_or_visible()
+        mc_id = int(model_card_row["id"])
+        model_row = await _get_linked_model_row(conn, mc_id)
         external_metadata = None
-        if model_card_row and (
+        if (
             model_row is None
             or any(
                 _clean_text(model_row[field]) is None
@@ -386,14 +374,13 @@ async def get_model_card(
         ):
             external_metadata = await _fetch_external_model_metadata(model_card_row)
 
-    if not model_card_row:
-        raise asset_not_available_or_visible()
     if model_card_row["is_private"] and not include_private:
         raise asset_not_available_or_visible()
     ai_model = _build_ai_model(model_card_row, model_row, external_metadata)
     is_gated = bool(model_card_row["is_gated"] or (external_metadata or {}).get("is_gated"))
     return ModelCardDetail(
-        external_id=int(model_card_row["id"]),
+        id=int(model_card_row["id"]),
+        uuid=str(model_card_row["uuid"]),
         name=model_card_row["name"],
         version=model_card_row["version"],
         short_description=model_card_row["short_description"],
@@ -408,9 +395,6 @@ async def get_model_card(
         foundational_model=model_card_row["foundational_model"],
         is_private=bool(model_card_row["is_private"]),
         is_gated=is_gated,
-        asset_version=int(model_card_row["asset_version"] or 1),
-        previous_version_id=int(model_card_row["previous_version_id"]) if model_card_row["previous_version_id"] is not None else None,
-        root_version_id=int(model_card_row["root_version_id"]) if model_card_row["root_version_id"] is not None else None,
         ai_model=ai_model,
     )
 
@@ -432,22 +416,29 @@ _MC_UPDATE_COLUMNS = {
     "documentation": "documentation",
     "foundational_model": "foundational_model",
     "is_private": "is_private",
+    "is_gated": "is_gated",
 }
 
 
-@router.put("/modelcard/{id}", response_model=ModelCardDetail)
+@router.put("/modelcard/{uuid}", response_model=ModelCardDetail)
 async def update_model_card(
     body: ModelCardUpdate,
-    id: int = Path(..., description="Model card ID (integer)"),
+    uuid: UUID = Path(..., description="Model card UUID"),
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
     actor: PatraActor = Depends(require_authenticated_actor),
 ):
     """Update a model card and its linked AI model (authenticated users only)."""
+    async with pool.acquire() as conn:
+        id_val = await conn.fetchval("SELECT id FROM model_cards WHERE uuid = $1", uuid)
+    if id_val is None:
+        raise asset_not_available_or_visible()
+    id = int(id_val)
+
     updates = body.model_dump(exclude_none=True)
     ai_model_updates = updates.pop("ai_model", None) or {}
     if not updates and not ai_model_updates:
-        return await get_model_card(id=id, pool=pool, include_private=include_private)
+        return await get_model_card(uuid=uuid, pool=pool, include_private=include_private)
 
     async with pool.acquire() as conn:
         # Update model_cards table
@@ -513,24 +504,25 @@ async def update_model_card(
                 query = f"INSERT INTO models ({', '.join(col_names)}) VALUES ({', '.join(placeholders)})"
                 await conn.execute(query, *col_vals)
 
-    return await get_model_card(id=id, pool=pool, include_private=include_private)
+    return await get_model_card(uuid=uuid, pool=pool, include_private=include_private)
 
 
-@router.get("/modelcard/{id}/download_url", response_model=ModelDownloadURL)
+@router.get("/modelcard/{uuid}/download_url", response_model=ModelDownloadURL)
 async def get_model_download_url(
-    id: int = Path(..., description="Model card ID (integer)"),
+    uuid: UUID = Path(..., description="Model card UUID"),
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
 ):
     async with pool.acquire() as conn:
-        model_card_row = await _get_model_card_base_row(conn, id)
-        model_row = await _get_linked_model_row(conn, id) if model_card_row else None
+        model_card_row = await _get_model_card_base_row(conn, uuid)
+        if not model_card_row:
+            raise asset_not_available_or_visible()
+        mc_id = int(model_card_row["id"])
+        model_row = await _get_linked_model_row(conn, mc_id)
         external_metadata = None
-        if model_card_row and (model_row is None or _clean_text(model_row["location"]) is None):
+        if model_row is None or _clean_text(model_row["location"]) is None:
             external_metadata = await _fetch_external_model_metadata(model_card_row)
 
-    if not model_card_row:
-        raise asset_not_available_or_visible()
     if model_card_row["is_private"] and not include_private:
         raise asset_not_available_or_visible()
     ai_model = _build_ai_model(model_card_row, model_row, external_metadata)
@@ -544,19 +536,20 @@ async def get_model_download_url(
     )
 
 
-@router.get("/modelcard/{id}/deployments", response_model=list[ModelDeployment])
+@router.get("/modelcard/{uuid}/deployments", response_model=list[ModelDeployment])
 async def get_model_deployments(
-    id: int = Path(..., description="Model card ID (integer)"),
+    uuid: UUID = Path(..., description="Model card UUID"),
     pool: asyncpg.Pool = Depends(get_pool),
     include_private: bool = Depends(get_include_private),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
 ):
     async with pool.acquire() as conn:
-        model_card_row = await _get_model_card_base_row(conn, id)
-        model_row = await _get_linked_model_row(conn, id) if model_card_row else None
-    if not model_card_row:
-        raise asset_not_available_or_visible()
+        model_card_row = await _get_model_card_base_row(conn, uuid)
+        if not model_card_row:
+            raise asset_not_available_or_visible()
+        mc_id = int(model_card_row["id"])
+        model_row = await _get_linked_model_row(conn, mc_id)
     if model_card_row["is_private"] and not include_private:
         raise asset_not_available_or_visible()
     if not model_row or model_row["id"] is None:
@@ -566,7 +559,7 @@ async def get_model_deployments(
         SELECT
             e.id AS experiment_id,
             e.edge_device_id AS device_id,
-            COALESCE(e.executed_at, e.model_used_at, e.start_at) AS timestamp,
+            COALESCE(e.executed_at, e.start_at) AS timestamp,
             CASE
                 WHEN e.executed_at IS NULL THEN 'active'
                 ELSE 'completed'
@@ -578,7 +571,7 @@ async def get_model_deployments(
             e.map_50_95
         FROM experiments e
         WHERE e.model_id = $1
-        ORDER BY COALESCE(e.executed_at, e.model_used_at, e.start_at) DESC NULLS LAST, e.id DESC
+        ORDER BY COALESCE(e.executed_at, e.start_at) DESC NULLS LAST, e.id DESC
         LIMIT $2 OFFSET $3
     """
     async with pool.acquire() as conn:
@@ -586,7 +579,7 @@ async def get_model_deployments(
     return [
         ModelDeployment(
             experiment_id=int(r["experiment_id"]),
-            device_id=int(r["device_id"]),
+            device_id=r["device_id"],
             timestamp=r["timestamp"].isoformat() if r["timestamp"] else None,
             status=r["status"],
             precision=float(r["precision"]) if r["precision"] is not None else None,

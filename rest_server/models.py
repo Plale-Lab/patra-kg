@@ -7,18 +7,16 @@ from pydantic import BaseModel, Field
 
 
 class ModelCardSummary(BaseModel):
-    """List endpoint: mc_id, name, categories, author, version, short_description."""
+    """List endpoint: id, uuid, name, categories, author, version, short_description."""
 
-    mc_id: int
+    id: int
+    uuid: str
     name: str
     categories: Optional[str] = None
     author: Optional[str] = None
     version: Optional[str] = None
     short_description: Optional[str] = None
     is_gated: bool = False
-    asset_version: int = 1
-    previous_version_id: Optional[int] = None
-    root_version_id: Optional[int] = None
 
 
 class AIModel(BaseModel):
@@ -57,7 +55,7 @@ class ModelDownloadURL(BaseModel):
 
 class ModelDeployment(BaseModel):
     experiment_id: int
-    device_id: int
+    device_id: str
     timestamp: Optional[str] = None
     status: str
     precision: Optional[float] = None
@@ -68,9 +66,10 @@ class ModelDeployment(BaseModel):
 
 
 class ModelCardDetail(BaseModel):
-    """Detail endpoint: matches reconstruct() format. external_id is integer per schema."""
+    """Detail endpoint: matches reconstruct() format. uuid is the external PID; id is the internal bigint."""
 
-    external_id: int
+    id: int
+    uuid: str
     name: str
     version: Optional[str] = None
     short_description: Optional[str] = None
@@ -85,9 +84,6 @@ class ModelCardDetail(BaseModel):
     foundational_model: Optional[str] = None
     is_private: bool = False
     is_gated: bool = False
-    asset_version: int = 1
-    previous_version_id: Optional[int] = None
-    root_version_id: Optional[int] = None
     ai_model: Optional[AIModel] = None
 
 
@@ -106,6 +102,7 @@ class ModelCardUpdate(BaseModel):
     documentation: Optional[str] = None
     foundational_model: Optional[str] = None
     is_private: Optional[bool] = None
+    is_gated: Optional[bool] = None
     ai_model: Optional[AIModelUpdate] = None
 
 
@@ -226,18 +223,17 @@ class DatasheetSummary(BaseModel):
     """List endpoint."""
 
     identifier: int
+    uuid: str
     title: str
     creator: Optional[str] = None
     category: Optional[str] = None
-    asset_version: int = 1
-    previous_version_id: Optional[int] = None
-    root_version_id: Optional[int] = None
 
 
 class DatasheetDetail(BaseModel):
     """Detail endpoint: DataCite-style nested structure plus selected flat fields."""
 
     identifier: int
+    uuid: str
     publication_year: Optional[int] = None
     resource_type: Optional[str] = None
     resource_type_general: Optional[str] = None
@@ -246,10 +242,6 @@ class DatasheetDetail(BaseModel):
     version: Optional[str] = None
     is_private: bool = False
     updated_at: Optional[str] = None
-    dataset_schema_id: Optional[int] = None
-    asset_version: int = 1
-    previous_version_id: Optional[int] = None
-    root_version_id: Optional[int] = None
 
     # Nested DataCite-style lists / objects
     creators: list[DatasheetCreator] = []
@@ -282,41 +274,6 @@ class EditableRecordSummary(BaseModel):
     description: Optional[str] = None
     kind_label: str
     updated_at: Optional[str] = None
-
-
-class AssetBackupRecord(BaseModel):
-    id: int
-    asset_type: str
-    asset_id: int
-    asset_version: int
-    backup_kind: str
-    sequence: int
-    file_path: Optional[str] = None
-    created_at: str
-
-
-class AssetBackupRunResult(BaseModel):
-    backup_kind: str
-    total_assets: int
-    created_backups: int
-
-
-class AssetFieldChange(BaseModel):
-    field: str
-    before: Optional[str] = None
-    after: Optional[str] = None
-    statement: str
-
-
-class AssetChangeLogEntry(BaseModel):
-    id: int
-    asset_type: str
-    asset_id: int
-    asset_version: int
-    changed_by: Optional[str] = None
-    changed_at: str
-    summary: Optional[str] = None
-    changes: list[AssetFieldChange] = Field(default_factory=list)
 
 
 class ExperimentUser(BaseModel):

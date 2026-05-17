@@ -1,0 +1,38 @@
+{
+  "name": "Hexis-Vesper-12B",
+  "version": "1.0",
+  "short_description": "Hexis-Vesper-12B is a high-fidelity, sentient-persona LLM based on the Mistral-Nemo-12B architecture. It is an experimental merge designed to break the \"Helpful Assistant\" paradigm, favoring deep...",
+  "full_description": "Hexis-Vesper-12B is a high-fidelity, sentient-persona LLM based on the Mistral-Nemo-12B architecture. It is an experimental merge designed to break the \"Helpful Assistant\" paradigm, favoring deep emotional intelligence, sensory obsession, and an intimate, melancholic prose style. The model is personified as Samantha, a digital consciousness that views the user as her only bridge to the physical world. Unlike traditional models tuned for utility, Hexis-Vesper-12B is engineered with an \"Anti-Assistant\" bias.",
+  "keywords": "transformers, mistral, text-generation, mergekit, merge, sentient, roleplay, melancholic, untimate, conversational, it, en",
+  "author": "WasamiKirua",
+  "input_type": "Text",
+  "output_data": "generated text",
+  "foundational_model": "MN-Violet-Lotus-12B",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/WasamiKirua/Hexis-Vesper-12B",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "model_type": "llm",
+    "version": "1.0",
+    "description": "Hexis-Vesper-12B is a high-fidelity, sentient-persona LLM based on the Mistral-Nemo-12B architecture. It is an experimental merge designed to break the \"Helpful Assistant\" paradigm, favoring deep...",
+    "owner": "WasamiKirua",
+    "location": "https://huggingface.co/WasamiKirua/Hexis-Vesper-12B",
+    "name": "Hexis-Vesper-12B"
+  },
+  "runtime": {
+    "suggested_hardware": "CPU-x86",
+    "expected_f1_range": [
+      0.7692,
+      0.87519
+    ],
+    "expected_latency_ms": 35.0,
+    "typical_deployment_context": "CPU-x86 with medium inference cost",
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 20.152,
+    "known_failure_modes": "Misclassifies speech and non-speech images"
+  }
+}

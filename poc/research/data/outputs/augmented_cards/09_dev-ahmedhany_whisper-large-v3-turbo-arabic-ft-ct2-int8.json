@@ -1,0 +1,26 @@
+{
+  "name": "whisper-large-v3-turbo-arabic-ft-ct2-int8",
+  "version": "1.0",
+  "short_description": "CTranslate2 **int8** build of `openai/whisper-large-v3-turbo` fine-tuned with QLoRA on a dialect-balanced Arabic mix (MSA + Egyptian + Levantine + Gulf). 820 MB on disk, designed to run at real-time...",
+  "full_description": "CTranslate2 **int8** build of `openai/whisper-large-v3-turbo` fine-tuned with QLoRA on a dialect-balanced Arabic mix (MSA + Egyptian + Levantine + Gulf). 820 MB on disk, designed to run at real-time on commodity CPU. This is the production-deployable artifact (model.bin + tokenizer + normalizer). For the float16/bf16 PyTorch version, see [`whisper-large-v3-turbo-arabic-ft`](https://huggingface.co/dev-ahmedhany/whisper-large-v3-turbo-arabic-ft); for the LoRA adapter (further fine-tuning), see [`whisper-large-v3-turbo-arabic-ft-lora`](https://huggingface.co/dev-ahmedhany/whisper-large-v3-turbo-arabic-ft-lora). **Note**: as of 2026-05, the `-lora` and `-ft` repos linked above contain the v1 weights (LoRA r=32) and the int8 here is the v2 (r=8) \u2014 which is the recipe that survives int8...",
+  "keywords": "ctranslate2, whisper, faster-whisper, arabic, multi-dialect, quantized, int8, automatic-speech-recognition, ar, model-index",
+  "author": "dev-ahmedhany",
+  "citation": "@misc{hany2026whisperarabic,\n  title        = {Production-Aware Fine-Tuning of Whisper Variants for Multi-Dialect\n                  Arabic ASR: A Cross-Platform CPU Inference Study},\n  author       = {Hany, Ahmed},\n  year         = {2026},\n  howpublished = {Preprint, arXiv (in preparation)},\n  url          = {https://github.com/dev-ahmedhany/whisper-arabic-dialects},\n}",
+  "input_type": "Audio",
+  "output_data": "transcribed text",
+  "foundational_model": "whisper-large-v3-turbo",
+  "category": "classification",
+  "documentation": "https://huggingface.co/dev-ahmedhany/whisper-large-v3-turbo-arabic-ft-ct2-int8",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "other",
+    "license": "apache-2.0",
+    "model_type": "dnn",
+    "version": "1.0",
+    "description": "CTranslate2 **int8** build of `openai/whisper-large-v3-turbo` fine-tuned with QLoRA on a dialect-balanced Arabic mix (MSA + Egyptian + Levantine + Gulf). 820 MB on disk, designed to run at real-time...",
+    "owner": "dev-ahmedhany",
+    "location": "https://huggingface.co/dev-ahmedhany/whisper-large-v3-turbo-arabic-ft-ct2-int8",
+    "name": "whisper-large-v3-turbo-arabic-ft-ct2-int8"
+  }
+}

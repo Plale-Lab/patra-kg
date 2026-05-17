@@ -1,0 +1,24 @@
+{
+  "_id": "621ffdd236468d709f1835cf",
+  "id": "huggingface/documentation-images",
+  "author": "huggingface",
+  "disabled": false,
+  "gated": false,
+  "lastModified": "2026-04-30T09:17:10.000Z",
+  "likes": 134,
+  "private": false,
+  "sha": "700a14b2df2a76a2c3a42e889923bcc96777c061",
+  "description": "\n\t\n\t\t\n\t\tThis dataset contains images used in the documentation of HuggingFace's libraries.\n\t\n\nHF Team: Please make sure you optimize the assets before uploading them.\nMy favorite tool for this is https://tinypng.com/.\n",
+  "downloads": 2679718,
+  "tags": [
+    "license:cc-by-nc-sa-4.0",
+    "size_categories:n<1K",
+    "format:imagefolder",
+    "modality:image",
+    "library:datasets",
+    "library:mlcroissant",
+    "region:us"
+  ],
+  "createdAt": "2022-03-02T23:29:22.000Z",
+  "key": ""
+}

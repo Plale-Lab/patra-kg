@@ -1,0 +1,20 @@
+%%{ init: { "sequence": { "mirrorActors": false } } }%%
+sequenceDiagram
+    participant HF as HuggingFace / GitHub
+    participant ING as Ingestion Service
+    participant LLM as LLM
+    participant EMB as Embedding Service
+    participant MC as Model Cards / Data Sheet Service
+
+    HF->>ING: Webhook (new model / update)
+    ING->>HF: Fetch README + metadata
+    HF-->>ING: Raw content
+    ING->>LLM: Extract structured fields
+    LLM-->>ING: Structured model card draft
+    ING->>EMB: Check for duplicates
+    EMB-->>ING: Similar existing cards
+    alt Duplicate found
+        ING->>MC: Update existing card
+    else New card
+        ING->>MC: Create model card / data sheet
+    end

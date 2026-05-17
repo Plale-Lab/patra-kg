@@ -1,0 +1,10 @@
+{
+  "title": "results",
+  "description": "The MTEB results dataset contains evaluation results for various text embedding models on the Massive Text Embedding Benchmark. It provides a comprehensive comparison of different models' performance on a wide range of tasks. The dataset can be used to identify the most suitable models for specific NLP applications. It is useful for researchers and practitioners looking to benchmark their models against existing state-of-the-art.",
+  "subjects": "NLP, text embedding, benchmark, evaluation",
+  "creator": "mteb",
+  "publisher": "arXiv",
+  "resource_type": "Text embedding benchmark results",
+  "resource_type_general": "Dataset",
+  "publication_year": "2024"
+}

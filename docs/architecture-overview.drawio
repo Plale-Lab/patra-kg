@@ -1,0 +1,257 @@
+<mxfile host="app.diagrams.net" modified="2026-04-17" type="device">
+  <diagram name="Patra Architecture" id="patra-arch">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Patra Web App                          -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="grp_webapp" value="Patra Web App" style="rounded=1;whiteSpace=wrap;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="200" height="380" as="geometry"/>
+        </mxCell>
+        <mxCell id="explore" value="Read / Write Records" style="rounded=1;whiteSpace=wrap;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="55" y="80" width="170" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="ask" value="Ask Patra&#xa;(Chat Bot)" style="rounded=1;whiteSpace=wrap;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="55" y="150" width="170" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="mcp_ex" value="MCP Explorer" style="rounded=1;whiteSpace=wrap;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="55" y="225" width="170" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="exper_tab" value="Experiments" style="rounded=1;whiteSpace=wrap;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="55" y="295" width="170" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Patra Backend                          -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="grp_backend" value="Patra Backend" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;fontColor=#4285f4;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="280" height="960" as="geometry"/>
+        </mxCell>
+
+        <!-- MCP Service -->
+        <mxCell id="mcp_svc" value="MCP Service" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="200" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Model Cards & Data Sheets group -->
+        <mxCell id="grp_mcds" value="Model Cards &amp; Data Sheets" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#4285f4;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="340" y="155" width="240" height="195" as="geometry"/>
+        </mxCell>
+        <mxCell id="read_svc" value="Read Service" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="185" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="write_svc" value="Write Service" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="240" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="aug_svc" value="🤖 Data Augmentation" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="295" width="200" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- RAG Service group -->
+        <mxCell id="grp_rag" value="RAG Service" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#4285f4;dashed=1;dashPattern=8 4;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="340" y="380" width="240" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="query_proc" value="Query Processing" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="410" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="ans_gen" value="🤖 Answer Generation" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="465" width="200" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Schema Discovery Service group -->
+        <mxCell id="grp_schema" value="Schema Discovery Service" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#4285f4;dashed=1;dashPattern=8 4;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="340" y="550" width="240" height="310" as="geometry"/>
+        </mxCell>
+        <mxCell id="intent" value="🤖 Intent Schema" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="585" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="meta_disc" value="Metadata Discovery&#xa;(TF-IDF)" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="360" y="645" width="200" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="ds_assembly" value="Dataset Assembly" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="710" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="train_ready" value="Training Readiness" style="rounded=1;whiteSpace=wrap;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="770" width="200" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- PostgreSQL -->
+        <mxCell id="pg" value="PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#fef7e0;strokeColor=#f9ab00;strokeWidth=2;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="905" width="140" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Shared ICICLE Infrastructure           -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="grp_icicle" value="Shared ICICLE Infrastructure" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#ea4335;opacity=30;" vertex="1" parent="1">
+          <mxGeometry x="700" y="40" width="240" height="790" as="geometry"/>
+        </mxCell>
+
+        <!-- Embedding Service group -->
+        <mxCell id="grp_emb" value="Embedding Service" style="rounded=1;whiteSpace=wrap;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=12;fontColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="emb_api" value="Store / Retrieve" style="rounded=1;whiteSpace=wrap;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="740" y="110" width="160" height="38" as="geometry"/>
+        </mxCell>
+        <mxCell id="qdrant" value="Qdrant" style="shape=cylinder3;whiteSpace=wrap;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#fef7e0;strokeColor=#f9ab00;strokeWidth=2;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="163" width="130" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- HuggingFace / GitHub -->
+        <mxCell id="hf_gh" value="HuggingFace / GitHub" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="260" width="200" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ML Field Planner with CKN -->
+        <mxCell id="grp_mlfp" value="ML Field Planner" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#ea4335;opacity=60;" vertex="1" parent="1">
+          <mxGeometry x="720" y="340" width="200" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="ckn" value="CKN Broker" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="740" y="370" width="160" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- MLHub + FlexServ -->
+        <mxCell id="mlhub" value="MLHub + FlexServ" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="465" width="200" height="45" as="geometry"/>
+        </mxCell>
+        <!-- HARVEST -->
+        <mxCell id="harvest" value="HARVEST" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="540" width="200" height="45" as="geometry"/>
+        </mxCell>
+        <!-- AI Studio -->
+        <mxCell id="ai_studio" value="AI Studio" style="rounded=1;whiteSpace=wrap;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="615" width="200" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: Web App → Backend (to groups)  -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_explore_mcds" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="explore" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_ask_rag" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="ask" target="grp_rag" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_mcp_ex_mcp" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="mcp_ex" target="mcp_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_exper_mcds" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" source="exper_tab" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: ICICLE → Backend (to groups)   -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_mlhub_mcds" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" edge="1" source="mlhub" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_harvest_webapp" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="harvest" target="grp_webapp" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_aistudio_mcds" style="strokeColor=#1e1e1e;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" edge="1" source="ai_studio" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_hfgh_mcds" style="strokeColor=#868e96;strokeWidth=1;dashed=1;dashPattern=8 4;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="hf_gh" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: Backend internal (group level) -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_mcp_mcds" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="mcp_svc" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_mcp_rag" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="mcp_svc" target="grp_rag" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_schema_mcds" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="grp_schema" target="grp_mcds" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="705"/>
+              <mxPoint x="330" y="253"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: Internal pipelines (within groups) -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_query_ans" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="query_proc" target="ans_gen" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_intent_meta" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="intent" target="meta_disc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_meta_ds" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="meta_disc" target="ds_assembly" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_ds_train" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="ds_assembly" target="train_ready" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_aug_write" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="aug_svc" target="write_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: Backend → Embedding Service    -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_rag_emb" style="strokeColor=#e65100;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="grp_rag" target="grp_emb" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_mcds_emb" style="strokeColor=#e65100;strokeWidth=2;dashed=1;dashPattern=8 4;endArrow=block;endFill=1;exitX=1;exitY=0.9;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" edge="1" source="grp_mcds" target="grp_emb" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: Services → PostgreSQL          -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_mcds_pg" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="grp_mcds" target="pg" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_rag_pg" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="grp_rag" target="pg" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a_schema_pg" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;" edge="1" source="grp_schema" target="pg" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Arrows: ML Field Planner → PG          -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="a_mlfp_pg" style="strokeColor=#868e96;strokeWidth=1;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="grp_mlfp" target="pg" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- Legend                                  -->
+        <!-- ══════════════════════════════════════ -->
+        <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#cccccc;strokeWidth=1;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="200" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_title" value="Legend" style="text;fontSize=13;fontStyle=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="470" width="60" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_existing" value="" style="rounded=1;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="55" y="500" width="20" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_existing_text" value="Existing" style="text;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="85" y="498" width="60" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_planned" value="" style="rounded=1;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;dashed=1;dashPattern=8 4;" vertex="1" parent="1">
+          <mxGeometry x="55" y="528" width="20" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_planned_text" value="Planned" style="text;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="85" y="526" width="60" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_llm_text" value="🤖 = Uses LLM" style="text;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="55" y="556" width="100" height="20" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

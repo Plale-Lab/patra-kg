@@ -1,0 +1,23 @@
+{
+  "_id": "69f0f75cba2e95da8723aad4",
+  "id": "aryanshh/littercam-yolov9c",
+  "lastModified": "2026-05-01T07:33:01.000Z",
+  "likes": 0,
+  "private": false,
+  "downloads": 0,
+  "tags": [
+    "object-detection",
+    "yolov9",
+    "litter-detection",
+    "waste-detection",
+    "littercam",
+    "computer-vision",
+    "dataset:taco",
+    "dataset:openlittermap",
+    "license:apache-2.0",
+    "region:us"
+  ],
+  "pipeline_tag": "object-detection",
+  "createdAt": "2026-04-28T18:07:24.000Z",
+  "modelId": "aryanshh/littercam-yolov9c"
+}

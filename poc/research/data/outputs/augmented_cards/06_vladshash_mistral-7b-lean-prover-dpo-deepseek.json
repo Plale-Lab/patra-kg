@@ -1,0 +1,25 @@
+{
+  "name": "mistral-7B-lean-prover-dpo-deepseek",
+  "version": "1.0",
+  "short_description": "This model is a fine-tuned version of [formalmathatepfl/mistral-7B-v0.3-finetuned](https://huggingface.co/formalmathatepfl/mistral-7B-v0.3-finetuned).\nIt has been trained using...",
+  "full_description": "This model is a fine-tuned version of [formalmathatepfl/mistral-7B-v0.3-finetuned](https://huggingface.co/formalmathatepfl/mistral-7B-v0.3-finetuned).\nIt has been trained using [TRL](https://github.com/huggingface/trl). question = \"If you had a time machine, but could only go to the past or the future once and never return, which would you choose and why?\"\ngenerator = pipeline(\"text-generation\", model=\"VladShash/mistral-7B-lean-prover-dpo-deepseek\", device=\"cuda\")\noutput = generator([{\"role\": \"user\", \"content\": question}], max_new_tokens=128, return_full_text=False)[0]\nprint(output[\"generated_text\"])\n``` This model was trained with DPO, a method introduced in [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://huggingface.co/papers/2305.18290).",
+  "keywords": "transformers, mistral, text-generation, generated_from_trainer, dpo, trl",
+  "author": "VladShash",
+  "citation": "https://arxiv.org/abs/2305.18290",
+  "input_type": "Text",
+  "output_data": "generated text",
+  "foundational_model": "mistral-7B-v0.3-finetuned",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/VladShash/mistral-7B-lean-prover-dpo-deepseek",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "model_type": "llm",
+    "version": "1.0",
+    "description": "This model is a fine-tuned version of [formalmathatepfl/mistral-7B-v0.3-finetuned](https://huggingface.co/formalmathatepfl/mistral-7B-v0.3-finetuned).\nIt has been trained using...",
+    "owner": "VladShash",
+    "location": "https://huggingface.co/VladShash/mistral-7B-lean-prover-dpo-deepseek",
+    "name": "mistral-7B-lean-prover-dpo-deepseek"
+  }
+}

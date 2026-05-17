@@ -1,0 +1,74 @@
+{
+  "name": "en_child_mlm_42_english8192",
+  "author": "Haerim",
+  "model_type": "llm",
+  "license": null,
+  "inference_software_dependencies": null,
+  "pretraining_datasets": null,
+  "keywords": [
+    "transformers",
+    "roberta",
+    "fill-mask",
+    "generated_from_trainer"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "TextClassification",
+    "FillMask",
+    "TextGeneration"
+  ],
+  "inference_hardware": {
+    "accelerators": [
+      {
+        "accelerator_type": "A100",
+        "cores": null,
+        "memory_gb": 80,
+        "system_requirements": []
+      }
+    ],
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 80
+  },
+  "inference_max_energy_consumption_watts": 253,
+  "inference_max_latency_ms": 95,
+  "inference_min_throughput": 10,
+  "inference_max_memory_usage_mb": 81920,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": false,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "predicted token",
+      "shape": null
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "text",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": false,
+  "slimmed": false,
+  "supports_quantization": null,
+  "annotations": {
+    "source": "Patra card and README"
+  },
+  "training_distributed": null,
+  "pruned": false,
+  "finetuning_datasets": [],
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

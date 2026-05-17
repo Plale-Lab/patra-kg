@@ -34,14 +34,11 @@ services:
         condition: service_healthy
     environment:
       PORT: 8000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-patra}:${POSTGRES_PASSWORD:-patra-dev-password}@postgres:5432/${POSTGRES_DB:-patra}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-patra}:${POSTGRES_PASSWORD:-patra-dev-password}@postgres:5432/${POSTGRES_DB:-patra}}
       PATRA_ASSET_INGEST_KEYS_JSON: '{"org-a":"change-me"}'
+      ENABLE_DOMAIN_EXPERIMENTS: ${ENABLE_DOMAIN_EXPERIMENTS:-true}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
-    volumes:
-      - ../../src:/app/src:ro
-      - ../../PATRA:/app/PATRA
-      - ./rest_server:/app/rest_server:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
       interval: 30s
@@ -74,6 +71,7 @@ services:
       postgres:
         condition: service_healthy
 
+# Uncomment to enable external network for CKN integration:
 networks:
   ckn-network:
     external: true

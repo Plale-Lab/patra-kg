@@ -1,0 +1,103 @@
+%%{ init: { "flowchart": { "curve": "linear", "nodeSpacing": 60, "rankSpacing": 70, "padding": 20 } } }%%
+graph LR
+    %% ── Patra Web App ───────────────────────────
+    subgraph WebApp["Patra Web App"]
+        direction TB
+        EXPLORE["Read / Write Records"]
+        ASK["Ask Patra<br/>(Chat Bot)"]
+        MCP_EX["MCP Explorer"]
+        EXPER_TAB["Experiments"]
+    end
+
+    %% ── Patra Backend ───────────────────────────
+    subgraph Backend["Patra Backend"]
+        direction TB
+        MCP_SVC["MCP Service"]
+
+        subgraph MC_DS["Model Cards & Data Sheets"]
+            direction TB
+            READ_SVC["Read Service"]
+            WRITE_SVC["Write Service"]
+            AUG_SVC["🤖 Data Augmentation<br/>Service"]
+        end
+
+        subgraph RAG_SVC["RAG Service"]
+            direction TB
+            QUERY_PROC["Query Processing"]
+            ANS_GEN["🤖 Answer Generation"]
+        end
+        subgraph SCHEMA_SVC["Schema Discovery Service"]
+            direction TB
+            INTENT["🤖 Intent Schema"]
+            META_DISC["Metadata Discovery<br/>(TF-IDF)"]
+            DS_ASSEMBLY["Dataset Assembly"]
+            TRAIN_READY["Training Readiness"]
+        end
+        PG[("PostgreSQL")]
+    end
+
+    %% ── ICICLE Infra ────────────────────────────
+    subgraph ICICLE["Shared ICICLE Infrastructure"]
+        direction TB
+        subgraph EMB_SVC["Embedding Service"]
+            direction TB
+            EMB_API["Store / Retrieve"]
+            QDRANT[("Qdrant")]
+            EMB_API --> QDRANT
+        end
+        HF_GH["HuggingFace / GitHub"]
+        subgraph ML_FP["ML Field Planner"]
+            direction TB
+            CKN["CKN Broker"]
+        end
+        MLHub["MLHub + FlexServ"]
+        HARVEST["HARVEST"]
+        AI_STUDIO["AI Studio"]
+    end
+
+    %% ── Web App → Backend ───────────────────────
+    EXPLORE --> READ_SVC & WRITE_SVC
+    ASK --> QUERY_PROC
+    MCP_EX --> MCP_SVC
+    EXPER_TAB --> READ_SVC
+
+    %% ── ICICLE → Backend ────────────────────────
+    MLHub --> READ_SVC
+    HARVEST --> WebApp
+    AI_STUDIO --> READ_SVC
+    HF_GH -.-> AUG_SVC
+
+    %% ── Schema Discovery internal ───────────────
+    INTENT --> META_DISC --> DS_ASSEMBLY --> TRAIN_READY
+    META_DISC --> READ_SVC
+
+    %% ── Data Augmentation connections ────────────
+    AUG_SVC --> WRITE_SVC
+    AUG_SVC --> EMB_API
+
+    %% ── RAG pipeline ────────────────────────────
+    QUERY_PROC --> EMB_API
+    QUERY_PROC --> ANS_GEN
+
+    %% ── Backend internal ────────────────────────
+    MCP_SVC --> READ_SVC & QUERY_PROC
+    READ_SVC & WRITE_SVC & ANS_GEN --> PG
+    META_DISC --> PG
+
+    %% ── ML Field Planner → PG ────────────────────
+    ML_FP --> PG
+
+    %% ── Styles ──────────────────────────────────
+    classDef svc fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,color:#000
+    classDef db fill:#fef7e0,stroke:#f9ab00,stroke-width:2px,color:#000
+    classDef ext fill:#fce8e6,stroke:#ea4335,stroke-width:1px,color:#000
+    classDef client fill:#e6f4ea,stroke:#34a853,stroke-width:1px,color:#000
+    classDef planned fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,stroke-dasharray:5 5,color:#000
+    classDef embsvc fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+
+    class READ_SVC,WRITE_SVC,MCP_SVC svc
+    class PG,QDRANT db
+    class CKN,HF_GH,MLHub,ML_FP,HARVEST,AI_STUDIO ext
+    class EMB_API embsvc
+    class INTENT,META_DISC,DS_ASSEMBLY,TRAIN_READY,QUERY_PROC,ANS_GEN,AUG_SVC planned
+    class EXPLORE,ASK,MCP_EX,EXPER_TAB client

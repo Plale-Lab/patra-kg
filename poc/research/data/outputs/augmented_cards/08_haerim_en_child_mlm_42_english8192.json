@@ -1,0 +1,36 @@
+{
+  "name": "en_child_mlm_42_english8192",
+  "version": "1.0",
+  "short_description": "More information needed",
+  "full_description": "More information needed",
+  "keywords": "transformers, roberta, fill-mask, generated_from_trainer",
+  "author": "Haerim",
+  "input_type": "Text",
+  "output_data": "predicted token",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/Haerim/en_child_mlm_42_english8192",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "version": "1.0",
+    "description": "More information needed",
+    "owner": "Haerim",
+    "location": "https://huggingface.co/Haerim/en_child_mlm_42_english8192",
+    "name": "en_child_mlm_42_english8192"
+  },
+  "runtime": {
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.7692,
+      0.87519
+    ],
+    "expected_latency_ms": 35.0,
+    "typical_deployment_context": "Deployed on A100 hardware with medium inference cost and validated maturity.",
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 106.701,
+    "known_failure_modes": "Fails on non-text or non-English inputs, misclassifying labels."
+  }
+}

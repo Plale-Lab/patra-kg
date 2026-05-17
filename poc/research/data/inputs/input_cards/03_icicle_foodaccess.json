@@ -1,0 +1,87 @@
+{
+  "_id": "67a771b79cf69ce231370939",
+  "id": "ICICLE-AI/FoodAccessModel",
+  "private": true,
+  "library_name": "Mesa",
+  "tags": [
+    "Mesa",
+    "license:unknown",
+    "region:us"
+  ],
+  "downloads": 0,
+  "likes": 0,
+  "modelId": "ICICLE-AI/FoodAccessModel",
+  "author": "ICICLE-AI",
+  "sha": "6ecc199e3dc992c89388f35a54880f154b8790d1",
+  "lastModified": "2025-02-10T17:14:49.000Z",
+  "gated": false,
+  "disabled": false,
+  "model-index": null,
+  "cardData": {
+    "model_id": "FoodAccessModel",
+    "license": "unknown",
+    "library_name": "Mesa"
+  },
+  "siblings": [
+    {
+      "rfilename": ".gitattributes"
+    },
+    {
+      "rfilename": ".gitignore"
+    },
+    {
+      "rfilename": ".python-version"
+    },
+    {
+      "rfilename": "Dockerfile"
+    },
+    {
+      "rfilename": "README.md"
+    },
+    {
+      "rfilename": "constants.py"
+    },
+    {
+      "rfilename": "entrypoint.sh"
+    },
+    {
+      "rfilename": "food_access_model/abm/agent_visualization.py"
+    },
+    {
+      "rfilename": "food_access_model/abm/geo_model.py"
+    },
+    {
+      "rfilename": "food_access_model/abm/household.py"
+    },
+    {
+      "rfilename": "food_access_model/abm/store.py"
+    },
+    {
+      "rfilename": "food_access_model/api/helpers.py"
+    },
+    {
+      "rfilename": "food_access_model/api/routes.py"
+    },
+    {
+      "rfilename": "food_access_model/main.py"
+    },
+    {
+      "rfilename": "food_access_model/preprocessing/get_data.py"
+    },
+    {
+      "rfilename": "food_access_model/preprocessing/household_constants.py"
+    },
+    {
+      "rfilename": "pyproject.toml"
+    },
+    {
+      "rfilename": "run_local.py"
+    },
+    {
+      "rfilename": "uv.lock"
+    }
+  ],
+  "spaces": [],
+  "createdAt": "2025-02-08T15:01:11.000Z",
+  "usedStorage": 0
+}

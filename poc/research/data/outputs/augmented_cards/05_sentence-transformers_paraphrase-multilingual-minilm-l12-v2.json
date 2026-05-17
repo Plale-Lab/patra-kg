@@ -1,0 +1,37 @@
+{
+  "name": "paraphrase-multilingual-MiniLM-L12-v2",
+  "version": "1.0",
+  "short_description": "This is a [sentence-transformers](https://www.SBERT.net) model: It maps sentences & paragraphs to a 384 dimensional dense vector space and can be used for tasks like clustering or semantic search.",
+  "full_description": "This is a [sentence-transformers](https://www.SBERT.net) model: It maps sentences & paragraphs to a 384 dimensional dense vector space and can be used for tasks like clustering or semantic search. Using this model becomes easy when you have [sentence-transformers](https://www.SBERT.net) installed: Then you can use the model like this:",
+  "keywords": "sentence-transformers, pytorch, tf, onnx, openvino, bert, feature-extraction, sentence-similarity, transformers, multilingual, ar, bg, ca, cs, da",
+  "author": "sentence-transformers",
+  "citation": "https://arxiv.org/abs/1908.10084",
+  "input_type": "Text",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "license": "apache-2.0",
+    "version": "1.0",
+    "description": "This is a [sentence-transformers](https://www.SBERT.net) model: It maps sentences & paragraphs to a 384 dimensional dense vector space and can be used for tasks like clustering or semantic search.",
+    "owner": "sentence-transformers",
+    "location": "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "name": "paraphrase-multilingual-MiniLM-L12-v2"
+  },
+  "runtime": {
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.72342,
+      0.88596
+    ],
+    "expected_latency_ms": 55.0,
+    "typical_deployment_context": "Deployment on A100 hardware with high inference cost.",
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "high",
+    "expected_total_power_w": 194.529,
+    "known_failure_modes": "Mispredicts labels for images unrelated to text or multilingual content."
+  }
+}

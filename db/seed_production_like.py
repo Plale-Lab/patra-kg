@@ -241,9 +241,8 @@ async def seed():
             "datasheet_creators",
             "datasheets",
             "models",
-            "publishers",
+            "datasheet_publishers",
             "model_cards",
-            "dataset_schemas",
             "edge_devices",
             "users",
         ]
@@ -251,19 +250,18 @@ async def seed():
             await conn.execute(f"TRUNCATE TABLE {t} RESTART IDENTITY CASCADE")
         print("Truncated all tables.")
 
-        for _ in range(NUM_USERS):
+        for i in range(NUM_USERS):
             await conn.execute(
-                "INSERT INTO users (created_at, updated_at) VALUES ($1, $2)",
-                _NOW,
-                _NOW,
+                "INSERT INTO users (username) VALUES ($1)",
+                f"seeded-user-{i+1}",
             )
         print(f"Inserted {NUM_USERS} users.")
 
-        for _ in range(NUM_EDGE_DEVICES):
+        for i in range(NUM_EDGE_DEVICES):
             await conn.execute(
-                "INSERT INTO edge_devices (created_at, updated_at) VALUES ($1, $2)",
-                _NOW,
-                _NOW,
+                "INSERT INTO edge_devices (device_id, device_type) VALUES ($1, $2)",
+                f"seeded-device-{i+1}",
+                "jetson-nano",
             )
         print(f"Inserted {NUM_EDGE_DEVICES} edge devices.")
 
@@ -320,7 +318,7 @@ async def seed():
 
         for ds in DATASHEETS:
             publisher_id = await conn.fetchval(
-                "INSERT INTO publishers (name) VALUES ($1) RETURNING id",
+                "INSERT INTO datasheet_publishers (name) VALUES ($1) RETURNING id",
                 ds["publisher"],
             )
 

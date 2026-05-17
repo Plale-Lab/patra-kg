@@ -1,0 +1,19 @@
+{
+  "_id": "69f41876822a3b46ffee2887",
+  "id": "donaldsebleung/fashion-mnist-mlp",
+  "lastModified": "2026-05-01T04:40:51.000Z",
+  "likes": 0,
+  "private": false,
+  "downloads": 0,
+  "tags": [
+    "onnx",
+    "image-classification",
+    "en",
+    "dataset:zalando-datasets/fashion_mnist",
+    "license:apache-2.0",
+    "region:us"
+  ],
+  "pipeline_tag": "image-classification",
+  "createdAt": "2026-05-01T03:05:26.000Z",
+  "modelId": "donaldsebleung/fashion-mnist-mlp"
+}

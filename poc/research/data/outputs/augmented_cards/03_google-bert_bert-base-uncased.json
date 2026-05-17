@@ -1,0 +1,40 @@
+{
+  "name": "bert-base-uncased",
+  "version": "1.0",
+  "short_description": "BERT is a transformers model pretrained on a large corpus of English data in a self-supervised fashion. This means it\nwas pretrained on the raw texts only, with no humans labeling them in any way...",
+  "full_description": "BERT is a transformers model pretrained on a large corpus of English data in a self-supervised fashion. This means it\nwas pretrained on the raw texts only, with no humans labeling them in any way (which is why it can use lots of\npublicly available data) with an automatic process to generate inputs and labels from those texts. More precisely, it\nwas pretrained with two objectives: - Masked language modeling (MLM): taking a sentence, the model randomly masks 15% of the words in the input then run\n  the entire masked sentence through the model and has to predict the masked words. This is different from traditional\n  recurrent neural networks (RNNs) that usually see the words one after the other, or from autoregressive models like\n  GPT which internally masks the future tokens. It allows the...",
+  "keywords": "transformers, pytorch, tf, jax, rust, coreml, onnx, bert, fill-mask, exbert, en",
+  "author": "google-bert",
+  "citation": "https://arxiv.org/abs/1810.04805",
+  "input_data": "https://huggingface.co/datasets/bookcorpus, https://huggingface.co/datasets/wikipedia",
+  "input_type": "Text",
+  "output_data": "predicted token",
+  "category": "natural language processing",
+  "documentation": "https://huggingface.co/google-bert/bert-base-uncased",
+  "is_private": false,
+  "is_gated": false,
+  "ai_model": {
+    "framework": "pytorch",
+    "license": "apache-2.0",
+    "model_type": "dnn",
+    "version": "1.0",
+    "description": "BERT is a transformers model pretrained on a large corpus of English data in a self-supervised fashion. This means it\nwas pretrained on the raw texts only, with no humans labeling them in any way...",
+    "owner": "google-bert",
+    "location": "https://huggingface.co/google-bert/bert-base-uncased",
+    "name": "bert-base-uncased"
+  },
+  "runtime": {
+    "suggested_hardware": "A100",
+    "expected_f1_range": [
+      0.71052,
+      0.78078
+    ],
+    "expected_latency_ms": 27.0,
+    "typical_deployment_context": "Deployed on A100 hardware with validated maturity and medium inference cost.",
+    "deployment_maturity": "validated",
+    "recommended_min_ram_mb": 16384,
+    "inference_cost_class": "medium",
+    "expected_total_power_w": 113.704,
+    "known_failure_modes": "Mispredicts labels for non-text or non-English speech inputs."
+  }
+}

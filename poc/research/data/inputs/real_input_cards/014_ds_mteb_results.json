@@ -1,0 +1,19 @@
+{
+  "_id": "6689a6c741fcf83c027f8cd4",
+  "id": "mteb/results",
+  "author": "mteb",
+  "disabled": false,
+  "gated": false,
+  "lastModified": "2026-04-30T14:57:21.000Z",
+  "likes": 9,
+  "private": false,
+  "sha": "c75441ec9547ac5b4c589236adf6df318d03d334",
+  "citation": "@article{muennighoff2022mteb,\n  doi = {10.48550/ARXIV.2210.07316},\n  url = {https://arxiv.org/abs/2210.07316},\n  author = {Muennighoff, Niklas and Tazi, Nouamane and Magne, Lo{\\\"\\i}c and Reimers, Nils},\n  title = {MTEB: Massive Text Embedding Benchmark},\n  publisher = {arXiv},\n  journal={arXiv preprint arXiv:2210.07316},\n  year = {2022}\n}",
+  "description": "Results on MTEB",
+  "downloads": 1311860,
+  "tags": [
+    "region:us"
+  ],
+  "createdAt": "2024-07-06T20:19:19.000Z",
+  "key": ""
+}

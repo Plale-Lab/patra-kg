@@ -1,0 +1,11 @@
+{
+  "title": "banned-historical-archives",
+  "description": "The banned-historical-archives dataset contains historical documents and images, including raw files and configuration files, that have been either recorded or not yet recorded on the banned-historical-archives.github.io website. The dataset is organized into directories for recorded data, raw files, configuration files, and files yet to be recorded. Some related resources are stored in separate repositories. The dataset can be used for historical research and analysis.",
+  "subjects": "historical documents, images, archives",
+  "creator": "banned-historical-archives",
+  "publisher": "banned-historical-archives",
+  "resource_type": "Historical document and image dataset",
+  "resource_type_general": "Dataset",
+  "publication_year": "2023",
+  "format": "imagefolder"
+}

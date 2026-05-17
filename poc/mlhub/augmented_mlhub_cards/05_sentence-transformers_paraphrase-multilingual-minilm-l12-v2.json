@@ -1,0 +1,80 @@
+{
+  "name": "paraphrase-multilingual-MiniLM-L12-v2",
+  "author": "sentence-transformers",
+  "model_type": "dnn",
+  "license": "apache-2.0",
+  "inference_software_dependencies": null,
+  "pretraining_datasets": null,
+  "keywords": [
+    "sentence-transformers",
+    "pytorch",
+    "tf",
+    "onnx",
+    "openvino",
+    "bert",
+    "feature-extraction",
+    "sentence-similarity",
+    "transformers",
+    "multilingual",
+    "ar",
+    "bg",
+    "ca",
+    "cs",
+    "da"
+  ],
+  "libraries": [
+    "pytorch"
+  ],
+  "task_types": [
+    "TextClassification",
+    "FillMask",
+    "TextGeneration"
+  ],
+  "inference_hardware": {
+    "accelerators": null,
+    "architectures": null,
+    "cpus": null,
+    "disk_gb": null,
+    "memory_gb": 16
+  },
+  "inference_max_energy_consumption_watts": 206,
+  "inference_max_latency_ms": 28,
+  "inference_min_throughput": 35,
+  "inference_max_memory_usage_mb": 16384,
+  "inference_distributed": false,
+  "bias_evaluation_score": null,
+  "pretrained": true,
+  "quantization_aware": false,
+  "training_precision": null,
+  "training_time": null,
+  "model_outputs": [
+    {
+      "data_type": "float32",
+      "shape": [
+        384
+      ]
+    }
+  ],
+  "inference_precision": null,
+  "image": null,
+  "inference_max_compute_utilization_percentage": null,
+  "model_inputs": [
+    {
+      "data_type": "text",
+      "shape": null
+    }
+  ],
+  "training_max_energy_consumption_watts": null,
+  "edge_optimized": false,
+  "slimmed": true,
+  "supports_quantization": true,
+  "annotations": {
+    "provenance": "Patra card and README"
+  },
+  "training_distributed": null,
+  "pruned": false,
+  "finetuning_datasets": null,
+  "training_hardware": null,
+  "regulatory": [],
+  "multi_modal": false
+}

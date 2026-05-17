@@ -2,8 +2,8 @@
 --
 -- Row counts:
 --   model_cards: 10 (5 public, 5 private), models: 10, datasheets: 10
---   camera_trap_events: ~20, camera_trap_power: 3
---   digital_ag_events: 8, digital_ag_power: 2
+--   events: ~20, power_summary: 3
+--   events: 8, power_summary: 2
 --
 -- Usage:
 --   psql -d patra -f db/seed_synthetic_data.sql
@@ -11,16 +11,15 @@
 BEGIN;
 
 TRUNCATE TABLE
-  digital_ag_power,
-  digital_ag_events,
-  camera_trap_power,
-  camera_trap_events,
+  power_summary,
+  events,
+  power_summary,
+  events,
   experiment_images,
   experiments,
   raw_images,
   models,
   model_cards,
-  dataset_schemas,
   edge_devices,
   users
 RESTART IDENTITY CASCADE;
@@ -168,9 +167,9 @@ INSERT INTO datasheets (
   (2025, 'images', '45 GB', 'png', '1.0', true, NOW(), NOW());
 
 --------------------------------------------------------------------------------
--- 4. camera_trap_events  (flat table — mirrors Kafka oracle-events topic)
+-- 4. events  (flat table — mirrors Kafka oracle-events topic)
 --------------------------------------------------------------------------------
-INSERT INTO camera_trap_events (
+INSERT INTO events (
   uuid, image_count, image_name, ground_truth,
   image_receiving_timestamp, image_scoring_timestamp, image_store_delete_time,
   image_decision, model_id, label, probability, flattened_scores,
@@ -282,9 +281,9 @@ INSERT INTO camera_trap_events (
    2, 2, 2, 2, 0, 0, 1.00000, 1.00000, 1.00000, 0.75600, 0.89100, 0.78900);
 
 --------------------------------------------------------------------------------
--- 5. camera_trap_power  (flat table — mirrors Kafka power-summary topic)
+-- 5. power_summary  (flat table — mirrors Kafka power-summary topic)
 --------------------------------------------------------------------------------
-INSERT INTO camera_trap_power (
+INSERT INTO power_summary (
   experiment_id,
   image_generating_plugin_cpu_power_consumption,
   image_generating_plugin_gpu_power_consumption,
@@ -300,9 +299,9 @@ INSERT INTO camera_trap_power (
   ('yolov9-wildlife-survey', 15.6700, 22.3400, 3.4500, 1.2300, 25.8900, 67.4500, 45.0100, 91.0200);
 
 --------------------------------------------------------------------------------
--- 6. digital_ag_events  (flat table — digital agriculture domain)
+-- 6. events  (flat table — digital agriculture domain)
 --------------------------------------------------------------------------------
-INSERT INTO digital_ag_events (
+INSERT INTO events (
   uuid, image_count, image_name, ground_truth,
   image_receiving_timestamp, image_scoring_timestamp, image_store_delete_time,
   image_decision, model_id, label, probability, flattened_scores,
@@ -370,9 +369,9 @@ INSERT INTO digital_ag_events (
    4, 4, 3, 3, 1, 0, 0.75000, 1.00000, 0.85714, 0.71500, 0.83200, 0.72400);
 
 --------------------------------------------------------------------------------
--- 7. digital_ag_power  (flat table — digital agriculture power data)
+-- 7. power_summary  (flat table — digital agriculture power data)
 --------------------------------------------------------------------------------
-INSERT INTO digital_ag_power (
+INSERT INTO power_summary (
   experiment_id,
   image_generating_plugin_cpu_power_consumption,
   image_generating_plugin_gpu_power_consumption,

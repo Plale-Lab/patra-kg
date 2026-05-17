@@ -1,0 +1,32 @@
+{
+  "_id": "621ffdc036468d709f174338",
+  "id": "google-bert/bert-base-uncased",
+  "likes": 2639,
+  "private": false,
+  "downloads": 59153489,
+  "tags": [
+    "transformers",
+    "pytorch",
+    "tf",
+    "jax",
+    "rust",
+    "coreml",
+    "onnx",
+    "safetensors",
+    "bert",
+    "fill-mask",
+    "exbert",
+    "en",
+    "dataset:bookcorpus",
+    "dataset:wikipedia",
+    "arxiv:1810.04805",
+    "license:apache-2.0",
+    "endpoints_compatible",
+    "deploy:azure",
+    "region:us"
+  ],
+  "pipeline_tag": "fill-mask",
+  "library_name": "transformers",
+  "createdAt": "2022-03-02T23:29:04.000Z",
+  "modelId": "google-bert/bert-base-uncased"
+}

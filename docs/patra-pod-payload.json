@@ -1,0 +1,53 @@
+{
+  "pod_id": "patra",
+  "image": "plalelab/patra-frontend",
+  "template": "",
+  "description": "",
+  "environment_variables": {},
+  "secret_map": {},
+  "status_requested": "ON",
+  "volume_mounts": {},
+  "time_to_stop_default": 43200,
+  "networking": {
+    "default": {
+      "protocol": "http",
+      "port": 80,
+      "url": "patra.pods.icicleai.tapis.io",
+      "ip_allow_list": [],
+      "tapis_auth": false,
+      "tapis_auth_response_headers": {},
+      "tapis_auth_allowed_users": [
+        "AUTHORIZED_USERS"
+      ],
+      "tapis_auth_return_path": "/",
+      "tapis_auth_excluded_paths": [],
+      "tapis_auth_excluded_path_regex": [],
+      "cors_allow_origins": [],
+      "cors_allow_methods": [],
+      "cors_allow_headers": [],
+      "cors_allow_credentials": false,
+      "cors_max_age": 100,
+      "tapis_ui_uri": "",
+      "tapis_ui_uri_redirect": false,
+      "tapis_ui_uri_description": "",
+      "proxy_compression": true,
+      "proxy_compression_encodings": [
+        "zstd",
+        "br",
+        "gzip"
+      ],
+      "proxy_compression_excluded_content_types": [],
+      "proxy_compression_min_response_body_bytes": 1024
+    }
+  },
+  "resources": {
+    "cpu_request": 250,
+    "cpu_limit": 2000,
+    "mem_request": 256,
+    "mem_limit": 3072,
+    "ephemeral_storage_request": -1,
+    "ephemeral_storage_limit": -1,
+    "gpus": 0
+  },
+  "compute_queue": "default"
+}

@@ -21,9 +21,21 @@ PRIVATE_MC_IDS = [6, 7, 8, 9, 10]
 ALL_MC_IDS = list(range(1, 11))
 
 
+def uuid_for_id(i: int) -> str:
+    """Deterministic test UUID for a given integer id (well-formed v4 shape)."""
+    return f"00000000-0000-4000-8000-{i:012d}"
+
+
+PUBLIC_MC_UUIDS = [uuid_for_id(i) for i in PUBLIC_MC_IDS]
+PRIVATE_MC_UUIDS = [uuid_for_id(i) for i in PRIVATE_MC_IDS]
+ALL_MC_UUIDS = [uuid_for_id(i) for i in ALL_MC_IDS]
+_MC_ID_BY_UUID = {uuid_for_id(i): i for i in ALL_MC_IDS}
+
+
 def _mc_row(mc_id: int, private: bool) -> dict:
     return {
         "id": mc_id,
+        "uuid": uuid_for_id(mc_id),
         "name": f"Model {mc_id}",
         "category": "classification",
         "author": "tester",
@@ -101,10 +113,15 @@ PUBLIC_MC_ROWS = sorted(
 PUBLIC_DS_IDENTIFIERS = list(range(1, 6))
 PRIVATE_DS_IDENTIFIERS = list(range(6, 11))
 
+PUBLIC_DS_UUIDS = [uuid_for_id(i) for i in PUBLIC_DS_IDENTIFIERS]
+PRIVATE_DS_UUIDS = [uuid_for_id(i) for i in PRIVATE_DS_IDENTIFIERS]
+_DS_IDENT_BY_UUID = {uuid_for_id(i): i for i in PUBLIC_DS_IDENTIFIERS + PRIVATE_DS_IDENTIFIERS}
+
 
 def _ds_row(ident: int, private: bool) -> dict:
     return {
         "identifier": ident,
+        "uuid": uuid_for_id(ident),
         "publication_year": 2024,
         "resource_type": "images",
         "resource_type_general": "Dataset",
@@ -112,7 +129,6 @@ def _ds_row(ident: int, private: bool) -> dict:
         "format": "jpeg",
         "version": "1.0",
         "is_private": private,
-        "dataset_schema_id": None,
         # First title / creator / subject used in summary endpoint
         "summary_title": f"Dataset {ident}",
         "summary_creator": "tester",
@@ -133,7 +149,7 @@ def _deployment_rows(model_id: int) -> list[dict]:
     return [
         {
             "experiment_id": model_id * 100 + 1,
-            "device_id": 501,
+            "device_id": f"device-{model_id}",
             "timestamp": datetime(2026, 3, 1, 12, 0, tzinfo=timezone.utc),
             "status": "completed",
             "precision": Decimal("0.91"),
@@ -258,6 +274,7 @@ def _make_mock_pool():
             return [
                 {
                     "identifier": r["identifier"],
+                    "uuid": r["uuid"],
                     "title": r["summary_title"],
                     "creator": r["summary_creator"],
                     "category": r["summary_category"],
@@ -330,15 +347,14 @@ def _make_mock_pool():
                     "model_id": mc_id,
                 }
             return None
-        if "FROM model_cards" in query and "WHERE id = $1" in query and args:
-            raw = args[0]
-            mc_id = int(raw) if isinstance(raw, str) and raw.isdigit() else raw
-            if isinstance(mc_id, int) and mc_id in ALL_MC_IDS:
+        if "FROM model_cards" in query and "WHERE uuid = $1" in query and args:
+            mc_id = _MC_ID_BY_UUID.get(str(args[0]))
+            if mc_id is not None:
                 return _mc_detail_row(mc_id, mc_id in PRIVATE_MC_IDS)
             return None
         if "FROM datasheets d" in query and args:
-            ident = args[0]
-            if ident in PUBLIC_DS_IDENTIFIERS or ident in PRIVATE_DS_IDENTIFIERS:
+            ident = _DS_IDENT_BY_UUID.get(str(args[0]))
+            if ident is not None:
                 private = ident in PRIVATE_DS_IDENTIFIERS
                 return _ds_detail_row(ident, private)
             return None
@@ -347,6 +363,10 @@ def _make_mock_pool():
     async def _fetchval(query: str, *args):
         if query.strip() == "SELECT 1":
             return 1
+        if "SELECT id FROM model_cards WHERE uuid = $1" in query and args:
+            return _MC_ID_BY_UUID.get(str(args[0]))
+        if "SELECT identifier FROM datasheets WHERE uuid = $1" in query and args:
+            return _DS_IDENT_BY_UUID.get(str(args[0]))
         return None
 
     conn.fetch = _fetch
